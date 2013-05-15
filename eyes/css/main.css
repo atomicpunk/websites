@@ -1,0 +1,85 @@
+/*
+ * Copyright (c) 2012, Todd Brandt.
+ *
+ * This program is licensed under the terms and conditions of the 
+ * Apache License, version 2.0.  The full text of the Apache License is at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
+
+/* -------------------------------- global ----------------------------- */
+
+body {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+    background: white;
+}
+
+a {
+    outline: none;
+    text-decoration: none;
+}
+
+#main_page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 1080px;
+    width: 1920px;
+    background: url(../images/background.jpg) no-repeat;
+}
+
+#lefteye {
+    position: absolute;
+    top: 173px;
+    left: 677px;
+    height: 77px;
+    width: 103px;
+    background-image: url(../images/lefteye.png);
+    -webkit-animation: lefteye_anim 30s linear infinite;
+}
+
+@-webkit-keyframes lefteye_anim {
+    0% { background-image:url(../images/lefteye.png);}
+    16.67% { background-image:url(../images/lefteye_blue.png);}
+    33.33% { background-image:url(../images/lefteye_violet.png);}
+    50% { background-image:url(../images/lefteye_red.png);}
+    66.67% { background-image:url(../images/lefteye_orange.png);}
+    83.33% { background-image:url(../images/lefteye_yellow.png);}
+    100% { background-image:url(../images/lefteye.png);}
+}
+
+.red #lefteye {background-image: url(../images/lefteye_red.png);}
+.orange #lefteye {background-image: url(../images/lefteye_orange.png);}
+.yellow #lefteye {background-image: url(../images/lefteye_yellow.png);}
+.green #lefteye {background-image: url(../images/lefteye_green.png);}
+.blue #lefteye {background-image: url(../images/lefteye_blue.png);}
+.violet #lefteye {background-image: url(../images/lefteye_violet.png);}
+
+#righteye {
+    position: absolute;
+    top: 163px;
+    left: 1192px;
+    height: 75px;
+    width: 105px;
+    background-image: url(../images/righteye.png);
+    -webkit-animation: righteye_anim 30s linear infinite;
+}
+
+@-webkit-keyframes righteye_anim {
+    0% { background-image:url(../images/righteye.png);}
+    16.67% { background-image:url(../images/righteye_blue.png);}
+    33.33% { background-image:url(../images/righteye_violet.png);}
+    50% { background-image:url(../images/righteye_red.png);}
+    66.67% { background-image:url(../images/righteye_orange.png);}
+    83.33% { background-image:url(../images/righteye_yellow.png);}
+    100% { background-image:url(../images/righteye.png);}
+}
+
+.red #righteye {background-image: url(../images/righteye_red.png);}
+.orange #righteye {background-image: url(../images/righteye_orange.png);}
+.yellow #righteye {background-image: url(../images/righteye_yellow.png);}
+.green #righteye {background-image: url(../images/righteye_green.png);}
+.blue #righteye {background-image: url(../images/righteye_blue.png);}
+.violet #righteye {background-image: url(../images/righteye_violet.png);}
