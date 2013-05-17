@@ -36,6 +36,7 @@ a {
     left: 677px;
     height: 77px;
     width: 103px;
+    background-repeat: no-repeat;
     background-image: url(../images/lefteye.png);
     -webkit-animation: lefteye_anim 30s linear infinite;
 }
@@ -63,6 +64,7 @@ a {
     left: 1192px;
     height: 75px;
     width: 105px;
+    background-repeat: no-repeat;
     background-image: url(../images/righteye.png);
     -webkit-animation: righteye_anim 30s linear infinite;
 }
@@ -83,3 +85,80 @@ a {
 .green #righteye {background-image: url(../images/righteye_green.png);}
 .blue #righteye {background-image: url(../images/righteye_blue.png);}
 .violet #righteye {background-image: url(../images/righteye_violet.png);}
+
+#lips {
+    position: absolute;
+    top: 703px;
+    left: 790px;
+    height: 160px;
+    width: 400px;
+    background-repeat: no-repeat;
+    background-image: url(../images/lips.png);
+    -webkit-animation: lips_anim 60s linear infinite;
+    opacity: 0.6;
+}
+
+@-webkit-keyframes lips_anim {
+    0% { background-image:url(../images/lips.png);}
+    50% { background-image:url(../images/lips_red.png);}
+    100% { background-image:url(../images/lips.png);}
+}
+
+.red #lips {background-image: url(../images/lips_red.png);}
+.orange #lips {background-image: url(../images/lips_orange.png);}
+.yellow #lips {background-image: url(../images/lips_yellow.png);}
+.green #lips {background-image: url(../images/lips_green.png);}
+.blue #lips {background-image: url(../images/lips_blue.png);}
+.violet #lips {background-image: url(../images/lips_violet.png);}
+
+#hair_right {
+    position: absolute;
+    top: 0px;
+    left: 1403px;
+    height: 1080px;
+    width: 517px;
+    background-repeat: no-repeat;
+    background-image: url(../images/hair_right.png);
+    -webkit-animation: hair_right_anim 60s linear infinite;
+    opacity: 0.5;
+}
+
+@-webkit-keyframes hair_right_anim {
+    0% { background-image:url(../images/hair_right.png);}
+    16.67% { background-image:url(../images/hair_right_copper.png);}
+    33.33% { background-image:url(../images/hair_right_red.png);}
+    50% { background-image:url(../images/hair_right_violet.png);}
+    66.67% { background-image:url(../images/hair_right_red.png);}
+    83.33% { background-image:url(../images/hair_right_copper.png);}
+    100% { background-image:url(../images/hair_right.png);}
+}
+
+.red #hair_right {background-image: url(../images/hair_right_red.png);}
+.orange #hair_right {background-image: url(../images/hair_right_orange.png);}
+.yellow #hair_right {background-image: url(../images/hair_right_yellow.png);}
+.green #hair_right {background-image: url(../images/hair_right_green.png);}
+.blue #hair_right {background-image: url(../images/hair_right_blue.png);}
+.violet #hair_right {background-image: url(../images/hair_right_violet.png);}
+
+#hair_left {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 1080px;
+    width: 752px;
+    background-repeat: no-repeat;
+    background-image: url(../images/hair_left.png);
+    -webkit-animation: hair_left_anim 60s linear infinite;
+    opacity: 0.5;
+}
+
+@-webkit-keyframes hair_left_anim {
+    0% { background-image:url(../images/hair_left.png);}
+    16.67% { background-image:url(../images/hair_left_copper.png);}
+    33.33% { background-image:url(../images/hair_left_red.png);}
+    50% { background-image:url(../images/hair_left_violet.png);}
+    66.67% { background-image:url(../images/hair_left_red.png);}
+    83.33% { background-image:url(../images/hair_left_copper.png);}
+    100% { background-image:url(../images/hair_left.png);}
+}
+
