@@ -12,6 +12,7 @@ function Photo() {
             usercomment += String.fromCharCode(uc[i]);
         }
         var e = document.getElementById("caption");
+        console.log(usercomment);
         e.innerText = usercomment;
     }
 
@@ -19,7 +20,7 @@ function Photo() {
     {
         if(location.search.indexOf("?image=") != 0)
             return;
-        self.file = "photos/"+location.search.substr(7);
+        self.file = location.search.substr(7);
         var e = document.getElementById("photoview");
         e.innerHTML = '<center><img src="'+self.file+'" width="96%" exif="true"/></center>';
         var aImages = document.getElementsByTagName("img");
@@ -27,6 +28,8 @@ function Photo() {
         {
             if(aImages[i].getAttribute("src") == self.file)
             {
+                console.log("calling EXIF.getData("+self.file+")");
+                aImages[i].complete = false;
                 EXIF.getData(aImages[i], exifDone);
                 break;
             }
@@ -35,3 +38,9 @@ function Photo() {
 
     init();
 }
+
+window.addEventListener('load', function () {
+    "use strict";
+    var main = new Photo();
+});
+

@@ -1,9 +1,4 @@
-function Photo() {
-    "use strict";
-
-    var self = this;
-
-    function exifDone(oImg)
+function exifDone(oImg)
     {
         var uc = oImg.exifdata.UserComment;
         var usercomment = "";
@@ -35,3 +30,9 @@ function Photo() {
 
     init();
 }
+
+window.addEventListener('load', function () {
+    "use strict";
+    var main = new Photo();
+});
+

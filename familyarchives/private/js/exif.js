@@ -317,7 +317,7 @@ function getImageData(oImg, fncCallback)
 		function(oHTTP) {
 			var oEXIF = findEXIFinJPEG(oHTTP.binaryResponse);
 			oImg.exifdata = oEXIF || {};
-			if (fncCallback) fncCallback();
+			if (fncCallback) fncCallback(oImg);
 		}
 	)
 }
@@ -611,8 +611,4 @@ EXIF.loadAllImages = function()
 	}
 }
 
-//addEvent(window, "load", loadAllImages); 
-
 })();
-
-
