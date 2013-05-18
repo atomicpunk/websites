@@ -1,0 +1,3 @@
+index.html
+sudo delfilecat /dev/sdb1 23136456704 1000
+
