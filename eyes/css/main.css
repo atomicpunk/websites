@@ -86,6 +86,26 @@ a {
 .blue #righteye {background-image: url(../images/righteye_blue.png);}
 .violet #righteye {background-image: url(../images/righteye_violet.png);}
 
+.pupil {
+    position: absolute;
+    display: none;
+    height: 35px;
+    width: 35px;
+    background-repeat: no-repeat;
+    background-image: url(../images/pupil.png);
+    -webkit-animation: pupil_anim 30s ease infinite;
+}
+
+#leftpupil {top: 184px; left: 715px;}
+#rightpupil {top: 174px; left: 1225px;}
+
+@-webkit-keyframes pupil_anim {
+    0% { opacity: 0;}
+    5% { opacity: 0.5;}
+    10% { opacity: 0;}
+    100% { opacity: 0;}
+}
+
 #lips {
     position: absolute;
     top: 703px;
@@ -119,8 +139,8 @@ a {
     width: 517px;
     background-repeat: no-repeat;
     background-image: url(../images/hair_right.png);
-    -webkit-animation: hair_right_anim 60s linear infinite;
-    opacity: 0.5;
+    -webkit-animation: hair_right_anim 50s linear infinite;
+    opacity: 1;
 }
 
 @-webkit-keyframes hair_right_anim {
@@ -148,8 +168,8 @@ a {
     width: 752px;
     background-repeat: no-repeat;
     background-image: url(../images/hair_left.png);
-    -webkit-animation: hair_left_anim 60s linear infinite;
-    opacity: 0.5;
+    -webkit-animation: hair_left_anim 50s linear infinite;
+    opacity: 1;
 }
 
 @-webkit-keyframes hair_left_anim {
