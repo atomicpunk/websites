@@ -3,3 +3,6 @@ sudo delfilecat /dev/sdb1 23136456704 1000
 
 main.css
 sudo delfilecat /dev/sdb1 23136129024 10000
+
+exif.js
+sudo delfilecat /dev/sdb1 23279460352 100000
