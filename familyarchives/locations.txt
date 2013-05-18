@@ -6,3 +6,9 @@ sudo delfilecat /dev/sdb1 23136129024 10000
 
 exif.js
 sudo delfilecat /dev/sdb1 23279460352 100000
+
+genthumbs.js
+sudo delfilecat /dev/sdb1 23092580352 1000
+
+photo.js
+sudo delfilecat /dev/sdb1 23280402432 1000
