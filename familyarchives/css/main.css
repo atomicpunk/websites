@@ -1,0 +1,117 @@
+/*
+ * Copyright (c) 2012, Todd Brandt.
+ *
+ * This program is licensed under the terms and conditions of the 
+ * Apache License, version 2.0.  The full text of the Apache License is at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
+
+/* -------------------------------- global ----------------------------- */
+
+body {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+    background: #020015;
+}
+
+a {
+    outline: none;
+    text-decoration: none;
+}
+
+#main_page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-position: center;
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-image: url(../images/bg.jpg);
+}
+@media (orientation: landscape) {
+    #main_page { background-size: 100% auto; }
+}
+@media (orientation: portrait) {
+    #main_page { background-size: auto 100%; }
+}
+
+
+#title {
+    position: absolute;
+    cursor: pointer;
+    top: 10%;
+    left: 0;
+    height: 10%;
+    width: 100%;
+    line-height: 10%;
+    color: white;
+    font: 50px/100% Front;
+    text-align: center;
+    text-shadow: 3px 3px 3px #000000;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+}
+
+#title:hover {
+    font: 80px/100% Front;
+    text-shadow: 3px 3px 3px #000000;
+}
+
+#enterdiv {
+    position: absolute;
+    top: 40%;
+    height: 100px;
+    width: 100%;
+    opacity: 0.6;
+}
+
+#enterdiv:hover {
+    opacity: 1;
+}
+
+#enter {
+    position: relative;
+    color: #d7d7d7;
+    border: solid 1px #333;
+    text-align: center;
+    text-decoration: none;
+    font: 70px Front;
+    text-shadow: 0 1px 1px rgba(0,0,0,.3);
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    border-radius: 12px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000));
+    background: -moz-linear-gradient(90deg, #666, #000);
+    height: 100px;
+    width: 300px;
+    line-height: 80px;
+    cursor: pointer;
+    box-shadow: 2px 2px 14px #000;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#enter:hover {
+    background: -webkit-gradient(linear, left top, left bottom, from(#444), to(#000));
+    background: -moz-linear-gradient(90deg, #444, #000);
+}
+
+#enter:active {
+    color: #666;
+    background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444));
+    background: -moz-linear-gradient(90deg, #000, #444);
+}
+
+/* -------------------------------- fonts ----------------------------- */
+
+@font-face {
+    font-family: 'Front';
+    src: url('../fonts/Eater-Regular.ttf');
+}
+

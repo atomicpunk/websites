@@ -1,3 +1,5 @@
 index.html
 sudo delfilecat /dev/sdb1 23136456704 1000
 
+main.css
+sudo delfilecat /dev/sdb1 23136129024 10000
