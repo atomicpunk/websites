@@ -27,12 +27,14 @@
         if(navigator.appName.search("Microsoft") >= 0)
         {
             var e = document.getElementById("main_page");
-            e.innerHTML = '<center><h1>' +
+            e.style.color = "black";
+            e.style.background = "white";
+            e.innerHTML = '<center><h1><br><br><br>' +
                 'Microsoft Internet Explorer is Not Supported<br>' +
                 'Please download firefox or chrome<br>' +
-                '<a href="http://www.mozilla.org/en-US/firefox/new/">Download Firefox</a><br>' +
-                '<a href="https://www.google.com/intl/en/chrome/browser/">Download Google Chrome</a><br>' +
-                '<a href="http://download-chromium.appspot.com/">Download Chromium</a><br>';
+                '<a style="color: red" href="http://www.mozilla.org/en-US/firefox/new/">Download Firefox</a><br>' +
+                '<a style="color: red" href="https://www.google.com/intl/en/chrome/browser/">Download Google Chrome</a><br>' +
+                '<a style="color: red" href="http://download-chromium.appspot.com/">Download Chromium</a><br>';
         }
     </script>
 </body>
