@@ -29,6 +29,9 @@ body {
 }
 
 #photoview {
+    position: absolute;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
 }
@@ -42,11 +45,10 @@ body {
 }
 
 #leftside {
-    position: absolute;
     top: 0;
-    left: 0;
+    float: left;
     height: 100%;
-    width: 5%;
+    width: 100px;
     opacity: 0.5;
    -webkit-transition: all 0.4s;
    -moz-transition: all 0.4s;
@@ -56,11 +58,10 @@ body {
 }
 
 #rightside {
-    position: absolute;
+    float: right;
     top: 0;
-    left: 95%;
     height: 100%;
-    width: 5%;
+    width: 100px;
     opacity: 0.5;
    -webkit-transition: all 0.4s;
    -moz-transition: all 0.4s;
@@ -91,6 +92,16 @@ body {
 }
 #prevbtn:active {
     background: url(../left_down.png) no-repeat;
+}
+
+img {
+    height: 100%;
+    width: auto;
+}
+
+img.wide {
+    height: auto;
+    width: 100%;
 }
 
 /* -------------------------------- fonts ----------------------------- */
