@@ -555,7 +555,6 @@ function readEXIFData(oFile, iStart, iLength)
 
 EXIF.getData = function(oImg, fncCallback) 
 {
-	if (!oImg.complete) return false;
 	if (!imageHasData(oImg)) {
 		getImageData(oImg, fncCallback);
 	} else {

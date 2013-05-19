@@ -13,24 +13,41 @@ body {
     margin: 0px;
     height: 100%;
     width: 100%;
-    background: #533f36;
+    background: white;
 }
 
-img { 
-   border:1px solid #533f36;
+#main_page {
+    width: 100%;
+    margin-left: 4px;
+    margin-right: auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+.thumb {
+   position: relative;
+   float: left;
+   padding-left: 8px;
+   padding-top: 8px;
+   height: 150px;
+   width: 150px;
+   box-shadow: 8px 8px 20px black;
    -webkit-transition: all 0.5s;
    -moz-transition: all 0.5s;
 }
 
-img:hover {
-   border:1px solid #fafafa;
+.thumb:hover {
+   background: rgba(178, 178, 255, 0.6);
+   box-shadow: 8px 8px 20px rgb(128, 128, 255);
 }
 
-img:active {
-   border:1px solid #fa8888;
+.thumb:active {
+   background: rgba(255, 178, 178, 0.6);
+   box-shadow: 8px 8px 20px rgb(255, 128, 128);
    -webkit-transition: all 0s;
    -moz-transition: all 0s;
 }
+
 
 /* -------------------------------- fonts ----------------------------- */
 

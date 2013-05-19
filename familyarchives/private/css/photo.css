@@ -1,0 +1,101 @@
+/*
+ * Copyright (c) 2012, Todd Brandt.
+ *
+ * This program is licensed under the terms and conditions of the 
+ * Apache License, version 2.0.  The full text of the Apache License is at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
+
+/* -------------------------------- global ----------------------------- */
+
+body {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+    background: #f7dcc1;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+#main_page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+#photoview {
+    height: 100%;
+    width: 100%;
+}
+
+#caption {
+    display: none;
+    margin: 1%;
+    height: 8%;
+    width: 98%;
+    text-align: center;
+}
+
+#leftside {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 5%;
+    opacity: 0.5;
+   -webkit-transition: all 0.4s;
+   -moz-transition: all 0.4s;
+}
+#leftside:hover {
+    opacity: 1;
+}
+
+#rightside {
+    position: absolute;
+    top: 0;
+    left: 95%;
+    height: 100%;
+    width: 5%;
+    opacity: 0.5;
+   -webkit-transition: all 0.4s;
+   -moz-transition: all 0.4s;
+}
+#rightside:hover {
+    opacity: 1;
+}
+
+#nextbtn {
+    position: relative;
+    float: left;
+    top: 45%;
+    width: 45px;
+    height: 84px;
+    background: url(../right_up.png) no-repeat;
+}
+#nextbtn:active {
+    background: url(../right_down.png) no-repeat;
+}
+
+#prevbtn {
+    position: relative;
+    float: right;
+    top: 45%;
+    width: 45px;
+    height: 84px;
+    background: url(../left_up.png) no-repeat;
+}
+#prevbtn:active {
+    background: url(../left_down.png) no-repeat;
+}
+
+/* -------------------------------- fonts ----------------------------- */
+
+@font-face {
+    font-family: 'Front';
+    src: url('../fonts/primary.ttf');
+}
