@@ -32,7 +32,7 @@ a {
     background-position: center;
     background-size: auto 100%;
     background-repeat: no-repeat;
-    background-image: url(../images/bg.jpg);
+    background-image: url(../familyarchives/images/bg.jpg);
     -webkit-user-select: none;
     -moz-user-select: none;
 }
@@ -57,7 +57,7 @@ a {
     margin-left: auto;
     margin-right: auto;
     opacity: 0;
-    background-image: url(../images/brandtengineering.jpg);
+    background-image: url(../familyarchives/images/brandtengineering.jpg);
     -webkit-transition: opacity 1s;
     -moz-transition: opacity 1s;
     border: 2px solid white;
@@ -149,5 +149,5 @@ a:active {
 
 @font-face {
     font-family: 'Front';
-    src: url('../../fonts/primary.ttf');
+    src: url('../fonts/primary.ttf');
 }
