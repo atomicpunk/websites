@@ -10,13 +10,23 @@ function Photo() {
             return;
         self.loadImage(location.search.substr(7));
 
-        document.getElementById("prevbtn").addEventListener('click', function () {
-            self.prev();
-        });
-
-        document.getElementById("nextbtn").addEventListener('click', function () {
-            self.next();
-        });
+        if (!window.addEventListener) {
+            document.getElementById("prevbtn").attachEvent("onclick", function () {
+                self.prev();
+            });
+            document.getElementById("nextbtn").attachEvent("onclick", function () {
+                self.next();
+            });
+        }
+        else
+        {
+            document.getElementById("prevbtn").addEventListener('click', function () {
+                self.prev();
+            });
+            document.getElementById("nextbtn").addEventListener('click', function () {
+                self.next();
+            });
+        }
     }
 
     init();
@@ -52,7 +62,13 @@ Photo.prototype.exifDone = function(oImg) {
     e.innerText = usercomment;
 }
 
-window.addEventListener('load', function () {
-    "use strict";
-    var main = new Photo();
-});
+if (!window.addEventListener) {
+    window.attachEvent("onclick", function () {
+        var main = new Photo();
+    });
+} else {
+    window.addEventListener('load', function () {
+        "use strict";
+        var main = new Photo();
+    });
+}

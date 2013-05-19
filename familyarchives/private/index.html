@@ -9,8 +9,21 @@
 </head>
 <body>
     <div id="main_page">
+<center><h1>Please wait, loading images...</h1></center>
     </div>
     <script src="js/photolist.js"></script>
     <script src="js/main.js"></script>
+    <script type="text/javascript">
+        if(navigator.appName.search("Microsoft") >= 0)
+        {
+            var e = document.getElementById("main_page");
+            e.innerHTML = '<center><h1>' +
+                'Microsoft Internet Explorer is Not Supported<br>' +
+                'Please download firefox or chrome<br>' +
+                '<a href="http://www.mozilla.org/en-US/firefox/new/">Download Firefox</a><br>' +
+                '<a href="https://www.google.com/intl/en/chrome/browser/">Download Google Chrome</a><br>' +
+                '<a href="http://download-chromium.appspot.com/">Download Chromium</a><br>';
+        }
+    </script>
 </body>
 </html>
