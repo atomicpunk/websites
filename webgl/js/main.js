@@ -1,3 +1,6 @@
+var myWidth = 0;
+var myHeight = 0;
+
 function WebGl() {
     "use strict";
 
@@ -6,8 +9,20 @@ function WebGl() {
 
     function init()
     {
-        var canvas = document.getElementById("main");
-        initGL(canvas);
+        var canvas = document.getElementById("main_canvas");
+        canvas.width = myWidth;
+        canvas.height = myHeight;
+        try {
+            gl = canvas.getContext("experimental-webgl");
+            gl.viewportWidth = canvas.width;
+            gl.viewportHeight = canvas.height;
+        } catch (e) {}
+
+        if (!gl) {
+            alert("Could not initialise WebGL");
+            return;
+        }
+
         initShaders();
         initBuffers();
         initTexture();
@@ -20,18 +35,6 @@ function WebGl() {
         document.onmousemove = handleMouseMove;
 
         tick();
-    }
-
-    function initGL(canvas) {
-        try {
-            gl = canvas.getContext("experimental-webgl");
-            gl.viewportWidth = canvas.width;
-            gl.viewportHeight = canvas.height;
-        } catch (e) {
-        }
-        if (!gl) {
-            alert("Could not initialise WebGL, sorry :-(");
-        }
     }
 
     function getShader(gl, id) {
@@ -118,16 +121,16 @@ function WebGl() {
     }
 
 
-    var moonTexture;
+    var earthTexture;
 
     function initTexture() {
-        moonTexture = gl.createTexture();
-        moonTexture.image = new Image();
-        moonTexture.image.onload = function () {
-            handleLoadedTexture(moonTexture)
+        earthTexture = gl.createTexture();
+        earthTexture.image = new Image();
+        earthTexture.image.onload = function () {
+            handleLoadedTexture(earthTexture)
         }
 
-        moonTexture.image.src = "images/moon.gif";
+        earthTexture.image.src = "images/earth_day.jpg";
     }
 
 
@@ -168,8 +171,8 @@ function WebGl() {
     var lastMouseX = null;
     var lastMouseY = null;
 
-    var moonRotationMatrix = mat4.create();
-    mat4.identity(moonRotationMatrix);
+    var earthRotationMatrix = mat4.create();
+    mat4.identity(earthRotationMatrix);
 
     function handleMouseDown(event) {
         mouseDown = true;
@@ -198,18 +201,16 @@ function WebGl() {
         var deltaY = newY - lastMouseY;
         mat4.rotate(newRotationMatrix, degToRad(deltaY / 10), [1, 0, 0]);
 
-        mat4.multiply(newRotationMatrix, moonRotationMatrix, moonRotationMatrix);
+        mat4.multiply(newRotationMatrix, earthRotationMatrix, earthRotationMatrix);
 
         lastMouseX = newX
         lastMouseY = newY;
     }
 
-
-
-    var moonVertexPositionBuffer;
-    var moonVertexNormalBuffer;
-    var moonVertexTextureCoordBuffer;
-    var moonVertexIndexBuffer;
+    var earthVertexPositionBuffer;
+    var earthVertexNormalBuffer;
+    var earthVertexTextureCoordBuffer;
+    var earthVertexIndexBuffer;
 
     function initBuffers() {
         var latitudeBands = 30;
@@ -261,31 +262,30 @@ function WebGl() {
             }
         }
 
-        moonVertexNormalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexNormalBuffer);
+        earthVertexNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexNormalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
-        moonVertexNormalBuffer.itemSize = 3;
-        moonVertexNormalBuffer.numItems = normalData.length / 3;
+        earthVertexNormalBuffer.itemSize = 3;
+        earthVertexNormalBuffer.numItems = normalData.length / 3;
 
-        moonVertexTextureCoordBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
+        earthVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexTextureCoordBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordData), gl.STATIC_DRAW);
-        moonVertexTextureCoordBuffer.itemSize = 2;
-        moonVertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
+        earthVertexTextureCoordBuffer.itemSize = 2;
+        earthVertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
 
-        moonVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexPositionBuffer);
+        earthVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexPositionBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
-        moonVertexPositionBuffer.itemSize = 3;
-        moonVertexPositionBuffer.numItems = vertexPositionData.length / 3;
+        earthVertexPositionBuffer.itemSize = 3;
+        earthVertexPositionBuffer.numItems = vertexPositionData.length / 3;
 
-        moonVertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
+        earthVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, earthVertexIndexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STATIC_DRAW);
-        moonVertexIndexBuffer.itemSize = 1;
-        moonVertexIndexBuffer.numItems = indexData.length;
+        earthVertexIndexBuffer.itemSize = 1;
+        earthVertexIndexBuffer.numItems = indexData.length;
     }
-
 
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -293,7 +293,7 @@ function WebGl() {
 
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
 
-        var lighting = true;
+        var lighting = false;
         var acolor = [0.2, 0.2, 0.2];
         var dcolor = [0.8, 0.8, 0.8];
         var lightingDirection = [-1.0, -1.0, -1.0];
@@ -313,24 +313,24 @@ function WebGl() {
 
         mat4.translate(mvMatrix, [0, 0, -6]);
 
-        mat4.multiply(mvMatrix, moonRotationMatrix);
+        mat4.multiply(mvMatrix, earthRotationMatrix);
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, moonTexture);
+        gl.bindTexture(gl.TEXTURE_2D, earthTexture);
         gl.uniform1i(shaderProgram.samplerUniform, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, moonVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, earthVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, moonVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexTextureCoordBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, earthVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexNormalBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, moonVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexNormalBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, earthVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, earthVertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, moonVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, earthVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
     }
 
 
@@ -342,10 +342,41 @@ function WebGl() {
     init();
 }
 
+function setWindowSize() {
+    if (typeof (window.innerWidth) == 'number') {
+        myWidth = window.innerWidth;
+        myHeight = window.innerHeight;
+    } else {
+        if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+            myWidth = document.documentElement.clientWidth;
+            myHeight = document.documentElement.clientHeight;
+        } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+            myWidth = document.body.clientWidth;
+            myHeight = document.body.clientHeight;
+        } else {
+            myWidth = document.width;
+            myHeight = document.height;
+        }
+    }
+}
+
+var webgl;
+var busy = false;
 if(window.addEventListener)
 {
     window.addEventListener('load', function () {
         "use strict";
-        var main = new WebGl();
+        busy = true;
+        setWindowSize();
+        webgl = new WebGl();
+        setTimeout(function(){busy = false;},1000);
+    });
+    window.addEventListener('resize', function () {
+        "use strict";
+        if(busy) return;
+        busy = true;
+        setWindowSize();
+        webgl = new WebGl();
+        setTimeout(function(){busy = false;},1000);
     });
 }
