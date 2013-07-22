@@ -108,7 +108,6 @@ function WebGl() {
         shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
     }
 
-
     function handleLoadedTexture(texture) {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -116,10 +115,8 @@ function WebGl() {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
-
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
-
 
     var earthTexture;
 
@@ -129,10 +126,8 @@ function WebGl() {
         earthTexture.image.onload = function () {
             handleLoadedTexture(earthTexture)
         }
-
         earthTexture.image.src = "images/earth_day.jpg";
     }
-
 
     var mvMatrix = mat4.create();
     var mvMatrixStack = [];
@@ -161,11 +156,9 @@ function WebGl() {
         gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
     }
 
-
     function degToRad(degrees) {
         return degrees * Math.PI / 180;
     }
-
 
     var mouseDown = false;
     var lastMouseX = null;
@@ -180,11 +173,9 @@ function WebGl() {
         lastMouseY = event.clientY;
     }
 
-
     function handleMouseUp(event) {
         mouseDown = false;
     }
-
 
     function handleMouseMove(event) {
         if (!mouseDown) {
@@ -297,6 +288,7 @@ function WebGl() {
         var acolor = [0.2, 0.2, 0.2];
         var dcolor = [0.8, 0.8, 0.8];
         var lightingDirection = [-1.0, -1.0, -1.0];
+
         gl.uniform1i(shaderProgram.useLightingUniform, lighting);
         if (lighting) {
             gl.uniform3f(shaderProgram.ambientColorUniform,
@@ -310,9 +302,7 @@ function WebGl() {
         }
 
         mat4.identity(mvMatrix);
-
         mat4.translate(mvMatrix, [0, 0, -6]);
-
         mat4.multiply(mvMatrix, earthRotationMatrix);
 
         gl.activeTexture(gl.TEXTURE0);
@@ -332,7 +322,6 @@ function WebGl() {
         setMatrixUniforms();
         gl.drawElements(gl.TRIANGLES, earthVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
     }
-
 
     function tick() {
         requestAnimFrame(tick);
