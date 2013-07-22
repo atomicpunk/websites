@@ -166,6 +166,24 @@ function SphereData(gl, imgfile, radius) {
     init();
 }
 
+SphereData.prototype.draw = function(gl, shaderProgram) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, this.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
+    gl.drawElements(gl.TRIANGLES, this.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+}
+
 function WebGl() {
     "use strict";
 
@@ -388,47 +406,17 @@ function WebGl() {
         mat4.identity(mvMatrix);
         mat4.translate(mvMatrix, [0, 0, zval]);
         mat4.multiply(mvMatrix, povRotationMatrix);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, earthdata.texture);
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthdata.vertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, earthdata.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthdata.vertexTextureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, earthdata.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthdata.vertexNormalBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, earthdata.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, earthdata.vertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, earthdata.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-
+        earthdata.draw(gl, shaderProgram);
 
         gl.uniform1i(shaderProgram.useLightingUniform, false);
         mat4.identity(mvMatrix);
         mat4.translate(mvMatrix, [0, 0, 0]);
         mat4.multiply(mvMatrix, povRotationMatrix);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, stardata.texture);
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, stardata.vertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, stardata.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, stardata.vertexTextureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, stardata.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, stardata.vertexNormalBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, stardata.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, stardata.vertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, stardata.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+        stardata.draw(gl, shaderProgram);
     }
 
     function tick() {
