@@ -1,11 +1,117 @@
 var myWidth = 0;
 var myHeight = 0;
 
+function SphereData(gl, imgfile, radius) {
+    "use strict";
+
+    var self = this;
+    this.vertexPositionBuffer = null;
+    this.vertexNormalBuffer = null;
+    this.vertexTextureCoordBuffer = null;
+    this.vertexIndexBuffer = null;
+    this.texture = null;
+
+    function initTexture() {
+        self.texture = gl.createTexture();
+        self.texture.image = new Image();
+        self.texture.image.onload = function () {
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+            gl.bindTexture(gl.TEXTURE_2D, self.texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self.texture.image);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.bindTexture(gl.TEXTURE_2D, null);
+        }
+        self.texture.image.src = imgfile;
+    }
+
+    function init() {
+        var latitudeBands = 30;
+        var longitudeBands = 30;
+
+        var vertexPositionData = [];
+        var normalData = [];
+        var textureCoordData = [];
+        for (var latNumber=0; latNumber <= latitudeBands; latNumber++) {
+            var theta = latNumber * Math.PI / latitudeBands;
+            var sinTheta = Math.sin(theta);
+            var cosTheta = Math.cos(theta);
+
+            for (var longNumber=0; longNumber <= longitudeBands; longNumber++) {
+                var phi = longNumber * 2 * Math.PI / longitudeBands;
+                var sinPhi = Math.sin(phi);
+                var cosPhi = Math.cos(phi);
+
+                var x = cosPhi * sinTheta;
+                var y = cosTheta;
+                var z = sinPhi * sinTheta;
+                var u = 1 - (longNumber / longitudeBands);
+                var v = 1 - (latNumber / latitudeBands);
+
+                normalData.push(x);
+                normalData.push(y);
+                normalData.push(z);
+                textureCoordData.push(u);
+                textureCoordData.push(v);
+                vertexPositionData.push(radius * x);
+                vertexPositionData.push(radius * y);
+                vertexPositionData.push(radius * z);
+            }
+        }
+
+        var indexData = [];
+        for (var latNumber=0; latNumber < latitudeBands; latNumber++) {
+            for (var longNumber=0; longNumber < longitudeBands; longNumber++) {
+                var first = (latNumber * (longitudeBands + 1)) + longNumber;
+                var second = first + longitudeBands + 1;
+                indexData.push(first);
+                indexData.push(second);
+                indexData.push(first + 1);
+
+                indexData.push(second);
+                indexData.push(second + 1);
+                indexData.push(first + 1);
+            }
+        }
+
+        self.vertexNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, self.vertexNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
+        self.vertexNormalBuffer.itemSize = 3;
+        self.vertexNormalBuffer.numItems = normalData.length / 3;
+
+        self.vertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, self.vertexTextureCoordBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordData), gl.STATIC_DRAW);
+        self.vertexTextureCoordBuffer.itemSize = 2;
+        self.vertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
+
+        self.vertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, self.vertexPositionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+        self.vertexPositionBuffer.itemSize = 3;
+        self.vertexPositionBuffer.numItems = vertexPositionData.length / 3;
+
+        self.vertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.vertexIndexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STATIC_DRAW);
+        self.vertexIndexBuffer.itemSize = 1;
+        self.vertexIndexBuffer.numItems = indexData.length;
+
+        initTexture();
+    }
+
+    init();
+}
+
 function WebGl() {
     "use strict";
 
     var self = this;
     var gl;
+    var earthdata = null;
+    var stardata = null;
 
     function init()
     {
@@ -24,8 +130,8 @@ function WebGl() {
         }
 
         initShaders();
-        initBuffers();
-        initTexture();
+        earthdata = new SphereData(gl, "images/earth_day.jpg", 2);
+        stardata = new SphereData(gl, "images/stars.jpg", 70);
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -109,27 +215,6 @@ function WebGl() {
         shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
     }
 
-    function handleLoadedTexture(texture) {
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-    }
-
-    var earthTexture;
-
-    function initTexture() {
-        earthTexture = gl.createTexture();
-        earthTexture.image = new Image();
-        earthTexture.image.onload = function () {
-            handleLoadedTexture(earthTexture)
-        }
-        earthTexture.image.src = "images/earth_day.jpg";
-    }
-
     var mvMatrix = mat4.create();
     var mvMatrixStack = [];
     var pMatrix = mat4.create();
@@ -209,86 +294,6 @@ function WebGl() {
             zval -= 0.1
     }
 
-    var earthVertexPositionBuffer;
-    var earthVertexNormalBuffer;
-    var earthVertexTextureCoordBuffer;
-    var earthVertexIndexBuffer;
-
-    function initBuffers() {
-        var latitudeBands = 30;
-        var longitudeBands = 30;
-        var radius = 2;
-
-        var vertexPositionData = [];
-        var normalData = [];
-        var textureCoordData = [];
-        for (var latNumber=0; latNumber <= latitudeBands; latNumber++) {
-            var theta = latNumber * Math.PI / latitudeBands;
-            var sinTheta = Math.sin(theta);
-            var cosTheta = Math.cos(theta);
-
-            for (var longNumber=0; longNumber <= longitudeBands; longNumber++) {
-                var phi = longNumber * 2 * Math.PI / longitudeBands;
-                var sinPhi = Math.sin(phi);
-                var cosPhi = Math.cos(phi);
-
-                var x = cosPhi * sinTheta;
-                var y = cosTheta;
-                var z = sinPhi * sinTheta;
-                var u = 1 - (longNumber / longitudeBands);
-                var v = 1 - (latNumber / latitudeBands);
-
-                normalData.push(x);
-                normalData.push(y);
-                normalData.push(z);
-                textureCoordData.push(u);
-                textureCoordData.push(v);
-                vertexPositionData.push(radius * x);
-                vertexPositionData.push(radius * y);
-                vertexPositionData.push(radius * z);
-            }
-        }
-
-        var indexData = [];
-        for (var latNumber=0; latNumber < latitudeBands; latNumber++) {
-            for (var longNumber=0; longNumber < longitudeBands; longNumber++) {
-                var first = (latNumber * (longitudeBands + 1)) + longNumber;
-                var second = first + longitudeBands + 1;
-                indexData.push(first);
-                indexData.push(second);
-                indexData.push(first + 1);
-
-                indexData.push(second);
-                indexData.push(second + 1);
-                indexData.push(first + 1);
-            }
-        }
-
-        earthVertexNormalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
-        earthVertexNormalBuffer.itemSize = 3;
-        earthVertexNormalBuffer.numItems = normalData.length / 3;
-
-        earthVertexTextureCoordBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexTextureCoordBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordData), gl.STATIC_DRAW);
-        earthVertexTextureCoordBuffer.itemSize = 2;
-        earthVertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
-
-        earthVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexPositionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
-        earthVertexPositionBuffer.itemSize = 3;
-        earthVertexPositionBuffer.numItems = vertexPositionData.length / 3;
-
-        earthVertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, earthVertexIndexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STATIC_DRAW);
-        earthVertexIndexBuffer.itemSize = 1;
-        earthVertexIndexBuffer.numItems = indexData.length;
-    }
-
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -317,21 +322,42 @@ function WebGl() {
         mat4.multiply(mvMatrix, earthRotationMatrix);
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, earthTexture);
+        gl.bindTexture(gl.TEXTURE_2D, earthdata.texture);
         gl.uniform1i(shaderProgram.samplerUniform, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, earthVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthdata.vertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, earthdata.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexTextureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, earthVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthdata.vertexTextureCoordBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, earthdata.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, earthVertexNormalBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, earthVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, earthdata.vertexNormalBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, earthdata.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, earthVertexIndexBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, earthdata.vertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, earthVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, earthdata.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+        mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, [0, 0, 0]);
+        mat4.multiply(mvMatrix, earthRotationMatrix);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, stardata.texture);
+        gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, stardata.vertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, stardata.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, stardata.vertexTextureCoordBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, stardata.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, stardata.vertexNormalBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, stardata.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, stardata.vertexIndexBuffer);
+        setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, stardata.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
     }
 
     function tick() {
