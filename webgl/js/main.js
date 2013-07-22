@@ -31,6 +31,7 @@ function WebGl() {
         gl.enable(gl.DEPTH_TEST);
 
         canvas.onmousedown = handleMouseDown;
+        canvas.onmousewheel = handleMouseWheel;
         document.onmouseup = handleMouseUp;
         document.onmousemove = handleMouseMove;
 
@@ -163,11 +164,14 @@ function WebGl() {
     var mouseDown = false;
     var lastMouseX = null;
     var lastMouseY = null;
+    var zval = -6.0
 
     var earthRotationMatrix = mat4.create();
     mat4.identity(earthRotationMatrix);
 
     function handleMouseDown(event) {
+        if(event.button != 0)
+            return;
         mouseDown = true;
         lastMouseX = event.clientX;
         lastMouseY = event.clientY;
@@ -196,6 +200,13 @@ function WebGl() {
 
         lastMouseX = newX
         lastMouseY = newY;
+    }
+    
+    function handleMouseWheel(event) {
+        if(event.wheelDelta > 0)
+            zval += 0.1
+        else
+            zval -= 0.1
     }
 
     var earthVertexPositionBuffer;
@@ -302,7 +313,7 @@ function WebGl() {
         }
 
         mat4.identity(mvMatrix);
-        mat4.translate(mvMatrix, [0, 0, -6]);
+        mat4.translate(mvMatrix, [0, 0, zval]);
         mat4.multiply(mvMatrix, earthRotationMatrix);
 
         gl.activeTexture(gl.TEXTURE0);
