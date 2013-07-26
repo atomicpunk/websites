@@ -1,12 +1,13 @@
 var myWidth = 0;
 var myHeight = 0;
+var sun = new Sun();
 
 function Sun() {
     "use strict";
 
     var self = this;
-    var days = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-    var sundec = [
+    this.days = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    this.sundec = [
         -23.1, -22.9, -22.9, -22.8, -22.7, -22.6, -22.4, -22.3, -22.2, -22.1,
         -21.9, -21.8, -21.6, -21.5, -21.3, -21.1, -20.9, -20.7, -20.5, -20.3,
         -20.1, -19.8, -19.6, -19.4, -19.2, -18.8, -18.6, -18.4, -18.1, -17.8,
@@ -41,25 +42,31 @@ function Sun() {
         -23.4, -23.4, -23.4, -23.3, -23.3, -23.2, -23.2, -23.1
     ];
     this.frontvector = [0, 0, 0];
+}
 
-    function sync() {
-        var date = new Date();
-        var day = days[date.getUTCMonth()] + date.getUTCDate();
-        var hour = date.getUTCHours();
-        var minute = date.getUTCMinutes();
-        var inc = (-1)*sundec[day]*Math.PI/180;
-        var azi = ((((60*hour)+minute))/1440)*2.0*Math.PI;
-        self.frontvector[0] = Math.cos(azi);
-        self.frontvector[1] = Math.tan(inc);
-        self.frontvector[2] = Math.sin(azi);
-    }
+Sun.prototype.sync = function() {
+    var date = new Date();
+    var day = this.days[date.getUTCMonth()] + date.getUTCDate();
+    var hour = date.getUTCHours();
+    var minute = date.getUTCMinutes();
+    var inc = this.sundec[day]*Math.PI/180;
+    var azi = ((((60*hour)+minute))/1440)*2.0*Math.PI;
+    this.frontvector[0] = Math.cos(azi);
+    this.frontvector[1] = Math.tan(inc);
+    this.frontvector[2] = Math.sin(azi);
+}
 
-    function init() {
-        sync();
-        window.setInterval(function() {sync();}, 60000);
-    }
+Sun.prototype.isNight = function(x, y, z, lat, lon) {
+    var x1 = x, y1 = y, z1 = z;
+    var x2 = this.frontvector[0], y2 = this.frontvector[1], z2 = this.frontvector[2];
+    var dotp = x1*x2 + y1*y2 + z1*z2;
+    var mag1 = Math.sqrt(x1*x1 + y1*y1 + z1*z1);
+    var mag2 = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
+    var a = Math.acos(dotp / (mag1 * mag2));
 
-    init();
+    if(a < Math.PI/2)
+        return false;
+    return true;
 }
 
 function SphereData(gl, imgfile, radius) {
@@ -71,6 +78,12 @@ function SphereData(gl, imgfile, radius) {
     this.vertexTextureCoordBuffer = null;
     this.vertexIndexBuffer = null;
     this.texture = null;
+
+    function init() {
+        initVectors(true);
+        initTexture();
+        window.setInterval(function() {initVectors(false);}, 60000);
+    }
 
     function initTexture() {
         self.texture = gl.createTexture();
@@ -87,9 +100,10 @@ function SphereData(gl, imgfile, radius) {
         self.texture.image.src = imgfile;
     }
 
-    function init() {
-        var latitudeBands = 30;
-        var longitudeBands = 30;
+    function initVectors(update) {
+        var latitudeBands = 180;
+        var longitudeBands = 360;
+        sun.sync();
 
         var vertexPositionData = [];
         var normalData = [];
@@ -107,8 +121,16 @@ function SphereData(gl, imgfile, radius) {
                 var x = cosPhi * sinTheta;
                 var y = cosTheta;
                 var z = sinPhi * sinTheta;
-                var u = 1 - (longNumber / longitudeBands);
                 var v = 1 - (latNumber / latitudeBands);
+                var u = 1 - (longNumber / longitudeBands);
+
+                if(imgfile == "images/earth.jpg") {
+                    u = (1 - (longNumber / longitudeBands))/2;
+                    var lat = ((latNumber*180)/latitudeBands) - 90;
+                    var lon = ((longNumber*180)/longitudeBands) - 180;
+                    if(sun.isNight(x, y, z, lat, lon))
+                        u += 0.5;
+                }
 
                 normalData.push(x);
                 normalData.push(y);
@@ -159,8 +181,6 @@ function SphereData(gl, imgfile, radius) {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STATIC_DRAW);
         self.vertexIndexBuffer.itemSize = 1;
         self.vertexIndexBuffer.numItems = indexData.length;
-
-        initTexture();
     }
 
     init();
@@ -192,7 +212,6 @@ function WebGl() {
     var earthdata = null;
     var stardata = null;
     var povRotationMatrix = mat4.create();
-    var sun = new Sun();
     var povAzi = Math.PI*(190/180);
     var povInc = Math.PI*(35/180);
 
@@ -217,7 +236,7 @@ function WebGl() {
         mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
         initShaders();
-        earthdata = new SphereData(gl, "images/earth_day.jpg", 2);
+        earthdata = new SphereData(gl, "images/earth.jpg", 2);
         stardata = new SphereData(gl, "images/stars.jpg", 70);
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -339,8 +358,7 @@ function WebGl() {
     var zval = -6.0
 
     function handleMouseDown(event) {
-        if(event.button != 0)
-            return;
+        if(event.button != 0) return;
         mouseDown = true;
         lastMouseX = event.clientX;
         lastMouseY = event.clientY;
