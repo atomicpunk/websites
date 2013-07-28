@@ -7,6 +7,8 @@ function Sun() {
 
     var self = this;
     this.days = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    this.inc = 0;
+    this.azi = 0;
     this.sundec = [
         -23.1, -22.9, -22.9, -22.8, -22.7, -22.6, -22.4, -22.3, -22.2, -22.1,
         -21.9, -21.8, -21.6, -21.5, -21.3, -21.1, -20.9, -20.7, -20.5, -20.3,
@@ -49,11 +51,11 @@ Sun.prototype.sync = function() {
     var day = this.days[date.getUTCMonth()] + date.getUTCDate();
     var hour = date.getUTCHours();
     var minute = date.getUTCMinutes();
-    var inc = this.sundec[day]*Math.PI/180;
-    var azi = ((((60*hour)+minute))/1440)*2.0*Math.PI;
-    this.frontvector[0] = Math.cos(azi);
-    this.frontvector[1] = Math.tan(inc);
-    this.frontvector[2] = Math.sin(azi);
+    this.inc = this.sundec[day]*Math.PI/180;
+    this.azi = ((((60*hour)+minute))/1440)*2.0*Math.PI;
+    this.frontvector[0] = Math.cos(this.azi);
+    this.frontvector[1] = Math.tan(this.inc);
+    this.frontvector[2] = Math.sin(this.azi);
 }
 
 Sun.prototype.isNight = function(x, y, z, lat, lon) {
@@ -231,6 +233,7 @@ function WebGl() {
             return;
         }
 
+        sun.sync();
         mat4.identity(povRotationMatrix);
         mat4.rotate(povRotationMatrix, povAzi, [0, 1, 0]);
         mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
@@ -414,7 +417,7 @@ function WebGl() {
             gl.uniform3f(shaderProgram.ambientColorUniform,
                          acolor[0], acolor[1], acolor[2]);
             var adjustedLD = vec3.create();
-            vec3.normalize(sun.frontvector, adjustedLD);
+            vec3.normalize(sun.frontvector + povRotationMatrix, adjustedLD);
             vec3.scale(adjustedLD, -1);
             gl.uniform3fv(shaderProgram.lightingDirectionUniform, adjustedLD);
             gl.uniform3f(shaderProgram.directionalColorUniform,
