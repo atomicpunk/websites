@@ -79,30 +79,31 @@ function SphereData(gl, imgfile, radius) {
     this.vertexNormalBuffer = null;
     this.vertexTextureCoordBuffer = null;
     this.vertexIndexBuffer = null;
-    this.texture = null;
+    this.texture = [];
 
     function init() {
-        initVectors(true);
-        initTexture();
-        window.setInterval(function() {initVectors(false);}, 60000);
+        initVectors();
+        for(var i = 0; i < imgfile.length; i++)
+            initTexture(i);
+        window.setInterval(function() {initVectors();}, 60000);
     }
 
-    function initTexture() {
-        self.texture = gl.createTexture();
-        self.texture.image = new Image();
-        self.texture.image.onload = function () {
+    function initTexture(idx) {
+        self.texture[idx] = gl.createTexture();
+        self.texture[idx].image = new Image();
+        self.texture[idx].image.onload = function () {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-            gl.bindTexture(gl.TEXTURE_2D, self.texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self.texture.image);
+            gl.bindTexture(gl.TEXTURE_2D, self.texture[idx]);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self.texture[idx].image);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
             gl.generateMipmap(gl.TEXTURE_2D);
             gl.bindTexture(gl.TEXTURE_2D, null);
         }
-        self.texture.image.src = imgfile;
+        self.texture[idx].image.src = imgfile[idx];
     }
 
-    function initVectors(update) {
+    function initVectors() {
         var latitudeBands = 180;
         var longitudeBands = 360;
         sun.sync();
@@ -110,12 +111,14 @@ function SphereData(gl, imgfile, radius) {
         var vertexPositionData = [];
         var normalData = [];
         var textureCoordData = [];
+        var indexData = [];
+
         for (var latNumber=0; latNumber <= latitudeBands; latNumber++) {
             var theta = latNumber * Math.PI / latitudeBands;
             var sinTheta = Math.sin(theta);
             var cosTheta = Math.cos(theta);
 
-            for (var longNumber=0; longNumber <= longitudeBands; longNumber++) {
+            for (var longNumber=0; longNumber < longitudeBands; longNumber++) {
                 var phi = longNumber * 2 * Math.PI / longitudeBands;
                 var sinPhi = Math.sin(phi);
                 var cosPhi = Math.cos(phi);
@@ -123,40 +126,40 @@ function SphereData(gl, imgfile, radius) {
                 var x = cosPhi * sinTheta;
                 var y = cosTheta;
                 var z = sinPhi * sinTheta;
-                var v = 1 - (latNumber / latitudeBands);
-                var u = 1 - (longNumber / longitudeBands);
-
-                if(imgfile == "images/earth_small.jpg") {
-                    u = (1 - (longNumber / longitudeBands))/2;
-                    var lat = ((latNumber*180)/latitudeBands) - 90;
-                    var lon = ((longNumber*180)/longitudeBands) - 180;
-                    if(sun.isNight(x, y, z, lat, lon))
-                        u += 0.5;
-                }
-
                 normalData.push(x);
                 normalData.push(y);
                 normalData.push(z);
-                textureCoordData.push(u);
-                textureCoordData.push(v);
                 vertexPositionData.push(radius * x);
                 vertexPositionData.push(radius * y);
                 vertexPositionData.push(radius * z);
-            }
-        }
 
-        var indexData = [];
-        for (var latNumber=0; latNumber < latitudeBands; latNumber++) {
-            for (var longNumber=0; longNumber < longitudeBands; longNumber++) {
-                var first = (latNumber * (longitudeBands + 1)) + longNumber;
-                var second = first + longitudeBands + 1;
-                indexData.push(first);
-                indexData.push(second);
-                indexData.push(first + 1);
+                var v = 1 - (latNumber / latitudeBands);
+                var u = 1 - (longNumber / longitudeBands);
 
-                indexData.push(second);
-                indexData.push(second + 1);
-                indexData.push(first + 1);
+                if(imgfile[0] == "images/earth_small.jpg") {
+                    u = (1 - (longNumber / longitudeBands))/2;
+                    var lat = ((latNumber*180)/latitudeBands) - 90;
+                    var lon = ((longNumber*180)/longitudeBands) - 180;
+                    if(sun.isNight(x, y, z, lat, lon)) {
+                        u += 0.5;
+                    }
+                }
+
+                textureCoordData.push(u);
+                textureCoordData.push(v);
+
+                if(latNumber < latitudeBands) {
+                    var uleft = (latNumber * longitudeBands) + longNumber;
+                    var lleft = uleft + longitudeBands;
+                    var uright = (latNumber * longitudeBands) + (longNumber + 1)%longitudeBands;
+                    var lright = uright + longitudeBands;
+                    indexData.push(uleft);
+                    indexData.push(uright);
+                    indexData.push(lleft);
+                    indexData.push(uright);
+                    indexData.push(lright);
+                    indexData.push(lleft);
+                }
             }
         }
 
@@ -190,7 +193,7 @@ function SphereData(gl, imgfile, radius) {
 
 SphereData.prototype.draw = function(gl, shaderProgram) {
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.bindTexture(gl.TEXTURE_2D, this.texture[0]);
     gl.uniform1i(shaderProgram.samplerUniform, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
@@ -239,8 +242,9 @@ function WebGl() {
         mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
         initShaders();
-        earthdata = new SphereData(gl, "images/earth_small.jpg", 2);
-        stardata = new SphereData(gl, "images/stars.jpg", 70);
+//        earthdata = new SphereData(gl, ["images/earth_day.jpg", "images/earth_night.jpg"], 2);
+        earthdata = new SphereData(gl, ["images/earth_small.jpg"], 2);
+        stardata = new SphereData(gl, ["images/stars.jpg"], 70);
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
