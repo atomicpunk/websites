@@ -44,6 +44,23 @@ function Sun() {
         -23.4, -23.4, -23.4, -23.3, -23.3, -23.2, -23.2, -23.1
     ];
     this.frontvector = [0, 0, 0];
+    this.latlon = [];
+    function init() {
+        for (var lat = 0; lat <= 180; lat++) {
+            self.latlon[lat] = [];
+            var theta = lat * Math.PI / 180;
+            var sinTheta = Math.sin(theta);
+            var cosTheta = Math.cos(theta);
+            for (var lon = 0; lon <= 360; lon++) {
+                var phi = lon * 2 * Math.PI / 360;
+                var x = Math.cos(phi) * sinTheta;
+                var y = cosTheta;
+                var z = Math.sin(phi) * sinTheta;
+                self.latlon[lat][lon] = { x: x, y: y, z: z };
+            }
+        }
+    }
+    init();
 }
 
 Sun.prototype.sync = function() {
@@ -58,8 +75,8 @@ Sun.prototype.sync = function() {
     this.frontvector[2] = Math.sin(this.azi);
 }
 
-Sun.prototype.isNight = function(x, y, z, lat, lon) {
-    var x1 = x, y1 = y, z1 = z;
+Sun.prototype.isNight = function(lat, lon) {
+    var x1 = this.latlon[lat][lon].x, y1 = this.latlon[lat][lon].y, z1 = this.latlon[lat][lon].z;
     var x2 = this.frontvector[0], y2 = this.frontvector[1], z2 = this.frontvector[2];
     var dotp = x1*x2 + y1*y2 + z1*z2;
     var mag1 = Math.sqrt(x1*x1 + y1*y1 + z1*z1);
@@ -104,8 +121,6 @@ function SphereData(gl, imgfile, radius) {
     }
 
     function initVectors() {
-        var latitudeBands = 180;
-        var longitudeBands = 360;
         sun.sync();
 
         var vertexPositionData = [];
@@ -113,19 +128,13 @@ function SphereData(gl, imgfile, radius) {
         var textureCoordData = [];
         var indexData = [];
 
-        for (var latNumber=0; latNumber <= latitudeBands; latNumber++) {
-            var theta = latNumber * Math.PI / latitudeBands;
-            var sinTheta = Math.sin(theta);
-            var cosTheta = Math.cos(theta);
+        for (var lat=0; lat <= 180; lat++) {
+            for (var lon=0; lon <= 360; lon++) {
+                var night = false;
+                var x = sun.latlon[lat][lon].x;
+                var y = sun.latlon[lat][lon].y;
+                var z = sun.latlon[lat][lon].z;
 
-            for (var longNumber=0; longNumber < longitudeBands; longNumber++) {
-                var phi = longNumber * 2 * Math.PI / longitudeBands;
-                var sinPhi = Math.sin(phi);
-                var cosPhi = Math.cos(phi);
-
-                var x = cosPhi * sinTheta;
-                var y = cosTheta;
-                var z = sinPhi * sinTheta;
                 normalData.push(x);
                 normalData.push(y);
                 normalData.push(z);
@@ -133,26 +142,31 @@ function SphereData(gl, imgfile, radius) {
                 vertexPositionData.push(radius * y);
                 vertexPositionData.push(radius * z);
 
-                var v = 1 - (latNumber / latitudeBands);
-                var u = 1 - (longNumber / longitudeBands);
+                var v = 1 - (lat / 180);
+                var u = 1 - (lon / 360);
 
                 if(imgfile[0] == "images/earth_small.jpg") {
-                    u = (1 - (longNumber / longitudeBands))/2;
-                    var lat = ((latNumber*180)/latitudeBands) - 90;
-                    var lon = ((longNumber*180)/longitudeBands) - 180;
-                    if(sun.isNight(x, y, z, lat, lon)) {
-                        u += 0.5;
-                    }
+                    u = (1 - (lon / 360))/2;
+                    night = sun.isNight(lat, lon);
+                    if(night) u += 0.5;
                 }
 
                 textureCoordData.push(u);
                 textureCoordData.push(v);
 
-                if(latNumber < latitudeBands) {
-                    var uleft = (latNumber * longitudeBands) + longNumber;
-                    var lleft = uleft + longitudeBands;
-                    var uright = (latNumber * longitudeBands) + (longNumber + 1)%longitudeBands;
-                    var lright = uright + longitudeBands;
+                if((lat < 180)&&(lon < 360)) {
+                    if(imgfile[0] == "images/earth_small.jpg") {
+                        if(sun.isNight(lat, lon+1) != night)
+                            continue;
+                        if(sun.isNight(lat+1, lon) != night)
+                            continue;
+                        if(sun.isNight(lat+1, lon+1) != night)
+                            continue;
+                    }
+                    var uleft = (lat * (360 + 1)) + lon;
+                    var uright = uleft + 1;
+                    var lleft = uleft + 360 + 1;
+                    var lright = uright + 360 + 1;
                     indexData.push(uleft);
                     indexData.push(uright);
                     indexData.push(lleft);
