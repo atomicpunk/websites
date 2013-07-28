@@ -126,7 +126,7 @@ function SphereData(gl, imgfile, radius) {
                 var v = 1 - (latNumber / latitudeBands);
                 var u = 1 - (longNumber / longitudeBands);
 
-                if(imgfile == "images/earth.jpg") {
+                if(imgfile == "images/earth_small.jpg") {
                     u = (1 - (longNumber / longitudeBands))/2;
                     var lat = ((latNumber*180)/latitudeBands) - 90;
                     var lon = ((longNumber*180)/longitudeBands) - 180;
@@ -239,7 +239,7 @@ function WebGl() {
         mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
         initShaders();
-        earthdata = new SphereData(gl, "images/earth.jpg", 2);
+        earthdata = new SphereData(gl, "images/earth_small.jpg", 2);
         stardata = new SphereData(gl, "images/stars.jpg", 70);
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
