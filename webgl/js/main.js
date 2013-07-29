@@ -45,6 +45,7 @@ function Sun() {
     ];
     this.frontvector = [0, 0, 0];
     this.latlon = [];
+    this.terminator = [];
     function init() {
         for (var lat = 0; lat <= 180; lat++) {
             self.latlon[lat] = [];
@@ -73,6 +74,13 @@ Sun.prototype.sync = function() {
     this.frontvector[0] = Math.cos(this.azi);
     this.frontvector[1] = Math.tan(this.inc);
     this.frontvector[2] = Math.sin(this.azi);
+    for(var i = 0; i <= 360; i++) {
+        var idx = (i >= 180)?(360-i):i;
+//        var x = Math.cos(a) * Math.cos(s);
+//        var y = this.latlon[idx][0];
+//        var z = Math.sin(a) * Math.sin(s);
+//        this.terminator[i] = { x: x, y: y, z: z };
+    }
 }
 
 Sun.prototype.isNight = function(lat, lon) {
@@ -123,17 +131,19 @@ function SphereData(gl, imgfile, radius) {
     function initVectors() {
         sun.sync();
 
+        var latmax = 180;
+        var lonmax = 360;
         var vertexPositionData = [];
         var normalData = [];
         var textureCoordData = [];
         var indexData = [];
 
-        for (var lat=0; lat <= 180; lat++) {
-            for (var lon=0; lon <= 360; lon++) {
-                var night = false;
+        for (var lat=0; lat <= latmax; lat++) {
+            for (var lon=0; lon <= lonmax; lon++) {
                 var x = sun.latlon[lat][lon].x;
                 var y = sun.latlon[lat][lon].y;
                 var z = sun.latlon[lat][lon].z;
+                var night = false;
 
                 normalData.push(x);
                 normalData.push(y);
@@ -142,11 +152,11 @@ function SphereData(gl, imgfile, radius) {
                 vertexPositionData.push(radius * y);
                 vertexPositionData.push(radius * z);
 
-                var v = 1 - (lat / 180);
-                var u = 1 - (lon / 360);
+                var v = 1 - (lat / latmax);
+                var u = 1 - (lon / lonmax);
 
                 if(imgfile[0] == "images/earth_small.jpg") {
-                    u = (1 - (lon / 360))/2;
+                    u = (1 - (lon / lonmax))/2;
                     night = sun.isNight(lat, lon);
                     if(night) u += 0.5;
                 }
@@ -154,19 +164,19 @@ function SphereData(gl, imgfile, radius) {
                 textureCoordData.push(u);
                 textureCoordData.push(v);
 
-                if((lat < 180)&&(lon < 360)) {
+                if((lat < latmax)&&(lon < lonmax)) {
                     if(imgfile[0] == "images/earth_small.jpg") {
-                        if(sun.isNight(lat, lon+1) != night)
+                        if((sun.isNight(lat, lon+1) != night)||
+                           (sun.isNight(lat+1, lon) != night)||
+                           (sun.isNight(lat+1, lon+1) != night))
+                        {
                             continue;
-                        if(sun.isNight(lat+1, lon) != night)
-                            continue;
-                        if(sun.isNight(lat+1, lon+1) != night)
-                            continue;
+                        }
                     }
-                    var uleft = (lat * (360 + 1)) + lon;
+                    var uleft = (lat * (lonmax + 1)) + lon;
                     var uright = uleft + 1;
-                    var lleft = uleft + 360 + 1;
-                    var lright = uright + 360 + 1;
+                    var lleft = uleft + lonmax + 1;
+                    var lright = uright + lonmax + 1;
                     indexData.push(uleft);
                     indexData.push(uright);
                     indexData.push(lleft);
@@ -176,6 +186,39 @@ function SphereData(gl, imgfile, radius) {
                 }
             }
         }
+
+/*
+        var zero = normalData.length/3;
+        normalData.push(0);
+        normalData.push(0);
+        normalData.push(0);
+        vertexPositionData.push(0);
+        vertexPositionData.push(0);
+        vertexPositionData.push(0);
+        textureCoordData.push(1);
+        textureCoordData.push(1);
+
+        if(imgfile[0] == "images/earth_small.jpg") {
+            for (var i = 0; i < sun.terminator.length; i++) {
+                var x = sun.terminator[i].x;
+                var y = sun.terminator[i].y;
+                var z = sun.terminator[i].z;
+                normalData.push(x);
+                normalData.push(y);
+                normalData.push(z);
+                vertexPositionData.push(2.5 * x);
+                vertexPositionData.push(2.5 * y);
+                vertexPositionData.push(2.5 * z);
+                textureCoordData.push(1);
+                textureCoordData.push(1);
+                if(i > 0) {
+                    indexData.push((normalData.length/3)-2);
+                    indexData.push((normalData.length/3)-1);
+                    indexData.push(zero);
+                }
+            }
+        }
+*/
 
         self.vertexNormalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, self.vertexNormalBuffer);
@@ -424,7 +467,7 @@ function WebGl() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 70.0, pMatrix);
 
         var lighting = false;
         var acolor = [0.1, 0.1, 0.1];
