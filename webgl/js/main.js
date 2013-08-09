@@ -1,6 +1,9 @@
 var myWidth = 0;
 var myHeight = 0;
 var sun = new Sun();
+var mvMatrix = mat4.create();
+var pMatrix = mat4.create();
+var normalMatrix = mat3.create();
 
 function Sun() {
     "use strict";
@@ -96,7 +99,7 @@ Sun.prototype.isNight = function(lat, lon) {
     return true;
 }
 
-function SphereData(gl, imgfile, radius) {
+function SphereData(gl, imgfile, radius, pos) {
     "use strict";
 
     var self = this;
@@ -105,6 +108,9 @@ function SphereData(gl, imgfile, radius) {
     this.vertexTextureCoordBuffer = null;
     this.vertexIndexBuffer = [];
     this.texture = [];
+    this.px = pos[0];
+    this.py = pos[1];
+    this.pz = pos[2];
 
     function init() {
         for(var i = 0; i < imgfile.length; i++)
@@ -121,7 +127,9 @@ function SphereData(gl, imgfile, radius) {
             gl.bindTexture(gl.TEXTURE_2D, self.texture[idx]);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self.texture[idx].image);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.generateMipmap(gl.TEXTURE_2D);
             gl.bindTexture(gl.TEXTURE_2D, null);
         }
@@ -205,7 +213,19 @@ function SphereData(gl, imgfile, radius) {
     init();
 }
 
-SphereData.prototype.draw = function(gl, shaderProgram) {
+SphereData.prototype.draw = function(gl, shaderProgram, zoom, pov) {
+
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, [0, 0, zoom]);
+    mat4.multiply(mvMatrix, pov);
+    mat4.translate(mvMatrix, [this.px, this.py, this.pz]);
+    mat4.toInverseMat3(mvMatrix, normalMatrix);
+    mat3.transpose(normalMatrix);
+
+    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+    gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
+
     for (var i = 0; i < this.texture.length; i++) {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.texture[i]);
@@ -232,9 +252,12 @@ function WebGl() {
     var gl;
     var earthdata = null;
     var stardata = null;
+    var moondata = null;
     var povRotationMatrix = mat4.create();
     var povAzi = Math.PI*(190/180);
     var povInc = Math.PI*(35/180);
+    var starsize = 200;
+    var earthsize = 2;
 
     function init()
     {
@@ -258,8 +281,11 @@ function WebGl() {
         mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
         initShaders();
-        earthdata = new SphereData(gl, ["images/earth_day.jpg", "images/earth_night.jpg"], 2);
-        stardata = new SphereData(gl, ["images/stars.jpg"], 70);
+        earthdata = new SphereData(gl, ["images/earth_day.jpg", "images/earth_night.jpg"], 
+                                      earthsize, [0, 0, 0]);
+        stardata = new SphereData(gl, ["images/stars.png"], starsize, [0, 0, 0]);
+        moondata = new SphereData(gl, ["images/moon.jpg"], earthsize*0.272798619, 
+                                      [earthsize*30.167948517, 0, 0]);
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -343,9 +369,7 @@ function WebGl() {
         shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
     }
 
-    var mvMatrix = mat4.create();
     var mvMatrixStack = [];
-    var pMatrix = mat4.create();
 
     function mvPushMatrix() {
         var copy = mat4.create();
@@ -358,16 +382,6 @@ function WebGl() {
             throw "Invalid popMatrix!";
         }
         mvMatrix = mvMatrixStack.pop();
-    }
-
-    function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-
-        var normalMatrix = mat3.create();
-        mat4.toInverseMat3(mvMatrix, normalMatrix);
-        mat3.transpose(normalMatrix);
-        gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
     }
 
     function degToRad(degrees) {
@@ -416,7 +430,7 @@ function WebGl() {
         }
         else
         {
-            if(zval > -20)
+            if(zval > -100)
                 zval *= 1.03;
         }
     }
@@ -425,7 +439,7 @@ function WebGl() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 70.0, pMatrix);
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
 
         var lighting = false;
         var acolor = [0.1, 0.1, 0.1];
@@ -443,20 +457,9 @@ function WebGl() {
                          dcolor[0], dcolor[1], dcolor[2]);
         }
 
-        mat4.identity(mvMatrix);
-        mat4.translate(mvMatrix, [0, 0, zval]);
-        mat4.multiply(mvMatrix, povRotationMatrix);
-        setMatrixUniforms();
-
-        earthdata.draw(gl, shaderProgram);
-
-        gl.uniform1i(shaderProgram.useLightingUniform, false);
-        mat4.identity(mvMatrix);
-        mat4.translate(mvMatrix, [0, 0, 0]);
-        mat4.multiply(mvMatrix, povRotationMatrix);
-        setMatrixUniforms();
-
-        stardata.draw(gl, shaderProgram);
+        earthdata.draw(gl, shaderProgram, zval, povRotationMatrix);
+        moondata.draw(gl, shaderProgram, zval, povRotationMatrix);
+        stardata.draw(gl, shaderProgram, 0, povRotationMatrix);
     }
 
     function tick() {
