@@ -47,6 +47,7 @@ function Sun() {
         -23.4, -23.4, -23.4, -23.3, -23.3, -23.2, -23.2, -23.1
     ];
     this.frontvector = [0, 0, 0];
+    this.noon = [];
     this.latlon = [];
     this.terminator = [];
     function init() {
@@ -67,16 +68,28 @@ function Sun() {
     init();
 }
 
+Sun.prototype.vecFromIncAzi = function(inclination, azimuth) {
+    var vec = [];
+    vec[0] = Math.cos(azimuth);
+    vec[1] = Math.tan(inclination);
+    vec[2] = Math.sin(azimuth);
+    return vec;
+}
+
 Sun.prototype.sync = function() {
     var date = new Date();
     var day = this.days[date.getUTCMonth()] + date.getUTCDate();
     var hour = date.getUTCHours();
     var minute = date.getUTCMinutes();
+    var dA = Math.PI/18;
     this.inc = this.sundec[day]*Math.PI/180;
     this.azi = ((((60*hour)+minute))/1440)*2.0*Math.PI;
-    this.frontvector[0] = Math.cos(this.azi);
-    this.frontvector[1] = Math.tan(this.inc);
-    this.frontvector[2] = Math.sin(this.azi);
+    this.frontvector = this.vecFromIncAzi(this.inc, this.azi);
+    this.noon[0] = this.vecFromIncAzi(this.inc-dA, this.azi-dA);
+    this.noon[1] = this.vecFromIncAzi(this.inc+dA, this.azi-dA);
+    this.noon[2] = this.vecFromIncAzi(this.inc-dA, this.azi+dA);
+    this.noon[3] = this.vecFromIncAzi(this.inc+dA, this.azi+dA);
+
     for(var i = 0; i <= 360; i++) {
         var idx = (i >= 180)?(360-i):i;
 //        var x = Math.cos(a) * Math.cos(s);
@@ -99,7 +112,7 @@ Sun.prototype.isNight = function(lat, lon) {
     return true;
 }
 
-function SphereData(gl, imgfile, radius, pos) {
+function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
     "use strict";
 
     var self = this;
@@ -111,6 +124,13 @@ function SphereData(gl, imgfile, radius, pos) {
     this.px = pos[0];
     this.py = pos[1];
     this.pz = pos[2];
+    this.id = idstr;
+    this.gl = gl;
+    this.shaderProgram = shaderProgram;
+    this.vertexPositionData = [];
+    this.normalData = [];
+    this.textureCoordData = [];
+    this.indexData = [];
 
     function init() {
         for(var i = 0; i < imgfile.length; i++)
@@ -136,84 +156,104 @@ function SphereData(gl, imgfile, radius, pos) {
         self.texture[idx].image.src = imgfile[idx];
     }
 
-    function initVectors() {
-        sun.sync();
-
-        var vertexPositionData = [];
-        var normalData = [];
-        var textureCoordData = [];
-        var indexData = [];
-
-        for (var i = 0; i < self.texture.length; i++) {
-            indexData[i] = [];
-        }
-
+    function vectorDefault() {
         for (var lat=0; lat <= 180; lat++) {
             for (var lon=0; lon <= 360; lon++) {
                 var x = sun.latlon[lat][lon].x;
                 var y = sun.latlon[lat][lon].y;
                 var z = sun.latlon[lat][lon].z;
-
-                normalData.push(x);
-                normalData.push(y);
-                normalData.push(z);
-                vertexPositionData.push(radius * x);
-                vertexPositionData.push(radius * y);
-                vertexPositionData.push(radius * z);
-
                 var v = 1 - (lat / 180);
                 var u = 1 - (lon / 360);
 
-                textureCoordData.push(u);
-                textureCoordData.push(v);
+                self.normalData.push(x, y, z);
+                self.vertexPositionData.push(radius * x, radius * y, radius * z);
+                self.textureCoordData.push(u, v);
 
                 if((lat < 180)&&(lon < 360)) {
                     var uright = (lat * (360 + 1)) + lon;
                     var uleft = uright + 1;
                     var lright = uright + 360 + 1;
                     var lleft = uleft + 360 + 1;
-                    if(self.texture.length > 1) {
+                    if(self.id == "earth") {
                         var ur = sun.isNight(lat, lon);
                         var idx = (ur)?1:0;
-                        indexData[idx].push(uright, uleft, lright, uleft, lleft, lright);
+                        self.indexData[idx].push(uright, uleft, lright, uleft, lleft, lright);
                     } else {
-                        indexData[0].push(uright, uleft, lright, uleft, lleft, lright);
+                        self.indexData[0].push(uright, uleft, lright, uleft, lleft, lright);
                     }
                 }
             }
         }
+    }
+
+    function vectorSun() {
+        for(var i = 0; i < 4; i++) {
+            var x = sun.noon[i][0];
+            var y = sun.noon[i][1];
+            var z = sun.noon[i][2];
+            var v = i%2;
+            var u = parseInt(i/2);
+            self.normalData.push(x, y, z);
+            self.vertexPositionData.push(radius * x, radius * y, radius * z);
+            self.textureCoordData.push(u, v);
+        }
+        self.indexData[0].push(0, 1, 2, 1, 3, 2);
+    }
+
+    function initVectors() {
+        sun.sync();
+
+        self.vertexPositionData = [];
+        self.normalData = [];
+        self.textureCoordData = [];
+        self.indexData = [];
+
+        for (var i = 0; i < self.texture.length; i++) {
+            self.indexData[i] = [];
+        }
+
+        if(self.id == "sun")
+            vectorSun();
+        else
+            vectorDefault();
 
         self.vertexNormalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, self.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(self.normalData), gl.STATIC_DRAW);
         self.vertexNormalBuffer.itemSize = 3;
-        self.vertexNormalBuffer.numItems = normalData.length / 3;
+        self.vertexNormalBuffer.numItems = self.normalData.length / 3;
 
         self.vertexTextureCoordBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, self.vertexTextureCoordBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordData), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(self.textureCoordData), gl.STATIC_DRAW);
         self.vertexTextureCoordBuffer.itemSize = 2;
-        self.vertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
+        self.vertexTextureCoordBuffer.numItems = self.textureCoordData.length / 2;
 
         self.vertexPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, self.vertexPositionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(self.vertexPositionData), gl.STATIC_DRAW);
         self.vertexPositionBuffer.itemSize = 3;
-        self.vertexPositionBuffer.numItems = vertexPositionData.length / 3;
+        self.vertexPositionBuffer.numItems = self.vertexPositionData.length / 3;
 
         for (var i = 0; i < self.texture.length; i++) {
-            self.vertexIndexBuffer[i] = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.vertexIndexBuffer[i]);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData[i]), gl.STATIC_DRAW);
-            self.vertexIndexBuffer[i].itemSize = 1;
-            self.vertexIndexBuffer[i].numItems = indexData[i].length;
+            if(self.indexData[i].length > 0) {
+                self.vertexIndexBuffer[i] = gl.createBuffer();
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.vertexIndexBuffer[i]);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(self.indexData[i]), gl.STATIC_DRAW);
+                self.vertexIndexBuffer[i].itemSize = 1;
+                self.vertexIndexBuffer[i].numItems = self.indexData[i].length;
+            } else {
+                self.vertexIndexBuffer[i] = null;
+            }
         }
     }
 
     init();
 }
 
-SphereData.prototype.draw = function(gl, shaderProgram, zoom, pov) {
+CosmicBody.prototype.draw = function(zoom, pov) {
+    var gl = this.gl;
+    var shader = this.shaderProgram;
 
     mat4.identity(mvMatrix);
     mat4.translate(mvMatrix, [0, 0, zoom]);
@@ -222,26 +262,28 @@ SphereData.prototype.draw = function(gl, shaderProgram, zoom, pov) {
     mat4.toInverseMat3(mvMatrix, normalMatrix);
     mat3.transpose(normalMatrix);
 
-    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-    gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
+    gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
+    gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
+    gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
 
     for (var i = 0; i < this.texture.length; i++) {
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this.texture[i]);
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
+        if(this.vertexIndexBuffer[i]) {
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, this.texture[i]);
+            gl.uniform1i(shader.samplerUniform, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+            gl.vertexAttribPointer(shader.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
+            gl.vertexAttribPointer(shader.textureCoordAttribute, this.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, this.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
+            gl.vertexAttribPointer(shader.vertexNormalAttribute, this.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer[i]);
-        gl.drawElements(gl.TRIANGLES, this.vertexIndexBuffer[i].numItems, gl.UNSIGNED_SHORT, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer[i]);
+            gl.drawElements(gl.TRIANGLES, this.vertexIndexBuffer[i].numItems, gl.UNSIGNED_SHORT, 0);
+        }
     }
 }
 
@@ -250,14 +292,21 @@ function WebGl() {
 
     var self = this;
     var gl;
+    var shaderProgram;
     var earthdata = null;
     var stardata = null;
     var moondata = null;
+    var sundata = null;
     var povRotationMatrix = mat4.create();
     var povAzi = Math.PI*(190/180);
     var povInc = Math.PI*(35/180);
     var starsize = 200;
     var earthsize = 2;
+    var mvMatrixStack = [];
+    var mouseDown = false;
+    var lastMouseX = null;
+    var lastMouseY = null;
+    var zval = -6.0
 
     function init()
     {
@@ -281,11 +330,23 @@ function WebGl() {
         mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
         initShaders();
-        earthdata = new SphereData(gl, ["images/earth_day.jpg", "images/earth_night.jpg"], 
-                                      earthsize, [0, 0, 0]);
-        stardata = new SphereData(gl, ["images/stars.png"], starsize, [0, 0, 0]);
-        moondata = new SphereData(gl, ["images/moon.jpg"], earthsize*0.272798619, 
-                                      [earthsize*30.167948517, 0, 0]);
+
+	earthdata = new CosmicBody(gl, shaderProgram, "earth",
+		["images/earth_day.jpg", "images/earth_night.jpg"],
+		earthsize,
+		[0, 0, 0]);
+	stardata = new CosmicBody(gl, shaderProgram, "stars",
+		["images/stars.png"],
+		starsize,
+		[0, 0, 0]);
+	moondata = new CosmicBody(gl, shaderProgram, "moon",
+		["images/moon.jpg"],
+		earthsize*0.272798619,
+		[earthsize*30.167948517, 0, 0]);
+        sundata = new CosmicBody(gl, shaderProgram, "sun", 
+		["images/sun.png"],
+		starsize - 20,
+		[0, 0, 0]);
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -333,8 +394,6 @@ function WebGl() {
         return shader;
     }
 
-    var shaderProgram;
-
     function initShaders() {
         var fragmentShader = getShader(gl, "shader-fs");
         var vertexShader = getShader(gl, "shader-vs");
@@ -369,8 +428,6 @@ function WebGl() {
         shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
     }
 
-    var mvMatrixStack = [];
-
     function mvPushMatrix() {
         var copy = mat4.create();
         mat4.set(mvMatrix, copy);
@@ -387,11 +444,6 @@ function WebGl() {
     function degToRad(degrees) {
         return degrees * Math.PI / 180;
     }
-
-    var mouseDown = false;
-    var lastMouseX = null;
-    var lastMouseY = null;
-    var zval = -6.0
 
     function handleMouseDown(event) {
         if(event.button != 0) return;
@@ -457,9 +509,10 @@ function WebGl() {
                          dcolor[0], dcolor[1], dcolor[2]);
         }
 
-        earthdata.draw(gl, shaderProgram, zval, povRotationMatrix);
-        moondata.draw(gl, shaderProgram, zval, povRotationMatrix);
-        stardata.draw(gl, shaderProgram, 0, povRotationMatrix);
+        earthdata.draw(zval, povRotationMatrix);
+        moondata.draw(zval, povRotationMatrix);
+        stardata.draw(0, povRotationMatrix);
+        sundata.draw(0, povRotationMatrix);
     }
 
     function tick() {
