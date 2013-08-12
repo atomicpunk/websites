@@ -1,53 +1,24 @@
+var starsize = 200;
+var earthsize = 2;
 var myWidth = 0;
 var myHeight = 0;
-var sun = new Sun();
+var aristotle = new GeocentricModel();
 var mvMatrix = mat4.create();
 var pMatrix = mat4.create();
 var normalMatrix = mat3.create();
+var povAzi = Math.PI*(190/180);
+var povInc = Math.PI*(35/180);
 
-function Sun() {
+function GeocentricModel() {
     "use strict";
 
     var self = this;
     this.days = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
     this.inc = 0;
     this.azi = 0;
-    this.sundec = [
-        -23.1, -22.9, -22.9, -22.8, -22.7, -22.6, -22.4, -22.3, -22.2, -22.1,
-        -21.9, -21.8, -21.6, -21.5, -21.3, -21.1, -20.9, -20.7, -20.5, -20.3,
-        -20.1, -19.8, -19.6, -19.4, -19.2, -18.8, -18.6, -18.4, -18.1, -17.8,
-        -17.6, -17.3, -17.1, -16.8, -16.5, -16.2, -15.8, -15.6, -15.2, -14.8,
-        -14.6, -14.3, -13.9, -13.6, -13.3, -12.9, -12.6, -12.2, -11.8, -11.6,
-        -11.2, -10.8, -10.5, -10.1, -9.7, -9.4, -9.0, -8.6, -8.3, -8.0, -7.8,
-        -7.4, -7.0, -6.6, -6.3, -5.8, -5.5, -5.1, -4.7, -4.3, -3.9, -3.5, -3.1,
-        -2.8, -2.3, -2.0, -1.6, -1.2, -0.8, -0.4, 0, 0.4, 0.8, 1.2, 1.6, 2, 2.6,
-         2.8, 3.1, 3.5, 3.8, 4.3, 4.7, 5.1, 5.5, 5.8, 6.2, 6.6, 7, 7.3, 7.7, 8.1,
-         8.5, 8.8, 9.2, 9.5, 9.9, 10.3, 10.6, 10.9, 11.3, 11.6, 12, 12.3, 12.4,
-         13, 13.3, 13.6, 14, 14.3, 14.6, 14.9, 15.2, 15.5, 15.8, 16.1, 16.4,
-         16.6, 16.9, 17.2, 17.4, 17.7, 18, 18.2, 18.5, 18.7, 19, 19.2, 19.4,
-         19.6, 19.8, 20.1, 20.3, 20.4, 20.6, 20.8, 21, 21.2, 21.4, 21.5, 21.6,
-         21.8, 22, 22.1, 22.2, 22.3, 22.5, 22.6, 22.7, 22.8, 22.9, 23, 23, 23.1,
-         23.2, 23.2, 23.3, 23.3, 23.3, 23.4, 23.4, 23.5, 23.5, 23.5, 23.5, 23.4,
-         23.4, 23.4, 23.3, 23.3, 23.2, 23.2, 23.1, 23.1, 23, 22.9, 22.8, 22.7,
-         22.6, 22.5, 22.5, 22.3, 22.2, 22.1, 21.9, 21.8, 21.6, 21.5, 21.3, 21.1,
-         20.9, 20.8, 20.6, 20.4, 20.2, 20, 19.8, 19.6, 19.3, 19.1, 18.9, 18.6,
-         18.4, 18.1, 17.9, 17.6, 17.4, 17.1, 16.8, 16.6, 16.3, 16, 15.7, 15.4,
-         15.1, 14.8, 14.5, 14.2, 13.9, 13.6, 13.3, 13, 12.6, 12.3, 12, 11.6,
-         11.3, 10.9, 10.6, 10.3, 9.9, 9.6, 9.3, 8.8, 8.5, 8.1, 7.8, 7.4, 7,
-         6.6, 6.3, 5.9, 5.5, 5.1, 4.8, 4.4, 4, 3.6, 3.3, 2.8, 2.5, 2.1, 1.7,
-         1.3, 0.9, 0.5, 0.1, -0.2, -0.6, -1.0, -1.4, -1.8, -2.1, -2.6, -2.9,
-        -3.3, -3.7, -4.1, -4.5, -4.8, -5.3, -5.6, -6.0, -6.4, -6.8, -7.1, -7.5,
-        -7.9, -8.3, -8.6, -9.0, -9.4, -9.7, -10.1, -10.5, -10.8, -11.2, -11.5,
-        -11.8, -12.2, -12.6, -12.9, -13.2, -13.6, -13.8, -14.2, -14.6, -14.8,
-        -15.2, -15.5, -15.8, -16.1, -16.4, -16.6, -16.9, -17.2, -17.5, -17.8,
-        -18.1, -18.3, -18.6, -18.8, -19.1, -19.3, -19.6, -19.8, -20.0, -20.2,
-        -20.4, -20.6, -20.8, -21.0, -21.2, -21.3, -21.5, -21.7, -21.8, -22.0,
-        -22.1, -22.3, -22.4, -22.5, -22.6, -22.7, -22.8, -22.9, -23.0, -23.1,
-        -23.1, -23.2, -23.3, -23.3, -23.3, -23.4, -23.4, -23.4, -23.4, -23.4,
-        -23.4, -23.4, -23.4, -23.3, -23.3, -23.2, -23.2, -23.1
-    ];
-    this.frontvector = [0, 0, 0];
-    this.noon = [];
+    this.sunvector = [0, 0, 0];
+    this.moonvector = [0, 0, 0];
+    this.moonrot = 0;
     this.latlon = [];
     this.terminator = [];
     function init() {
@@ -64,44 +35,58 @@ function Sun() {
                 self.latlon[lat][lon] = { x: x, y: y, z: z };
             }
         }
+        sunSync();
+        window.setInterval(function() {sunSync();}, 5000);
+        window.setInterval(function() {moonSync();}, 1000);
     }
+
+    function currentTime() {
+        var date = new Date();
+        var day = self.days[date.getUTCMonth()] + date.getUTCDate();
+        var sec = (date.getUTCHours()*3600) + (date.getUTCMinutes()*60) + date.getUTCSeconds();
+        return [day, sec];
+    }
+
+    function vecFromIncAzi(inclination, azimuth) {
+        var vec = [];
+        vec[0] = Math.cos(azimuth);
+        vec[1] = Math.tan(inclination);
+        vec[2] = Math.sin(azimuth);
+        return vec;
+    }
+
+    function sunSync() {
+        var t = currentTime();
+        var ang = (((t[0] * 86400) + t[1]) * Math.PI) / 15768000;
+        self.inc = -23.4 * (Math.PI/180) * Math.cos(ang + (0.054794521*Math.PI));
+        self.azi = (t[1]/86400)*2.0*Math.PI;
+        self.sunvector = vecFromIncAzi(self.inc, self.azi);
+    }
+
+    function moonSync() {
+        var date = new Date();
+        var t = date.getTime()/1000 + 200000;
+        var a = earthsize * 30.103480715;
+        var e = 0.0549;
+        var i = (5.145*Math.PI)/180
+        // northern major standstill = 9/15/2006
+        // a = 384000 km  Er = 6378 km
+        // orbital rotation period = 18.6 years = 6794 days
+        // rotation counterclockwise from above
+        // period = 27.321582 days
+        var ang = -1 * (t/2360585)*2.0*Math.PI;
+        var r = a*(1-(e*e))/(1 + e*Math.cos(ang));
+        self.moonvector[0] = r * Math.cos(ang);
+        self.moonvector[2] = r * Math.sin(ang);
+        self.moonrot = -1 * ang;
+    }
+
     init();
 }
 
-Sun.prototype.vecFromIncAzi = function(inclination, azimuth) {
-    var vec = [];
-    vec[0] = Math.cos(azimuth);
-    vec[1] = Math.tan(inclination);
-    vec[2] = Math.sin(azimuth);
-    return vec;
-}
-
-Sun.prototype.sync = function() {
-    var date = new Date();
-    var day = this.days[date.getUTCMonth()] + date.getUTCDate();
-    var hour = date.getUTCHours();
-    var minute = date.getUTCMinutes();
-    var dA = Math.PI/18;
-    this.inc = this.sundec[day]*Math.PI/180;
-    this.azi = ((((60*hour)+minute))/1440)*2.0*Math.PI;
-    this.frontvector = this.vecFromIncAzi(this.inc, this.azi);
-    this.noon[0] = this.vecFromIncAzi(this.inc-dA, this.azi-dA);
-    this.noon[1] = this.vecFromIncAzi(this.inc+dA, this.azi-dA);
-    this.noon[2] = this.vecFromIncAzi(this.inc-dA, this.azi+dA);
-    this.noon[3] = this.vecFromIncAzi(this.inc+dA, this.azi+dA);
-
-    for(var i = 0; i <= 360; i++) {
-        var idx = (i >= 180)?(360-i):i;
-//        var x = Math.cos(a) * Math.cos(s);
-//        var y = this.latlon[idx][0];
-//        var z = Math.sin(a) * Math.sin(s);
-//        this.terminator[i] = { x: x, y: y, z: z };
-    }
-}
-
-Sun.prototype.isNight = function(lat, lon) {
+GeocentricModel.prototype.isNight = function(lat, lon) {
     var x1 = this.latlon[lat][lon].x, y1 = this.latlon[lat][lon].y, z1 = this.latlon[lat][lon].z;
-    var x2 = this.frontvector[0], y2 = this.frontvector[1], z2 = this.frontvector[2];
+    var x2 = this.sunvector[0], y2 = this.sunvector[1], z2 = this.sunvector[2];
     var dotp = x1*x2 + y1*y2 + z1*z2;
     var mag1 = Math.sqrt(x1*x1 + y1*y1 + z1*z1);
     var mag2 = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
@@ -112,7 +97,7 @@ Sun.prototype.isNight = function(lat, lon) {
     return true;
 }
 
-function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
+function CosmicBody(gl, shaderProgram, idstr, imgfile, radius) {
     "use strict";
 
     var self = this;
@@ -121,9 +106,6 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
     this.vertexTextureCoordBuffer = null;
     this.vertexIndexBuffer = [];
     this.texture = [];
-    this.px = pos[0];
-    this.py = pos[1];
-    this.pz = pos[2];
     this.id = idstr;
     this.gl = gl;
     this.shaderProgram = shaderProgram;
@@ -136,7 +118,8 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
         for(var i = 0; i < imgfile.length; i++)
             initTexture(i);
         initVectors();
-        window.setInterval(function() {initVectors();}, 60000);
+        if(self.id == "earth")
+            window.setInterval(function() {initVectors();}, 5000);
     }
 
     function initTexture(idx) {
@@ -159,9 +142,9 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
     function vectorDefault() {
         for (var lat=0; lat <= 180; lat++) {
             for (var lon=0; lon <= 360; lon++) {
-                var x = sun.latlon[lat][lon].x;
-                var y = sun.latlon[lat][lon].y;
-                var z = sun.latlon[lat][lon].z;
+                var x = aristotle.latlon[lat][lon].x;
+                var y = aristotle.latlon[lat][lon].y;
+                var z = aristotle.latlon[lat][lon].z;
                 var v = 1 - (lat / 180);
                 var u = 1 - (lon / 360);
 
@@ -175,7 +158,7 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
                     var lright = uright + 360 + 1;
                     var lleft = uleft + 360 + 1;
                     if(self.id == "earth") {
-                        var ur = sun.isNight(lat, lon);
+                        var ur = aristotle.isNight(lat, lon);
                         var idx = (ur)?1:0;
                         self.indexData[idx].push(uright, uleft, lright, uleft, lleft, lright);
                     } else {
@@ -187,10 +170,16 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
     }
 
     function vectorSun() {
+        var square = []
+        var dA = Math.PI/18;
+        square[0] = [-1*dA, -1*dA];
+        square[1] = [   dA, -1*dA];
+        square[2] = [-1*dA,    dA];
+        square[3] = [   dA,    dA];
         for(var i = 0; i < 4; i++) {
-            var x = sun.noon[i][0];
-            var y = sun.noon[i][1];
-            var z = sun.noon[i][2];
+            var x = Math.cos(square[i][1]);
+            var y = Math.tan(square[i][0]);
+            var z = Math.sin(square[i][1]);
             var v = i%2;
             var u = parseInt(i/2);
             self.normalData.push(x, y, z);
@@ -201,8 +190,6 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
     }
 
     function initVectors() {
-        sun.sync();
-
         self.vertexPositionData = [];
         self.normalData = [];
         self.textureCoordData = [];
@@ -251,16 +238,9 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, pos) {
     init();
 }
 
-CosmicBody.prototype.draw = function(zoom, pov) {
+CosmicBody.prototype.drawHelper = function() {
     var gl = this.gl;
     var shader = this.shaderProgram;
-
-    mat4.identity(mvMatrix);
-    mat4.translate(mvMatrix, [0, 0, zoom]);
-    mat4.multiply(mvMatrix, pov);
-    mat4.translate(mvMatrix, [this.px, this.py, this.pz]);
-    mat4.toInverseMat3(mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
 
     gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
     gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
@@ -287,6 +267,41 @@ CosmicBody.prototype.draw = function(zoom, pov) {
     }
 }
 
+CosmicBody.prototype.draw = function(zoom) {
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, [0, 0, zoom]);
+    mat4.rotate(mvMatrix, povAzi, [0, 1, 0]);
+    mat4.rotate(mvMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
+    mat4.toInverseMat3(mvMatrix, normalMatrix);
+    mat3.transpose(normalMatrix);
+    this.drawHelper();
+}
+
+CosmicBody.prototype.drawStar = function() {
+    var inc = aristotle.inc + povInc;
+    var azi = povAzi - aristotle.azi;
+    mat4.identity(mvMatrix);
+    mat4.rotate(mvMatrix, azi, [0, 1, 0]);
+    mat4.rotate(mvMatrix, inc, [Math.cos(azi), 0, Math.sin(azi)]);
+    mat4.toInverseMat3(mvMatrix, normalMatrix);
+    mat3.transpose(normalMatrix);
+    this.drawHelper();
+}
+
+CosmicBody.prototype.drawMoon = function(zoom, pos, rot) {
+    var inc = aristotle.inc + povInc;
+    var azi = povAzi - aristotle.azi;
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, [0, 0, zoom]);
+    mat4.rotate(mvMatrix, azi, [0, 1, 0]);
+    mat4.rotate(mvMatrix, inc, [Math.cos(azi), 0, Math.sin(azi)]);
+    mat4.translate(mvMatrix, pos);
+    mat4.rotate(mvMatrix, rot, [0, 1, 0]);
+    mat4.toInverseMat3(mvMatrix, normalMatrix);
+    mat3.transpose(normalMatrix);
+    this.drawHelper();
+}
+
 function WebGl() {
     "use strict";
 
@@ -297,11 +312,6 @@ function WebGl() {
     var stardata = null;
     var moondata = null;
     var sundata = null;
-    var povRotationMatrix = mat4.create();
-    var povAzi = Math.PI*(190/180);
-    var povInc = Math.PI*(35/180);
-    var starsize = 200;
-    var earthsize = 2;
     var mvMatrixStack = [];
     var mouseDown = false;
     var lastMouseX = null;
@@ -324,29 +334,27 @@ function WebGl() {
             return;
         }
 
-        sun.sync();
+        var povRotationMatrix = mat4.create();
         mat4.identity(povRotationMatrix);
         mat4.rotate(povRotationMatrix, povAzi, [0, 1, 0]);
         mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
         initShaders();
 
 	earthdata = new CosmicBody(gl, shaderProgram, "earth",
 		["images/earth_day.jpg", "images/earth_night.jpg"],
-		earthsize,
-		[0, 0, 0]);
+		earthsize);
 	stardata = new CosmicBody(gl, shaderProgram, "stars",
 		["images/stars.png"],
-		starsize,
-		[0, 0, 0]);
+		starsize);
 	moondata = new CosmicBody(gl, shaderProgram, "moon",
 		["images/moon.jpg"],
-		earthsize*0.272798619,
-		[earthsize*30.167948517, 0, 0]);
+		earthsize*0.272798619);
         sundata = new CosmicBody(gl, shaderProgram, "sun", 
 		["images/sun.png"],
-		starsize - 20,
-		[0, 0, 0]);
+		starsize - 20);
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -426,6 +434,14 @@ function WebGl() {
         shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor");
         shaderProgram.lightingDirectionUniform = gl.getUniformLocation(shaderProgram, "uLightingDirection");
         shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
+
+        var acolor = [0.5, 0.5, 0.5];
+        var dcolor = [2, 2, 2];
+        gl.uniform3f(shaderProgram.ambientColorUniform,
+                     acolor[0], acolor[1], acolor[2]);
+        gl.uniform3f(shaderProgram.directionalColorUniform,
+                     dcolor[0], dcolor[1], dcolor[2]);
+
     }
 
     function mvPushMatrix() {
@@ -466,9 +482,6 @@ function WebGl() {
 
         povAzi += degToRad(deltaX / 10);
         povInc += degToRad(deltaY / 10);
-        mat4.identity(povRotationMatrix);
-        mat4.rotate(povRotationMatrix, povAzi, [0, 1, 0]);
-        mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
         lastMouseX = newX
         lastMouseY = newY;
@@ -488,31 +501,26 @@ function WebGl() {
     }
 
     function drawScene() {
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+        var azi = povAzi - aristotle.azi;
+        var inc = povInc;
+        var light = mat4.create();
+        mat4.identity(light);
+        mat4.rotate(light, azi, [0, 1, 0]);
+        mat4.rotate(light, inc, [Math.cos(azi), 0, Math.sin(azi)]);
 
-        var lighting = false;
-        var acolor = [0.1, 0.1, 0.1];
-        var dcolor = [1, 1, 1];
+        var adjustedLD = vec3.create(light);
+//        vec3.normalize(light, adjustedLD);
+//        vec3.scale(adjustedLD, -1);
+        gl.uniform3fv(shaderProgram.lightingDirectionUniform, adjustedLD);
 
-        gl.uniform1i(shaderProgram.useLightingUniform, lighting);
-        if (lighting) {
-            gl.uniform3f(shaderProgram.ambientColorUniform,
-                         acolor[0], acolor[1], acolor[2]);
-            var adjustedLD = vec3.create();
-            vec3.normalize(sun.frontvector + povRotationMatrix, adjustedLD);
-            vec3.scale(adjustedLD, -1);
-            gl.uniform3fv(shaderProgram.lightingDirectionUniform, adjustedLD);
-            gl.uniform3f(shaderProgram.directionalColorUniform,
-                         dcolor[0], dcolor[1], dcolor[2]);
-        }
-
-        earthdata.draw(zval, povRotationMatrix);
-        moondata.draw(zval, povRotationMatrix);
-        stardata.draw(0, povRotationMatrix);
-        sundata.draw(0, povRotationMatrix);
+        gl.uniform1i(shaderProgram.useLightingUniform, false);
+        stardata.drawStar();
+        sundata.drawStar();
+        earthdata.draw(zval);
+        gl.uniform1i(shaderProgram.useLightingUniform, true);
+        moondata.drawMoon(zval, aristotle.moonvector, aristotle.moonrot);
     }
 
     function tick() {
