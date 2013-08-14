@@ -317,6 +317,18 @@ function WebGl() {
     var lastMouseX = null;
     var lastMouseY = null;
     var zval = -6.0
+    this.resize = resize;
+
+    function resize()
+    {
+        var canvas = document.getElementById("main_canvas");
+        canvas.width = myWidth;
+        canvas.height = myHeight;
+        gl.viewportWidth = canvas.width;
+        gl.viewportHeight = canvas.height;
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+    }
 
     function init()
     {
@@ -346,12 +358,12 @@ function WebGl() {
 	earthdata = new CosmicBody(gl, shaderProgram, "earth",
 		["images/earth_day.jpg", "images/earth_night.jpg"],
 		earthsize);
-	stardata = new CosmicBody(gl, shaderProgram, "stars",
-		["images/stars.png"],
-		starsize);
 	moondata = new CosmicBody(gl, shaderProgram, "moon",
 		["images/moon.jpg"],
 		earthsize*0.272798619);
+	stardata = new CosmicBody(gl, shaderProgram, "stars",
+		["images/stars.png"],
+		starsize);
         sundata = new CosmicBody(gl, shaderProgram, "sun", 
 		["images/sun.png"],
 		starsize - 20);
@@ -359,8 +371,9 @@ function WebGl() {
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
 
+        var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
+        canvas.addEventListener(mousewheelevt, handleMouseWheel);
         canvas.onmousedown = handleMouseDown;
-        canvas.onmousewheel = handleMouseWheel;
         document.onmouseup = handleMouseUp;
         document.onmousemove = handleMouseMove;
 
@@ -488,7 +501,8 @@ function WebGl() {
     }
 
     function handleMouseWheel(event) {
-        if(event.wheelDelta > 0)
+        var delta = (/Firefox/i.test(navigator.userAgent)) ? (event.detail*-1) : event.wheelDelta;
+        if(delta > 0)
         {
             if(zval < -2.5)
                 zval *= 0.97;
@@ -523,9 +537,12 @@ function WebGl() {
         moondata.drawMoon(zval, aristotle.moonvector, aristotle.moonrot);
     }
 
-    function tick() {
+    var framecount = 0;
+    function tick(timestamp) {
         requestAnimFrame(tick);
-        drawScene();
+        if(framecount % 2 == 0)
+            drawScene();
+        framecount++;
     }
 
     init();
@@ -563,9 +580,7 @@ if(window.addEventListener)
     window.addEventListener('resize', function () {
         "use strict";
         if(busy) return;
-        busy = true;
         setWindowSize();
-        webgl = new WebGl();
-        setTimeout(function(){busy = false;},1000);
+        webgl.resize();
     });
 }
