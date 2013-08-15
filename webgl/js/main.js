@@ -338,6 +338,17 @@ function WebGl() {
 
     function init()
     {
+        var small = true;
+        if(location.search.indexOf("?normal") == 0)
+            small = false;
+
+        var imglist = [];
+        if(!small)
+            imglist = ["images/earth_day.jpg", "images/earth_night.jpg", 
+                       "images/moon.jpg", "images/stars.png", "images/sun.png"];
+        else
+            imglist = ["images/earth_day_small.jpg", "images/earth_night_small.jpg", 
+                       "images/moon_small.jpg", "images/stars.png", "images/sun.png"];
         var canvas = document.getElementById("main_canvas");
         try {
             gl = canvas.getContext("experimental-webgl");
@@ -356,23 +367,26 @@ function WebGl() {
         tick();
 
 	earthdata = new CosmicBody(gl, shaderProgram, "earth",
-		["images/earth_day.jpg", "images/earth_night.jpg"],
+		[imglist[0], imglist[1]],
 		earthsize, true);
 	moondata = new CosmicBody(gl, shaderProgram, "moon",
-		["images/moon.jpg"],
+		[imglist[2]],
 		earthsize*0.272798619, true);
 	stardata = new CosmicBody(gl, shaderProgram, "stars",
-		["images/stars.png"],
+		[imglist[3]],
 		starsize, false);
         sundata = new CosmicBody(gl, shaderProgram, "sun", 
-		["images/sun.png"],
+		[imglist[4]],
 		starsize - 20, false);
 
         var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
-        canvas.addEventListener(mousewheelevt, handleMouseWheel);
-        canvas.onmousedown = handleMouseDown;
-        document.onmouseup = handleMouseUp;
-        document.onmousemove = handleMouseMove;
+        window.addEventListener(mousewheelevt, handleMouseWheel);
+        window.onmousedown = handleMouseDown;
+        window.onmouseup = handleMouseUp;
+        window.onmousemove = handleMouseMove;
+        window.ontouchstart = handleTouchStart;
+        window.ontouchend = handleTouchEnd;
+        window.ontouchmove = handleTouchMove;
     }
 
     function getShader(gl, id) {
@@ -469,6 +483,7 @@ function WebGl() {
         return degrees * Math.PI / 180;
     }
 
+
     function handleMouseDown(event) {
         if(event.button != 0) return;
         mouseDown = true;
@@ -485,6 +500,34 @@ function WebGl() {
 
         var newX = event.clientX;
         var newY = event.clientY;
+        var deltaX = newX - lastMouseX;
+        var deltaY = newY - lastMouseY;
+
+        povAzi += degToRad(deltaX / 10);
+        povInc += degToRad(deltaY / 10);
+
+        lastMouseX = newX
+        lastMouseY = newY;
+    }
+
+
+    function handleTouchStart(event) {
+        var touch = event.changedTouches[0];
+        mouseDown = true;
+        lastMouseX = touch.clientX;
+        lastMouseY = touch.clientY;
+    }
+
+    function handleTouchEnd(event) {
+        mouseDown = false;
+    }
+
+    function handleTouchMove(event) {
+        if (!mouseDown) return;
+
+        var touch = event.changedTouches[0];
+        var newX = touch.clientX;
+        var newY = touch.clientY;
         var deltaX = newX - lastMouseX;
         var deltaY = newY - lastMouseY;
 
