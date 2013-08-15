@@ -8,6 +8,8 @@ var pMatrix = mat4.create();
 var normalMatrix = mat3.create();
 var povAzi = Math.PI*(190/180);
 var povInc = Math.PI*(35/180);
+var daylight = null;
+var nightlight = null;
 
 function GeocentricModel() {
     "use strict";
@@ -36,8 +38,9 @@ function GeocentricModel() {
             }
         }
         sunSync();
+        moonSync();
         window.setInterval(function() {sunSync();}, 5000);
-        window.setInterval(function() {moonSync();}, 1000);
+        window.setInterval(function() {moonSync();}, 60000);
     }
 
     function currentTime() {
@@ -92,12 +95,12 @@ GeocentricModel.prototype.isNight = function(lat, lon) {
     var mag2 = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
     var a = Math.acos(dotp / (mag1 * mag2));
 
-    if(a < Math.PI/2)
+    if(a < (Math.PI/2))
         return false;
     return true;
 }
 
-function CosmicBody(gl, shaderProgram, idstr, imgfile, radius) {
+function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, lighting) {
     "use strict";
 
     var self = this;
@@ -108,6 +111,7 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius) {
     this.texture = [];
     this.id = idstr;
     this.gl = gl;
+    this.lighting = lighting;
     this.shaderProgram = shaderProgram;
     this.vertexPositionData = [];
     this.normalData = [];
@@ -242,11 +246,19 @@ CosmicBody.prototype.drawHelper = function() {
     var gl = this.gl;
     var shader = this.shaderProgram;
 
+    mat4.toInverseMat3(mvMatrix, normalMatrix);
+    mat3.transpose(normalMatrix);
+    gl.uniform1i(shader.uselighting, (this.lighting)?1:0);
+    if(this.lighting) {
+        gl.uniform3fv(shader.daylightDirection, daylight);
+        gl.uniform3fv(shader.nightlightDirection, nightlight);
+    }
     gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
     gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
     gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
 
     for (var i = 0; i < this.texture.length; i++) {
+        if(i > 0) gl.uniform1i(shader.uselighting, 2);
         if(this.vertexIndexBuffer[i]) {
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, this.texture[i]);
@@ -272,8 +284,6 @@ CosmicBody.prototype.draw = function(zoom) {
     mat4.translate(mvMatrix, [0, 0, zoom]);
     mat4.rotate(mvMatrix, povAzi, [0, 1, 0]);
     mat4.rotate(mvMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
-    mat4.toInverseMat3(mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
     this.drawHelper();
 }
 
@@ -283,8 +293,6 @@ CosmicBody.prototype.drawStar = function() {
     mat4.identity(mvMatrix);
     mat4.rotate(mvMatrix, azi, [0, 1, 0]);
     mat4.rotate(mvMatrix, inc, [Math.cos(azi), 0, Math.sin(azi)]);
-    mat4.toInverseMat3(mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
     this.drawHelper();
 }
 
@@ -297,8 +305,6 @@ CosmicBody.prototype.drawMoon = function(zoom, pos, rot) {
     mat4.rotate(mvMatrix, inc, [Math.cos(azi), 0, Math.sin(azi)]);
     mat4.translate(mvMatrix, pos);
     mat4.rotate(mvMatrix, rot, [0, 1, 0]);
-    mat4.toInverseMat3(mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
     this.drawHelper();
 }
 
@@ -333,12 +339,9 @@ function WebGl() {
     function init()
     {
         var canvas = document.getElementById("main_canvas");
-        canvas.width = myWidth;
-        canvas.height = myHeight;
         try {
             gl = canvas.getContext("experimental-webgl");
-            gl.viewportWidth = canvas.width;
-            gl.viewportHeight = canvas.height;
+            self.resize();
         } catch (e) {}
 
         if (!gl) {
@@ -346,38 +349,30 @@ function WebGl() {
             return;
         }
 
-        var povRotationMatrix = mat4.create();
-        mat4.identity(povRotationMatrix);
-        mat4.rotate(povRotationMatrix, povAzi, [0, 1, 0]);
-        mat4.rotate(povRotationMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
 
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
         initShaders();
+        tick();
 
 	earthdata = new CosmicBody(gl, shaderProgram, "earth",
 		["images/earth_day.jpg", "images/earth_night.jpg"],
-		earthsize);
+		earthsize, true);
 	moondata = new CosmicBody(gl, shaderProgram, "moon",
 		["images/moon.jpg"],
-		earthsize*0.272798619);
+		earthsize*0.272798619, true);
 	stardata = new CosmicBody(gl, shaderProgram, "stars",
 		["images/stars.png"],
-		starsize);
+		starsize, false);
         sundata = new CosmicBody(gl, shaderProgram, "sun", 
 		["images/sun.png"],
-		starsize - 20);
-
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        gl.enable(gl.DEPTH_TEST);
+		starsize - 20, false);
 
         var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
         canvas.addEventListener(mousewheelevt, handleMouseWheel);
         canvas.onmousedown = handleMouseDown;
         document.onmouseup = handleMouseUp;
         document.onmousemove = handleMouseMove;
-
-        tick();
     }
 
     function getShader(gl, id) {
@@ -443,18 +438,18 @@ function WebGl() {
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
         shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
         shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-        shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, "uUseLighting");
-        shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor");
-        shaderProgram.lightingDirectionUniform = gl.getUniformLocation(shaderProgram, "uLightingDirection");
-        shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
+        shaderProgram.uselighting = gl.getUniformLocation(shaderProgram, "uselighting");
+        shaderProgram.daylightDirection = gl.getUniformLocation(shaderProgram, "daylightDirection");
+        shaderProgram.dayAmbientColor = gl.getUniformLocation(shaderProgram, "dayAmbientColor");
+        shaderProgram.dayDirectColor = gl.getUniformLocation(shaderProgram, "dayDirectColor");
+        shaderProgram.nightlightDirection = gl.getUniformLocation(shaderProgram, "nightlightDirection");
+        shaderProgram.nightAmbientColor = gl.getUniformLocation(shaderProgram, "nightAmbientColor");
+        shaderProgram.nightDirectColor = gl.getUniformLocation(shaderProgram, "nightDirectColor");
 
-        var acolor = [0.5, 0.5, 0.5];
-        var dcolor = [2, 2, 2];
-        gl.uniform3f(shaderProgram.ambientColorUniform,
-                     acolor[0], acolor[1], acolor[2]);
-        gl.uniform3f(shaderProgram.directionalColorUniform,
-                     dcolor[0], dcolor[1], dcolor[2]);
-
+        gl.uniform3f(shaderProgram.dayAmbientColor, 0.3, 0.3, 0.3);
+        gl.uniform3f(shaderProgram.dayDirectColor, 2, 2, 2);
+        gl.uniform3f(shaderProgram.nightAmbientColor, 0.8, 0.8, 0.8);
+        gl.uniform3f(shaderProgram.nightDirectColor, 1, 1, 1);
     }
 
     function mvPushMatrix() {
@@ -518,23 +513,20 @@ function WebGl() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         var azi = povAzi - aristotle.azi;
-        var inc = povInc;
         var light = mat4.create();
         mat4.identity(light);
         mat4.rotate(light, azi, [0, 1, 0]);
-        mat4.rotate(light, inc, [Math.cos(azi), 0, Math.sin(azi)]);
+        mat4.rotate(light, povInc, [Math.cos(azi), 0, Math.sin(azi)]);
+        mat4.rotate(light, aristotle.inc, [0, 0, 1]);
 
-        var adjustedLD = vec3.create(light);
-//        vec3.normalize(light, adjustedLD);
-//        vec3.scale(adjustedLD, -1);
-        gl.uniform3fv(shaderProgram.lightingDirectionUniform, adjustedLD);
+        daylight = vec3.create(light);
+        nightlight = vec3.create(light);
+        vec3.scale(nightlight, -1);
 
-        gl.uniform1i(shaderProgram.useLightingUniform, false);
-        stardata.drawStar();
-        sundata.drawStar();
-        earthdata.draw(zval);
-        gl.uniform1i(shaderProgram.useLightingUniform, true);
-        moondata.drawMoon(zval, aristotle.moonvector, aristotle.moonrot);
+        if(stardata) stardata.drawStar();
+        if(sundata) sundata.drawStar();
+        if(earthdata) earthdata.draw(zval);
+        if(moondata) moondata.drawMoon(zval, aristotle.moonvector, aristotle.moonrot);
     }
 
     var framecount = 0;
