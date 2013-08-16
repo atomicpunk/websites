@@ -50,6 +50,30 @@ function deep_arg_t() {
 	this.xn = 0.0;
 	this.t = 0.0;
 	this.ds50 = 0.0;
+	this.print = function() {
+		console.log(this.eosq+" "+
+		this.sinio+" "+
+	    this.cosio+" "+
+	    this.betao+" "+
+	    this.aodp+" "+
+	    this.theta2+" "+
+	    this.sing+" "+
+	    this.cosg+" "+
+	    this.betao2+" "+
+	    this.xmdot+" "+
+	    this.omgdot+" "+
+	    this.xnodot+" "+
+	    this.xnodp+" "+
+	    this.xll+" "+
+	    this.omgadf+" "+
+	    this.xnode+" "+
+	    this.em+" "+
+	    this.xinc+" "+
+	    this.xn+" "+
+	    this.t+" "+
+	    this.ds50
+		);
+	}
 }
 
 function Norad() {
@@ -159,16 +183,16 @@ function Norad() {
 		var year,day,UT,jd,ThetaG, val;
 
 		val = modf(epoch*1E-3);
-		year = val[1];
-		day = val[0]*1E3;
+		year = val[0];
+		day = val[1]*1E3;
 		if(year < 57)
 			year += 2000;
 		else
 			year += 1900;
 
 		val = modf(day);
-		day = val[1];
-		UT = val[0];
+		day = val[0];
+		UT = val[1];
 		jd = Julian_Date_of_Year(year)+day;
 		deep_arg.ds50 = jd-2433281.5+UT;
 		ThetaG = FMod2p(6.3003880987*deep_arg.ds50+1.72944494);
@@ -181,8 +205,8 @@ function Norad() {
 		var tmp,UT,TU,GMST,ThetaG,val;
 
 		val = modf(jd + 0.5);
-		tmp = val[1];
-		UT = val[0];
+		tmp = val[0];
+		UT = val[1];
 		jd = jd - UT;
 		TU = (jd-2451545.0)/36525;
 		GMST = 24110.54841+TU*(8640184.812866+TU*(0.093104-TU* 6.2E-6));
@@ -198,14 +222,13 @@ function Norad() {
 		var jdoy;
 
 		year = year-1;
-		i = year/100;
+		i = (year/100) | 0;
 		A = i;
-		i = A/4;
+		i = (A/4) | 0;
 		B = 2-A+i;
-		i = 365.25*year;
-		i += 30.6001*14;
+		i = (365.25*year) | 0;
+		i += (30.6001*14) | 0;
 		jdoy = i+1720994.5+B;
-
 		return (jdoy);
 	}
 
@@ -494,6 +517,18 @@ function Norad() {
 			/* initialize Deep() */
 			Deep(dpinit, tle, deep_arg);
 		}
+
+/*
+        console.log(a+" "+axn+" "+ayn+" "+aynl+" "+beta+" "+betal+" "+capu+" "+cos2u+" "+cosepw+" "+cosik+" "+
+            cosnok+" "+cosu+" "+cosuk+" "+ecose+" "+elsq+" "+epw+" "+esine+" "+pl+" "+theta4+" "+
+            rdot+" "+rdotk+" "+rfdot+" "+rfdotk+" "+rk+" "+sin2u+" "+sinepw+" "+sinik+" "+
+            sinnok+" "+sinu+" "+sinuk+" "+tempe+" "+templ+" "+tsq+" "+u+" "+uk+" "+ux+" "+uy+" "+uz+" "+
+            vx+" "+vy+" "+vz+" "+xinck+" "+xl+" "+xlt+" "+xmam+" "+xmdf+" "+xmx+" "+xmy+" "+xnoddf);
+        console.log("FARG"+xnodek+" "+xll+" "+a1+" "+a3ovk2+" "+ao+" "+c2+" "+coef+" "+coef1+" "+x1m5th+" "+
+            xhdot1+" "+del1+" "+r+" "+delo+" "+eeta+" "+eta+" "+etasq+" "+perige+" "+
+            psisq+" "+tsi+" "+qoms24+" "+s4+" "+pinvsq+" "+temp+" "+tempa+" "+temp1+" "+
+            temp2+" "+temp3+" "+temp4+" "+temp5+" "+temp6);
+*/
 
 		/* Update for secular gravity and atmospheric drag */
 		xmdf = tle.xmo+deep_arg.xmdot*tsince;
@@ -938,7 +973,7 @@ function Norad() {
 			stepn = -720;
 			step2 = 259200;
 			/* End case dpinit: */
-			return;
+			break;
 
 		case dpsec: /* Entrance for deep space secular effects */
 			deep_arg.xll = deep_arg.xll+ssl*deep_arg.t;
@@ -1061,7 +1096,7 @@ function Norad() {
 			else
 				deep_arg.xll = xl-deep_arg.omgadf+temp;
 
-			return;
+			break;
 			/*End case dpsec: */
 
 		case dpper: /* Entrance for lunar-solar periodics */
@@ -1141,7 +1176,7 @@ function Norad() {
 				deep_arg.omgadf = xls-deep_arg.xll-Math.cos(deep_arg.xinc)*
 				deep_arg.xnode;
 			}
-			return;
+			break;
 		}
 	}
 
@@ -1206,10 +1241,10 @@ Norad.prototype.getTrack = function(start, end, delta, tle) {
 }
 
 function testNorad() {
-	tle = new tle_t(80275.98708465, 7.3094e-4, 1.3844e-4, 6.6816e-5,
+	var tle = new tle_t(80275.98708465, 7.3094e-4, 1.3844e-4, 6.6816e-5,
 		72.8435, 115.9689, .0086731, 52.6988, 110.5714, 16.05824518);
 	norad.getTrack(0.0, 1440.0, 360.0, tle);
-	tls = new tle_t(80230.29629788, 1.431103E-2, 0.0, 1.4311E-2, 46.7916,
-		230.4354, .7318036, 47.4722, 10.4117, 2.28537848);
+	tle = new tle_t(80230.29629788, 1.431103E-2, 0.0, 1.4311E-2,
+		46.7916, 230.4354, .7318036, 47.4722, 10.4117, 2.28537848);
 	norad.getTrack(0.0, 1440.0, 360.0, tle);
 }
