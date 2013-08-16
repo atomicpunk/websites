@@ -50,30 +50,6 @@ function deep_arg_t() {
 	this.xn = 0.0;
 	this.t = 0.0;
 	this.ds50 = 0.0;
-	this.print = function() {
-		console.log(this.eosq+" "+
-		this.sinio+" "+
-	    this.cosio+" "+
-	    this.betao+" "+
-	    this.aodp+" "+
-	    this.theta2+" "+
-	    this.sing+" "+
-	    this.cosg+" "+
-	    this.betao2+" "+
-	    this.xmdot+" "+
-	    this.omgdot+" "+
-	    this.xnodot+" "+
-	    this.xnodp+" "+
-	    this.xll+" "+
-	    this.omgadf+" "+
-	    this.xnode+" "+
-	    this.em+" "+
-	    this.xinc+" "+
-	    this.xn+" "+
-	    this.t+" "+
-	    this.ds50
-		);
-	}
 }
 
 function Norad() {
@@ -518,18 +494,6 @@ function Norad() {
 			Deep(dpinit, tle, deep_arg);
 		}
 
-/*
-        console.log(a+" "+axn+" "+ayn+" "+aynl+" "+beta+" "+betal+" "+capu+" "+cos2u+" "+cosepw+" "+cosik+" "+
-            cosnok+" "+cosu+" "+cosuk+" "+ecose+" "+elsq+" "+epw+" "+esine+" "+pl+" "+theta4+" "+
-            rdot+" "+rdotk+" "+rfdot+" "+rfdotk+" "+rk+" "+sin2u+" "+sinepw+" "+sinik+" "+
-            sinnok+" "+sinu+" "+sinuk+" "+tempe+" "+templ+" "+tsq+" "+u+" "+uk+" "+ux+" "+uy+" "+uz+" "+
-            vx+" "+vy+" "+vz+" "+xinck+" "+xl+" "+xlt+" "+xmam+" "+xmdf+" "+xmx+" "+xmy+" "+xnoddf);
-        console.log("FARG"+xnodek+" "+xll+" "+a1+" "+a3ovk2+" "+ao+" "+c2+" "+coef+" "+coef1+" "+x1m5th+" "+
-            xhdot1+" "+del1+" "+r+" "+delo+" "+eeta+" "+eta+" "+etasq+" "+perige+" "+
-            psisq+" "+tsi+" "+qoms24+" "+s4+" "+pinvsq+" "+temp+" "+tempa+" "+temp1+" "+
-            temp2+" "+temp3+" "+temp4+" "+temp5+" "+temp6);
-*/
-
 		/* Update for secular gravity and atmospheric drag */
 		xmdf = tle.xmo+deep_arg.xmdot*tsince;
 		deep_arg.omgadf = tle.omegao+deep_arg.omgdot*tsince;
@@ -643,6 +607,14 @@ function Norad() {
 		vel.x = rdotk*ux+rfdotk*vx;
 		vel.y = rdotk*uy+rfdotk*vy;
 		vel.z = rdotk*uz+rfdotk*vz;
+
+		/* cartesian conversion */
+		pos.x = pos.x*xkmper/ae; /* Cartesian Position x */
+		pos.y = pos.y*xkmper/ae; /* Cartesian Position y */
+		pos.z = pos.z*xkmper/ae; /* Cartesian Position z */
+		vel.x = vel.x*xkmper/(ae*xmnpda/86400.0);
+		vel.y = vel.y*xkmper/(ae*xmnpda/86400.0);
+		vel.z = vel.z*xkmper/(ae*xmnpda/86400.0);
 	}
 
 	/* Deep (used by SDP) */
