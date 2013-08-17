@@ -382,20 +382,24 @@ function Norad(earthradius) {
 		pos.x = rk*ux;
 		pos.y = rk*uy;
 		pos.z = rk*uz;
-		vel.x = rdot*ux;
-		vel.y = rdot*uy;
-		vel.z = rdot*uz;
-		vel.x = rvdot*vx+vel.x;
-		vel.y = rvdot*vy+vel.y;
-		vel.z = rvdot*vz+vel.z;
+		if(vel) {
+			vel.x = rdot*ux;
+			vel.y = rdot*uy;
+			vel.z = rdot*uz;
+			vel.x = rvdot*vx+vel.x;
+			vel.y = rvdot*vy+vel.y;
+			vel.z = rvdot*vz+vel.z;
+		}
 
 		/* cartesian conversion */
 		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
 		pos.y = pos.y*earthrad/ae; /* Cartesian Position y */
 		pos.z = pos.z*earthrad/ae; /* Cartesian Position z */
-		vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
-		vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
-		vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
+		if(vel) {
+			vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
+			vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
+			vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
+		}
 	}
 
 	/* SDP4 implementation */
@@ -606,17 +610,21 @@ function Norad(earthradius) {
 		pos.x = rk*ux;
 		pos.y = rk*uy;
 		pos.z = rk*uz;
-		vel.x = rdotk*ux+rfdotk*vx;
-		vel.y = rdotk*uy+rfdotk*vy;
-		vel.z = rdotk*uz+rfdotk*vz;
+		if(vel) {
+			vel.x = rdotk*ux+rfdotk*vx;
+			vel.y = rdotk*uy+rfdotk*vy;
+			vel.z = rdotk*uz+rfdotk*vz;
+		}
 
 		/* cartesian conversion */
 		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
 		pos.y = pos.y*earthrad/ae; /* Cartesian Position y */
 		pos.z = pos.z*earthrad/ae; /* Cartesian Position z */
-		vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
-		vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
-		vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
+		if(vel) {
+			vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
+			vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
+			vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
+		}
 	}
 
 	/* Deep (used by SDP) */
@@ -1217,7 +1225,6 @@ Norad.prototype.getTrack = function(tle, start, end, delta) {
 }
 
 Norad.prototype.getOrbit = function(tle, points) {
-	var vel = new vector_t();
 	var pos = new vector_t();
 	var track = [];
 
@@ -1226,9 +1233,9 @@ Norad.prototype.getOrbit = function(tle, points) {
 	for(var t = 0; t < tle.period; t += delta)
 	{
 		if(deep)
-			this.sdp4(t, tle, pos, vel);
+			this.sdp4(t, tle, pos);
 		else
-			this.sgp(t, tle, pos, vel);
+			this.sgp(t, tle, pos);
 
 		track.push(pos.x, pos.y, pos.z);
 	}
