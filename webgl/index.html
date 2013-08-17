@@ -14,19 +14,24 @@
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
 </head>
 <body>
-    <canvas id="main_canvas"></canvas>
-    <script type="text/javascript" src="js/glMatrix-0.9.5.min.js"></script>
-    <script type="text/javascript" src="js/webgl-utils.js"></script>
-    <script id="shader-fs" type="x-shader/x-fragment">
-        precision mediump float;
-        varying vec2 vTextureCoord;
-        varying vec3 vLightWeighting;
-        uniform sampler2D uSampler;
-        void main(void) {
-            vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-            gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
-        }
-    </script>
+	<canvas id="main_canvas"></canvas>
+	<script type="text/javascript" src="js/glMatrix-0.9.5.min.js"></script>
+	<script type="text/javascript" src="js/webgl-utils.js"></script>
+	<script id="shader-fs" type="x-shader/x-fragment">
+		precision mediump float;
+		varying vec2 vTextureCoord;
+		varying vec3 vLightWeighting;
+		uniform sampler2D uSampler;
+		uniform bool monochromatic;
+		void main(void) {
+			if(monochromatic) {
+				gl_FragColor = vec4(vLightWeighting, 1);
+			} else {
+				vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+				gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
+			}
+		}
+	</script>
     <script id="shader-vs" type="x-shader/x-vertex">
         attribute vec3 aVertexPosition;
         attribute vec3 aVertexNormal;
@@ -59,6 +64,8 @@
             }
         }
     </script>
+    <script src="js/norad.js"></script>
+    <script src="js/satellite.js"></script>
     <script src="js/main.js"></script>
     <script type="text/javascript">
         if(navigator.appName.search("Microsoft") >= 0)

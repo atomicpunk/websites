@@ -1,20 +1,22 @@
-/* global interface opject */
-var norad = new Norad();
-
 /* data types */
 function tle_t(a, b, c, d, e, f, g, h, i, j) {
 	"use strict";
 
-	this.epoch = a;
-	this.xndt2o = b;
-	this.xndd6o = c;
-	this.bstar = d;
-	this.xincl = e;
-	this.xnodeo = f;
-	this.eo = g;
-	this.omegao = h;
-	this.xmo = i;
-	this.xno = j;
+/* Two-line-element satellite orbital data
+	0 000000 000000   aaaaaaaaaaaaaa bbbbbbbbbb  ccccccc dddddddd 0  0000
+	0 00000 eeeeeeee ffffffff ggggggg hhhhhhhh iiiiiiii jjjjjjjjjjjjjjjjj
+*/
+	this.epoch  = a; /* Epoch time (yrday.fracday) */
+	this.xndt2o = b; /* Decay rate (rev/day^2) */
+	this.xndd6o = c; /* */
+	this.bstar  = d; /* */
+	this.xincl  = e; /* Inclination (deg) */
+	this.xnodeo = f; /* RA of node (deg) */
+	this.eo     = g; /* Eccentricity */
+	this.omegao = h; /* Arg of perigee (deg) */
+	this.xmo    = i; /* */
+	this.xno    = j; /* Mean motion (rev/day) */
+	this.period = j;
 }
 
 function vector_t() {
@@ -52,7 +54,7 @@ function deep_arg_t() {
 	this.ds50 = 0.0;
 }
 
-function Norad() {
+function Norad(earthradius) {
 	"use strict";
 
 	/* flags */
@@ -103,7 +105,7 @@ function Norad() {
 	var xj3      = -2.53881E-6;
 	var xj4      = -1.65597E-6;
 	var xke      = 7.43669161E-2;
-	var xkmper   = 6.378135E3;
+	var earthrad   = (earthradius)?earthradius:6.378135E3;
 	var xmnpda   = 1.44E3;
 	var ae       = 1.0;
 	var ck2      = 5.413079E-4;
@@ -388,12 +390,12 @@ function Norad() {
 		vel.z = rvdot*vz+vel.z;
 
 		/* cartesian conversion */
-		pos.x = pos.x*xkmper/ae; /* Cartesian Position x */
-		pos.y = pos.y*xkmper/ae; /* Cartesian Position y */
-		pos.z = pos.z*xkmper/ae; /* Cartesian Position z */
-		vel.x = vel.x*xkmper/(ae*xmnpda/86400.0);
-		vel.y = vel.y*xkmper/(ae*xmnpda/86400.0);
-		vel.z = vel.z*xkmper/(ae*xmnpda/86400.0);
+		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
+		pos.y = pos.y*earthrad/ae; /* Cartesian Position y */
+		pos.z = pos.z*earthrad/ae; /* Cartesian Position z */
+		vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
+		vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
+		vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
 	}
 
 	/* SDP4 implementation */
@@ -437,15 +439,15 @@ function Norad() {
 			/* of s and qoms2t are altered.         */
 			s4 = s;
 			qoms24 = qoms2t;
-			perige = (deep_arg.aodp*(1-tle.eo)-ae)*xkmper;
+			perige = (deep_arg.aodp*(1-tle.eo)-ae)*earthrad;
 			if(perige < 156)
 			{
 				if(perige <= 98)
 					s4 = 20;
 				else
 					s4 = perige-78;
-				qoms24 = Math.pow((120-s4)*ae/xkmper,4);
-				s4 = s4/xkmper+ae;
+				qoms24 = Math.pow((120-s4)*ae/earthrad,4);
+				s4 = s4/earthrad+ae;
 			}
 			pinvsq = 1/(deep_arg.aodp*deep_arg.aodp*
 				deep_arg.betao2*deep_arg.betao2);
@@ -609,12 +611,12 @@ function Norad() {
 		vel.z = rdotk*uz+rfdotk*vz;
 
 		/* cartesian conversion */
-		pos.x = pos.x*xkmper/ae; /* Cartesian Position x */
-		pos.y = pos.y*xkmper/ae; /* Cartesian Position y */
-		pos.z = pos.z*xkmper/ae; /* Cartesian Position z */
-		vel.x = vel.x*xkmper/(ae*xmnpda/86400.0);
-		vel.y = vel.y*xkmper/(ae*xmnpda/86400.0);
-		vel.z = vel.z*xkmper/(ae*xmnpda/86400.0);
+		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
+		pos.y = pos.y*earthrad/ae; /* Cartesian Position y */
+		pos.z = pos.z*earthrad/ae; /* Cartesian Position z */
+		vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
+		vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
+		vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
 	}
 
 	/* Deep (used by SDP) */
@@ -1182,6 +1184,7 @@ function Norad() {
 			(del1*1.654320987654321+1.0)));
 		delo = temp/(ao*ao);
 		xnodp = tle.xno/(delo+1.0);
+		tle.period = twopi/xnodp;
 
 		/* Select a deep-space/near-earth ephemeris */
 		if (twopi/xnodp/xmnpda >= 0.15625) {
@@ -1194,9 +1197,10 @@ function Norad() {
 	}
 }
 
-Norad.prototype.getTrack = function(start, end, delta, tle) {
+Norad.prototype.getTrack = function(tle, start, end, delta) {
 	var vel = new vector_t();
 	var pos = new vector_t();
+	var track = [];
 
 	var deep = this.is_deep_space(tle);
 	for(var tsince = start; tsince <= end; tsince += delta)
@@ -1206,17 +1210,28 @@ Norad.prototype.getTrack = function(start, end, delta, tle) {
 		else
 			this.sgp(tsince, tle, pos, vel);
 
-		console.log("TIME: "+tsince);
-		console.log(" POS: "+pos.x+" "+pos.y+" "+pos.z);
-		console.log(" VEL: "+vel.x+" "+vel.y+" "+vel.z);
+		track.push(pos.x, pos.y, pos.z);
 	}
+
+	return track;
 }
 
-function testNorad() {
-	var tle = new tle_t(80275.98708465, 7.3094e-4, 1.3844e-4, 6.6816e-5,
-		72.8435, 115.9689, .0086731, 52.6988, 110.5714, 16.05824518);
-	norad.getTrack(0.0, 1440.0, 360.0, tle);
-	tle = new tle_t(80230.29629788, 1.431103E-2, 0.0, 1.4311E-2,
-		46.7916, 230.4354, .7318036, 47.4722, 10.4117, 2.28537848);
-	norad.getTrack(0.0, 1440.0, 360.0, tle);
+Norad.prototype.getOrbit = function(tle, points) {
+	var vel = new vector_t();
+	var pos = new vector_t();
+	var track = [];
+
+	var deep = this.is_deep_space(tle);
+	var delta = tle.period/points;
+	for(var t = 0; t < tle.period; t += delta)
+	{
+		if(deep)
+			this.sdp4(t, tle, pos, vel);
+		else
+			this.sgp(t, tle, pos, vel);
+
+		track.push(pos.x, pos.y, pos.z);
+	}
+
+	return track;
 }

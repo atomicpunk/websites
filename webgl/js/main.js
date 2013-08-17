@@ -10,6 +10,7 @@ var povAzi = Math.PI*(190/180);
 var povInc = Math.PI*(35/180);
 var daylight = null;
 var nightlight = null;
+var norad = new Norad(earthsize);
 
 function GeocentricModel() {
     "use strict";
@@ -226,57 +227,47 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, lighting) {
         self.vertexPositionBuffer.itemSize = 3;
         self.vertexPositionBuffer.numItems = self.vertexPositionData.length / 3;
 
-        for (var i = 0; i < self.texture.length; i++) {
-            if(self.indexData[i].length > 0) {
-                self.vertexIndexBuffer[i] = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.vertexIndexBuffer[i]);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(self.indexData[i]), gl.STATIC_DRAW);
-                self.vertexIndexBuffer[i].itemSize = 1;
-                self.vertexIndexBuffer[i].numItems = self.indexData[i].length;
-            } else {
-                self.vertexIndexBuffer[i] = null;
-            }
-        }
-    }
+		for (var i = 0; i < self.texture.length; i++) {
+			self.vertexIndexBuffer[i] = gl.createBuffer();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.vertexIndexBuffer[i]);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(self.indexData[i]), gl.STATIC_DRAW);
+			self.vertexIndexBuffer[i].itemSize = 1;
+			self.vertexIndexBuffer[i].numItems = self.indexData[i].length;
+		}
+	}
 
-    init();
+	init();
 }
 
 CosmicBody.prototype.drawHelper = function() {
-    var gl = this.gl;
-    var shader = this.shaderProgram;
+	var gl = this.gl;
+	var shader = this.shaderProgram;
 
-    mat4.toInverseMat3(mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
-    gl.uniform1i(shader.uselighting, (this.lighting)?1:0);
-    if(this.lighting) {
-        gl.uniform3fv(shader.daylightDirection, daylight);
-        gl.uniform3fv(shader.nightlightDirection, nightlight);
-    }
-    gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
-    gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
-    gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
+	mat4.toInverseMat3(mvMatrix, normalMatrix);
+	mat3.transpose(normalMatrix);
+	gl.uniform1i(shader.monochromatic, false);
+	gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
+	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
+	gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
 
-    for (var i = 0; i < this.texture.length; i++) {
-        if(i > 0) gl.uniform1i(shader.uselighting, 2);
-        if(this.vertexIndexBuffer[i]) {
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, this.texture[i]);
-            gl.uniform1i(shader.samplerUniform, 0);
+	for (var i = 0; i < this.texture.length; i++) {
+		gl.uniform1i(shader.uselighting, (this.lighting)?(i+1):0);
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, this.texture[i]);
+		gl.uniform1i(shader.samplerUniform, 0);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-            gl.vertexAttribPointer(shader.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+		gl.vertexAttribPointer(shader.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
-            gl.vertexAttribPointer(shader.textureCoordAttribute, this.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
+		gl.vertexAttribPointer(shader.textureCoordAttribute, this.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
-            gl.vertexAttribPointer(shader.vertexNormalAttribute, this.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
+		gl.vertexAttribPointer(shader.vertexNormalAttribute, this.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer[i]);
-            gl.drawElements(gl.TRIANGLES, this.vertexIndexBuffer[i].numItems, gl.UNSIGNED_SHORT, 0);
-        }
-    }
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer[i]);
+		gl.drawElements(gl.TRIANGLES, this.vertexIndexBuffer[i].numItems, gl.UNSIGNED_SHORT, 0);
+	}
 }
 
 CosmicBody.prototype.draw = function(zoom) {
@@ -318,6 +309,7 @@ function WebGl() {
     var stardata = null;
     var moondata = null;
     var sundata = null;
+    var issdata = null;
     var mvMatrixStack = [];
     var mouseDown = false;
     var lastMouseX = null;
@@ -342,13 +334,13 @@ function WebGl() {
         if(location.search.indexOf("?normal") == 0)
             small = false;
 
-        var imglist = [];
-        if(!small)
-            imglist = ["images/earth_day.jpg", "images/earth_night.jpg", 
-                       "images/moon.jpg", "images/stars.png", "images/sun.png"];
-        else
-            imglist = ["images/earth_day_small.jpg", "images/earth_night_small.jpg", 
-                       "images/moon_small.jpg", "images/stars.png", "images/sun.png"];
+		var imglist = [];
+//		if(!small)
+			imglist = ["images/earth_day.jpg", "images/earth_night.jpg", 
+						"images/moon.jpg", "images/stars.png", "images/sun.png"];
+//		else
+//			imglist = ["images/earth_day_small.jpg", "images/earth_night_small.jpg", 
+//						"images/moon_small.jpg", "images/stars.png", "images/sun.png"];
         var canvas = document.getElementById("main_canvas");
         try {
             gl = canvas.getContext("experimental-webgl");
@@ -366,18 +358,17 @@ function WebGl() {
         initShaders();
         tick();
 
-	earthdata = new CosmicBody(gl, shaderProgram, "earth",
-		[imglist[0], imglist[1]],
-		earthsize, true);
-	moondata = new CosmicBody(gl, shaderProgram, "moon",
-		[imglist[2]],
-		earthsize*0.272798619, true);
-	stardata = new CosmicBody(gl, shaderProgram, "stars",
-		[imglist[3]],
-		starsize, false);
+		earthdata = new CosmicBody(gl, shaderProgram, "earth",
+			[imglist[0], imglist[1]], earthsize, true);
+		moondata = new CosmicBody(gl, shaderProgram, "moon",
+			[imglist[2]], earthsize*0.272798619, true);
+		stardata = new CosmicBody(gl, shaderProgram, "stars",
+			[imglist[3]], starsize, false);
         sundata = new CosmicBody(gl, shaderProgram, "sun", 
-		[imglist[4]],
-		starsize - 20, false);
+			[imglist[4]], starsize - 20, false);
+		issdata = new Satellite(gl, shaderProgram, new tle_t(13053.60518867,
+			-0.00107979, 0.0, -1.7526E-2, 51.6510, 315.7581, 0.0011197, 
+			300.8439, 147.2887, 15.52322559816962));
 
         var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
         window.addEventListener(mousewheelevt, handleMouseWheel);
@@ -453,6 +444,7 @@ function WebGl() {
         shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
         shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
         shaderProgram.uselighting = gl.getUniformLocation(shaderProgram, "uselighting");
+        shaderProgram.monochromatic = gl.getUniformLocation(shaderProgram, "monochromatic");
         shaderProgram.daylightDirection = gl.getUniformLocation(shaderProgram, "daylightDirection");
         shaderProgram.dayAmbientColor = gl.getUniformLocation(shaderProgram, "dayAmbientColor");
         shaderProgram.dayDirectColor = gl.getUniformLocation(shaderProgram, "dayDirectColor");
@@ -565,10 +557,13 @@ function WebGl() {
         daylight = vec3.create(light);
         nightlight = vec3.create(light);
         vec3.scale(nightlight, -1);
+        gl.uniform3fv(shaderProgram.daylightDirection, daylight);
+        gl.uniform3fv(shaderProgram.nightlightDirection, nightlight);
 
         if(stardata) stardata.drawStar();
         if(sundata) sundata.drawStar();
         if(earthdata) earthdata.draw(zval);
+		if(issdata) issdata.draw(zval);
         if(moondata) moondata.drawMoon(zval, aristotle.moonvector, aristotle.moonrot);
     }
 
