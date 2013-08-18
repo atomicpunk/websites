@@ -9,6 +9,18 @@ function Satellite(tledata) {
 	this.position = [];
 }
 
+Satellite.prototype.print = function() {
+	if(this.deep)
+		console.log("DEEP (SDP)");
+	else
+		console.log("LEO (SGP)");
+	this.tle.print();
+	var x = this.position[0];
+	var y = this.position[1];
+	var z = this.position[2];
+	console.log("X: "+x+" Y: "+y+" Z: "+z);
+}
+
 function SatelliteArray(gl, shaderProgram, tlefile) {
 	"use strict";
 
@@ -35,8 +47,6 @@ function SatelliteArray(gl, shaderProgram, tlefile) {
 					var tle = line+" "+lines[i];
 					var id = line.split(" ")[1];
 					tledata[id] = tle;
-				} else {
-					line = "";
 				}
 			}
 			for(var t in tledata)

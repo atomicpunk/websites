@@ -61,6 +61,7 @@ tle_t.prototype.print = function()
 	console.log("Arg of Perigiee: ["+this.omegao+"]");
 	console.log("Mean anomaly: ["+this.xmo+"]");
 	console.log("Mean motion: ["+this.xno+"]");
+	console.log("Period: ["+this.period+"]");
 }
 
 function vector_t() {
@@ -98,6 +99,16 @@ function deep_arg_t() {
 	this.ds50 = 0.0;
 }
 
+deep_arg_t.prototype.print = function()
+{
+	console.log(this.eosq+" "+this.sinio+" "+this.cosio+" "+
+			this.betao+" "+this.aodp+" "+this.theta2+" "+this.sing+" "+
+			this.cosg+" "+this.betao2+" "+this.xmdot+" "+this.omgdot+" "+
+			this.xnodot+" "+this.xnodp+" "+this.xll+" "+this.omgadf+" "+
+			this.xnode+" "+this.em+" "+this.xinc+" "+this.xn+" "+
+			this.t+" "+this.ds50);
+}
+
 function Norad(earthradius) {
 	"use strict";
 
@@ -118,23 +129,27 @@ function Norad(earthradius) {
 	var EPOCH_RESTART_FLAG		= 0x1000;
 
 	/* flag handlers */
-	var Flags = 0;
+	var self = this;
+	this.Flags = 0;
+	this.isFlagSet = isFlagSet;
 	function isFlagSet(flag)
 	{
-		return (Flags & flag);
+		return (self.Flags & flag);
 	}
+	this.isFlagClear = isFlagClear;
 	function isFlagClear(flag)
 	{
-		return (~Flags & flag);
+		return (~self.Flags & flag);
 	}
+	this.SetFlag = SetFlag;
 	function SetFlag(flag)
 	{
-		Flags |= flag;
+		self.Flags |= flag;
 	}
 	this.ClearFlag = ClearFlag;
 	function ClearFlag(flag)
 	{
-		Flags &= ~flag;
+		self.Flags &= ~flag;
 	}
 
 	/* Table of constant values */
@@ -149,7 +164,8 @@ function Norad(earthradius) {
 	var xj3      = -2.53881E-6;
 	var xj4      = -1.65597E-6;
 	var xke      = 7.43669161E-2;
-	var earthrad   = (earthradius)?earthradius:6.378135E3;
+	var xkmper   = 6.378135E3;
+	var earthrad = (earthradius)?earthradius:xkmper;
 	var xmnpda   = 1.44E3;
 	var ae       = 1.0;
 	var ck2      = 5.413079E-4;
@@ -488,15 +504,15 @@ function Norad(earthradius) {
 			/* of s and qoms2t are altered.         */
 			s4 = s;
 			qoms24 = qoms2t;
-			perige = (deep_arg.aodp*(1-tle.eo)-ae)*earthrad;
+			perige = (deep_arg.aodp*(1-tle.eo)-ae)*xkmper;
 			if(perige < 156)
 			{
 				if(perige <= 98)
 					s4 = 20;
 				else
 					s4 = perige-78;
-				qoms24 = Math.pow((120-s4)*ae/earthrad,4);
-				s4 = s4/earthrad+ae;
+				qoms24 = Math.pow((120-s4)*ae/xkmper,4);
+				s4 = s4/xkmper+ae;
 			}
 			pinvsq = 1/(deep_arg.aodp*deep_arg.aodp*
 				deep_arg.betao2*deep_arg.betao2);
@@ -1284,6 +1300,25 @@ Norad.prototype.getPoint = function(tle, time, deep) {
 	var pos = new vector_t();
 	var sfunc = (deep)?this.sdp4:this.sgp;
 
+	this.Flags = 0;
 	sfunc(time, tle, pos);
-	return [pos.x, pos.y, pos.z];
+	return [-1*pos.x, pos.z, pos.y];
+}
+
+Norad.prototype.test = function(tle, deep) {
+	var pos = new vector_t();
+	var vel = new vector_t();
+
+	this.Flags = 0;
+	for(var t = 0.0; t <= 1440.0; t += 360.0)
+	{
+		if(deep)
+			this.sdp4(t, tle, pos, vel);
+		else
+			this.sgp(t, tle, pos, vel);
+
+		console.log("TIME: "+t);
+		console.log(" POS: "+pos.x+" "+pos.y+" "+pos.z);
+		console.log(" VEL: "+vel.x+" "+vel.y+" "+vel.z);
+	}
 }
