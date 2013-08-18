@@ -330,17 +330,13 @@ function WebGl() {
 
     function init()
     {
-        var small = true;
-        if(location.search.indexOf("?normal") == 0)
-            small = false;
-
 		var imglist = [];
-//		if(!small)
+		if(location.search.indexOf("?normal") == 0)
 			imglist = ["images/earth_day.jpg", "images/earth_night.jpg", 
 						"images/moon.jpg", "images/stars.png", "images/sun.png"];
-//		else
-//			imglist = ["images/earth_day_small.jpg", "images/earth_night_small.jpg", 
-//						"images/moon_small.jpg", "images/stars.png", "images/sun.png"];
+		else
+			imglist = ["images/earth_day_small.jpg", "images/earth_night_small.jpg", 
+						"images/moon_small.jpg", "images/stars.png", "images/sun.png"];
         var canvas = document.getElementById("main_canvas");
         try {
             gl = canvas.getContext("experimental-webgl");
