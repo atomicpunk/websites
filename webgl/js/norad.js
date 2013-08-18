@@ -6,17 +6,61 @@ function tle_t(a, b, c, d, e, f, g, h, i, j) {
 	0 000000 000000   aaaaaaaaaaaaaa bbbbbbbbbb  ccccccc dddddddd 0  0000
 	0 00000 eeeeeeee ffffffff ggggggg hhhhhhhh iiiiiiii jjjjjjjjjjjjjjjjj
 */
+	this.cat = "";
+	this.designator = "";
 	this.epoch  = a; /* Epoch time (yrday.fracday) */
-	this.xndt2o = b; /* Decay rate (rev/day^2) */
-	this.xndd6o = c; /* */
-	this.bstar  = d; /* */
+	this.xndt2o = b; /* First Time Derivative of the Mean Motion divided by two */
+	this.xndd6o = c; /* Second Time Derivative of Mean Motion divided by six */
+	this.bstar  = d; /* Drag term */
 	this.xincl  = e; /* Inclination (deg) */
-	this.xnodeo = f; /* RA of node (deg) */
+	this.xnodeo = f; /* RA of ascending node (deg) */
 	this.eo     = g; /* Eccentricity */
 	this.omegao = h; /* Arg of perigee (deg) */
-	this.xmo    = i; /* */
+	this.xmo    = i; /* Mean anomaly */
 	this.xno    = j; /* Mean motion (rev/day) */
 	this.period = j;
+
+	if(b == undefined) {
+		this.extract(a);
+	}
+}
+
+tle_t.prototype.getFloat = function(data)
+{
+	return parseFloat(data.slice(0, -2)+"E"+data.slice(-2))*1E-4;
+}
+
+tle_t.prototype.extract = function(data)
+{
+	this.id = data.slice(2, 8).trim();
+	this.designator = data.slice(9, 17).trim();
+	this.epoch  = parseFloat(data.slice(18, 32));
+	this.xndt2o = parseFloat(data.slice(33, 43));
+	this.xndd6o = this.getFloat(data.slice(44, 52));
+	this.bstar  = this.getFloat(data.slice(53, 61));
+	this.xincl  = parseFloat(data.slice(79, 87));
+	this.xnodeo = parseFloat(data.slice(88, 96));
+	this.eo     = parseFloat(data.slice(97, 104))/10000000;
+	this.omegao = parseFloat(data.slice(105, 113));
+	this.xmo    = parseFloat(data.slice(114, 122));
+	this.xno    = parseFloat(data.slice(123, 134));
+	this.period = this.xno;
+}
+
+tle_t.prototype.print = function()
+{
+	console.log("Satellite ID: ["+this.id+"]");
+	console.log("International Designator: ["+this.designator+"]");
+	console.log("Epoch time: ["+this.epoch+"]");
+	console.log("First Time Derivative: ["+this.xndt2o+"]");
+	console.log("Second Time Derivative: ["+this.xndd6o+"]");
+	console.log("Drag term: ["+this.bstar+"]");
+	console.log("Inclination: ["+this.xincl+"]");
+	console.log("RA of ascending node: ["+this.xnodeo+"]");
+	console.log("Eccentricity: ["+this.eo+"]");
+	console.log("Arg of Perigiee: ["+this.omegao+"]");
+	console.log("Mean anomaly: ["+this.xmo+"]");
+	console.log("Mean motion: ["+this.xno+"]");
 }
 
 function vector_t() {
@@ -149,6 +193,7 @@ function Norad(earthradius) {
 	var dpper    = 3; /* Deep-space periodic code       */
 
 	/* Math functions */
+	this.modf = modf;
 	function modf(val)
 	{
 		var i = val | 0;
@@ -1205,40 +1250,40 @@ function Norad(earthradius) {
 	}
 }
 
-Norad.prototype.getTrack = function(tle, start, end, delta) {
-	var vel = new vector_t();
+Norad.prototype.getTrack = function(tle, start, end, delta, deep) {
 	var pos = new vector_t();
+	var sfunc = (deep)?this.sdp4:this.sgp;
 	var track = [];
 
-	var deep = this.is_deep_space(tle);
-	for(var tsince = start; tsince <= end; tsince += delta)
+	for(var t = start; t < end; t += delta)
 	{
-		if(deep)
-			this.sdp4(tsince, tle, pos, vel);
-		else
-			this.sgp(tsince, tle, pos, vel);
-
+		sfunc(t, tle, pos);
 		track.push(pos.x, pos.y, pos.z);
 	}
 
 	return track;
 }
 
-Norad.prototype.getOrbit = function(tle, points) {
+Norad.prototype.getOrbit = function(tle, points, start, deep) {
 	var pos = new vector_t();
+	var sfunc = (deep)?this.sdp4:this.sgp;
+	var delta = tle.period/points;
+	var e = start + tle.period;
 	var track = [];
 
-	var deep = this.is_deep_space(tle);
-	var delta = tle.period/points;
-	for(var t = 0; t < tle.period; t += delta)
+	for(var t = start; t < e; t += delta)
 	{
-		if(deep)
-			this.sdp4(t, tle, pos);
-		else
-			this.sgp(t, tle, pos);
-
+		sfunc(t, tle, pos);
 		track.push(pos.x, pos.y, pos.z);
 	}
 
 	return track;
+}
+
+Norad.prototype.getPoint = function(tle, time, deep) {
+	var pos = new vector_t();
+	var sfunc = (deep)?this.sdp4:this.sgp;
+
+	sfunc(time, tle, pos);
+	return [pos.x, pos.y, pos.z];
 }

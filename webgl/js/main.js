@@ -309,7 +309,7 @@ function WebGl() {
     var stardata = null;
     var moondata = null;
     var sundata = null;
-    var issdata = null;
+    var satarray = null;
     var mvMatrixStack = [];
     var mouseDown = false;
     var lastMouseX = null;
@@ -366,9 +366,7 @@ function WebGl() {
 			[imglist[3]], starsize, false);
         sundata = new CosmicBody(gl, shaderProgram, "sun", 
 			[imglist[4]], starsize - 20, false);
-		issdata = new Satellite(gl, shaderProgram, new tle_t(13053.60518867,
-			-0.00107979, 0.0, -1.7526E-2, 51.6510, 315.7581, 0.0011197, 
-			300.8439, 147.2887, 15.52322559816962));
+		satarray = new SatelliteArray(gl, shaderProgram, "tle.txt");
 
         var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
         window.addEventListener(mousewheelevt, handleMouseWheel);
@@ -563,7 +561,7 @@ function WebGl() {
         if(stardata) stardata.drawStar();
         if(sundata) sundata.drawStar();
         if(earthdata) earthdata.draw(zval);
-		if(issdata) issdata.draw(zval);
+		if(satarray) satarray.draw(zval);
         if(moondata) moondata.drawMoon(zval, aristotle.moonvector, aristotle.moonrot);
     }
 
