@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2012, Todd Brandt.
+ *
+ * This program is licensed under the terms and conditions of the 
+ * Apache License, version 2.0.  The full text of the Apache License is at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
+
 var mdaysnonleap = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 var mdaysleap = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
 

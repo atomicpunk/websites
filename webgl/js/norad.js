@@ -1,3 +1,23 @@
+/*
+ * Copyright (c) 2012, Todd Brandt.
+ *
+ * This program is licensed under the terms and conditions of the 
+ * Apache License, version 2.0.  The full text of the Apache License is at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *
+ * The JS sourcecode in the file norad.js was ported partly from NORAD's
+ * Spacetrack report #3, which included FORTRAN source for SGP, SGP4,
+ * SDP4, SGP8 and SDP8. 
+ * 
+ * JS Author:  Todd Brandt 
+ * Author:  Dr TS Kelso 
+ * Original Version:  1991 Oct 30
+ * Current Revision:  1992 Sep 03
+ * Version:  1.50
+ * Copyright:  1991-1992, All Rights Reserved
+ */
+
 /* data types */
 function tle_t(a, b, c, d, e, f, g, h, i, j) {
 	"use strict";
