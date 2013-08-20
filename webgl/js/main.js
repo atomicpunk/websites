@@ -254,7 +254,7 @@ CosmicBody.prototype.drawHelper = function() {
 
 	mat4.toInverseMat3(mvMatrix, normalMatrix);
 	mat3.transpose(normalMatrix);
-	gl.uniform1i(shader.monochromatic, false);
+	gl.uniform1i(shader.monochromatic, 0);
 	gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
 	gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);

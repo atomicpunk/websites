@@ -22,10 +22,10 @@
 		varying vec2 vTextureCoord;
 		varying vec3 vLightWeighting;
 		uniform sampler2D uSampler;
-		uniform bool monochromatic;
+		uniform int monochromatic;
 		void main(void) {
-			if(monochromatic) {
-				gl_FragColor = vec4(vLightWeighting, 1);
+			if(monochromatic != 0) {
+				gl_FragColor = vec4(vec3(1.0, 1.0, 1.0), 1);
 			} else {
 				vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
 				gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
@@ -49,7 +49,7 @@
         varying vec2 vTextureCoord;
         varying vec3 vLightWeighting;
         void main(void) {
-			gl_PointSize = 1.0;
+			gl_PointSize = 1.5;
             gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
             vTextureCoord = aTextureCoord;
             if (uselighting == 1) {

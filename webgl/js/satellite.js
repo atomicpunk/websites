@@ -61,10 +61,11 @@ function SatelliteArray(gl, shaderProgram, tlefile) {
 			for(var t in tledata)
 			{
 				var s = new Satellite(tledata[t]);
+//				if(s.tle.id == "38913U")
 				self.satarray.push(s);
 			}
 			self.refresh();
-			window.setInterval(function() {self.refresh();}, 1000);
+			window.setInterval(function() {self.refresh();}, 200);
 		}
 		request.send();
 	}
@@ -86,12 +87,12 @@ SatelliteArray.prototype.refresh = function() {
 
 	var date = new Date();
 	var year = date.getUTCFullYear();
-	var day = date.getUTCDate();
+	var day = date.getUTCDate() + (date.getUTCHours()/24) + (date.getUTCMinutes()/1440);
 	if(year % 4 == 0)
 		day += mdaysleap[date.getUTCMonth()];
 	else
 		day += mdaysnonleap[date.getUTCMonth()];
-	day += ((date.getUTCHours()*3600)+(date.getUTCMinutes()*60)+date.getUTCSeconds())/86400;
+	day += (date.getUTCSeconds()/86400) + (date.getUTCMilliseconds()/86400000);
 
 	var vertexData = [];
 	var indexData = [];
@@ -101,6 +102,9 @@ SatelliteArray.prototype.refresh = function() {
 		var sat = this.satarray[s];
 		var t = this.sinceEpoch(sat.tle.epoch, year, day);
 		sat.position = norad.getPoint(sat.tle, t, sat.deep);
+//		vertexData = norad.getOrbit(sat.tle, 100, t, sat.deep);
+//		for(var i = 0; i <= 97; i++)
+//			indexData[i] = i%100;
 		vertexData.push(sat.position[0], sat.position[1], sat.position[2]);
 		indexData.push(idx);
 		idx++;
@@ -123,16 +127,15 @@ SatelliteArray.prototype.draw = function(zoom) {
 	var gl = this.gl;
 	var shader = this.shaderProgram;
 
-	var azi = povAzi - aristotle.azi;
 	mat4.identity(mvMatrix);
 	mat4.translate(mvMatrix, [0, 0, zoom]);
-	mat4.rotate(mvMatrix, azi, [0, 1, 0]);
-	mat4.rotate(mvMatrix, povInc, [Math.cos(azi), 0, Math.sin(azi)]);
+	mat4.rotate(mvMatrix, povAzi, [0, 1, 0]);
+	mat4.rotate(mvMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 	mat4.toInverseMat3(mvMatrix, normalMatrix);
 	mat3.transpose(normalMatrix);
 
 	gl.uniform1i(shader.uselighting, 0);
-	gl.uniform1i(shader.monochromatic, true);
+	gl.uniform1i(shader.monochromatic, 1);
 	gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
 	gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
