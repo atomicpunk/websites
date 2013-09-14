@@ -20,6 +20,13 @@ var povInc = Math.PI*(35/180);
 var daylight = null;
 var nightlight = null;
 var norad = new Norad(earthsize);
+var display = {
+	earth: true,
+	moon: true,
+	stars: true,
+	sun: true,
+	sat: true
+};
 
 function GeocentricModel() {
     "use strict";
@@ -33,6 +40,7 @@ function GeocentricModel() {
     this.moonrot = 0;
     this.latlon = [];
     this.terminator = [];
+    this.tidx = [];
     function init() {
         for (var lat = 0; lat <= 180; lat++) {
             self.latlon[lat] = [];
@@ -68,13 +76,23 @@ function GeocentricModel() {
         return vec;
     }
 
-    function sunSync() {
-        var t = currentTime();
-        var ang = (((t[0] * 86400) + t[1]) * Math.PI) / 15768000;
-        self.inc = -23.4 * (Math.PI/180) * Math.cos(ang + (0.054794521*Math.PI));
-        self.azi = (t[1]/86400)*2.0*Math.PI;
-        self.sunvector = vecFromIncAzi(self.inc, self.azi);
-    }
+	function sunSync() {
+		var t = currentTime();
+		var ang = (((t[0] * 86400) + t[1]) * Math.PI) / 15768000;
+		self.inc = -23.4 * (Math.PI/180) * Math.cos(ang + (0.054794521*Math.PI));
+		self.azi = (t[1]/86400)*2.0*Math.PI;
+		self.sunvector = vecFromIncAzi(self.inc, self.azi);
+		self.terminator = [];
+		self.tidx = [];
+		for (var i = 0; i < 360; i++) {
+			var a = Math.PI*i/180;
+			var x = earthsize * Math.cos(a);
+			var y = 0;
+			var z = earthsize * Math.sin(a);
+			self.terminator.push(x, y, z);
+			self.tidx.push(i);
+		}
+	}
 
     function moonSync() {
         var date = new Date();
@@ -204,6 +222,20 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, lighting) {
     }
 
     function initVectors() {
+		if(self.id == "earth") {
+			self.tbuf = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, self.tbuf);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(aristotle.terminator), gl.STATIC_DRAW);
+			self.tbuf.itemSize = 3;
+			self.tbuf.numItems = aristotle.terminator.length / 3;
+
+			self.tidx = gl.createBuffer();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.tidx);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(aristotle.tidx), gl.STATIC_DRAW);
+			self.tidx.itemSize = 1;
+			self.tidx.numItems = aristotle.tidx.length;
+		}
+
         self.vertexPositionData = [];
         self.normalData = [];
         self.textureCoordData = [];
@@ -277,6 +309,16 @@ CosmicBody.prototype.drawHelper = function() {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer[i]);
 		gl.drawElements(gl.TRIANGLES, this.vertexIndexBuffer[i].numItems, gl.UNSIGNED_SHORT, 0);
 	}
+
+/*
+	if(this.id == "earth") {
+	    gl.uniform1i(shader.monochromatic, 1);
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.tbuf);
+	    gl.vertexAttribPointer(shader.vertexPositionAttribute, this.tbuf.itemSize, gl.FLOAT, false, 0, 0);
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.tidx);
+	    gl.drawElements(gl.POINTS, this.tidx.numItems, gl.UNSIGNED_SHORT, 0);
+	}
+*/
 }
 
 CosmicBody.prototype.draw = function(zoom) {
@@ -339,13 +381,6 @@ function WebGl() {
 
     function init()
     {
-		var imglist = [];
-		if(location.search.indexOf("?normal") == 0)
-			imglist = ["images/earth_day.jpg", "images/earth_night.jpg", 
-						"images/moon.jpg", "images/stars.png", "images/sun.png"];
-		else
-			imglist = ["images/earth_day_small.jpg", "images/earth_night_small.jpg", 
-						"images/moon_small.jpg", "images/stars.png", "images/sun.png"];
         var canvas = document.getElementById("main_canvas");
         try {
             gl = canvas.getContext("experimental-webgl");
@@ -363,15 +398,27 @@ function WebGl() {
         initShaders();
         tick();
 
-		earthdata = new CosmicBody(gl, shaderProgram, "earth",
-			[imglist[0], imglist[1]], earthsize, true);
-		moondata = new CosmicBody(gl, shaderProgram, "moon",
-			[imglist[2]], earthsize*0.272798619, true);
-		stardata = new CosmicBody(gl, shaderProgram, "stars",
-			[imglist[3]], starsize, false);
-        sundata = new CosmicBody(gl, shaderProgram, "sun", 
-			[imglist[4]], starsize - 20, false);
-		satarray = new SatelliteArray(gl, shaderProgram, "tle.txt");
+		var n = (location.search.indexOf("?normal") == 0);
+		var imgearthday = (n)?"images/earth_day.jpg":"images/earth_day_small.jpg";
+		var imgearthnight = (n)?"images/earth_night.jpg":"images/earth_night_small.jpg";
+		var imgmoon = (n)?"images/moon.jpg":"images/moon_small.jpg";
+		var imgstars = "images/stars.png";
+		var imgsun = "images/sun.png";
+
+		if(display.earth)
+			earthdata = new CosmicBody(gl, shaderProgram, "earth",
+				[imgearthday, imgearthnight], earthsize, false);
+		if(display.sun)
+	        sundata = new CosmicBody(gl, shaderProgram, "sun", 
+				[imgsun], starsize - 20, false);
+		if(display.stars)
+			stardata = new CosmicBody(gl, shaderProgram, "stars",
+				[imgstars], starsize, false);
+		if(display.moon)
+			moondata = new CosmicBody(gl, shaderProgram, "moon",
+				[imgmoon], earthsize*0.272798619, true);
+		if(display.sat)
+			satarray = new SatelliteArray(gl, shaderProgram, "tle.txt");
 
         var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
         window.addEventListener(mousewheelevt, handleMouseWheel);
@@ -570,15 +617,17 @@ function WebGl() {
         if(moondata) moondata.drawMoon(zval, aristotle.moonvector, aristotle.moonrot);
     }
 
-    var framecount = 0;
-    function tick(timestamp) {
-        requestAnimFrame(tick);
-        if(framecount % 2 == 0)
-            drawScene();
-        framecount++;
-    }
+	var framebusy = false;
+	function tick(timestamp) {
+		requestAnimFrame(tick);
+		if(!framebusy) {
+			framebusy = true;
+			drawScene();
+			framebusy = false;
+		}
+	}
 
-    init();
+	init();
 }
 
 function setWindowSize() {

@@ -7,9 +7,6 @@
  *
  */
 
-var mdaysnonleap = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-var mdaysleap = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
-
 function Satellite(tledata) {
 	"use strict";
 
@@ -61,47 +58,30 @@ function SatelliteArray(gl, shaderProgram, tlefile) {
 			for(var t in tledata)
 			{
 				var s = new Satellite(tledata[t]);
-//				if(s.tle.id == "38913U")
-				self.satarray.push(s);
+//				if(s.tle.id == "25544U")
+					self.satarray.push(s);
 			}
 			self.refresh();
-			window.setInterval(function() {self.refresh();}, 200);
+			window.setInterval(function() {self.refresh();}, 1000);
 		}
 		request.send();
 	}
 	init();
 }
 
-SatelliteArray.prototype.sinceEpoch = function(epoch, year, day)
-{
-	var val = norad.modf(epoch*1E-3);
-	var eyear = (val[0] < 57)?(val[0]+2000):(val[0]+1900);
-	var eday = val[1]*1E3;
-	var since = (((year-eyear)*365.25)+(day-eday))*1440;
-	return since;
-}
-
 SatelliteArray.prototype.refresh = function() {
 	var gl = this.gl;
 	var shader = this.shaderProgram;
 
-	var date = new Date();
-	var year = date.getUTCFullYear();
-	var day = date.getUTCDate() + (date.getUTCHours()/24) + (date.getUTCMinutes()/1440);
-	if(year % 4 == 0)
-		day += mdaysleap[date.getUTCMonth()];
-	else
-		day += mdaysnonleap[date.getUTCMonth()];
-	day += (date.getUTCSeconds()/86400) + (date.getUTCMilliseconds()/86400000);
-
+	var julian = norad.Julian_Now();
 	var vertexData = [];
 	var indexData = [];
 	var idx = 0;
 	for(var s in this.satarray)
 	{
 		var sat = this.satarray[s];
-		var t = this.sinceEpoch(sat.tle.epoch, year, day);
-		sat.position = norad.getPoint(sat.tle, t, sat.deep);
+		var t = norad.sinceEpoch(sat.tle.epoch, julian);
+		sat.position = norad.getPoint(sat.tle, t, sat.deep, julian);
 //		vertexData = norad.getOrbit(sat.tle, 100, t, sat.deep);
 //		for(var i = 0; i <= 97; i++)
 //			indexData[i] = i%100;

@@ -93,6 +93,24 @@ function vector_t() {
 	this.mag = 0.0;
 }
 
+function geodetic_t() {
+	"use strict";
+
+	this.lat = 0.0;
+	this.lon = 0.0;
+	this.alt = 0.0;
+	this.theta = 0.0;
+}
+
+geodetic_t.prototype.print = function()
+{
+	var latitude = this.lat * 180 / Math.PI;
+	var longitude = this.lon * 180 / Math.PI;
+	if(longitude > 180) longitude -= 360;
+	var altitude = this.alt * 6.378135E3 / 2;
+	console.log("LAT: "+latitude+" LON: "+longitude+" ALT: "+altitude);
+}
+
 function deep_arg_t() {
 	"use strict";
 
@@ -227,6 +245,7 @@ function Norad(earthradius) {
 	var dpinit   = 1; /* Deep-space initialization code */
 	var dpsec    = 2; /* Deep-space secular code        */
 	var dpper    = 3; /* Deep-space periodic code       */
+	var mdays    = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 
 	/* Math functions */
 	this.modf = modf;
@@ -261,11 +280,9 @@ function Norad(earthradius) {
 
 	function ThetaG_JD(jd)
 	{
-		var tmp,UT,TU,GMST,ThetaG,val;
+		var UT,TU,GMST,ThetaG;
 
-		val = modf(jd + 0.5);
-		tmp = val[0];
-		UT = val[1];
+		UT = modf(jd + 0.5)[1];
 		jd = jd - UT;
 		TU = (jd-2451545.0)/36525;
 		GMST = 24110.54841+TU*(8640184.812866+TU*(0.093104-TU* 6.2E-6));
@@ -278,8 +295,6 @@ function Norad(earthradius) {
 	function Julian_Date_of_Year(year)
 	{
 		var A,B,i;
-		var jdoy;
-
 		year = year-1;
 		i = (year/100) | 0;
 		A = i;
@@ -287,8 +302,41 @@ function Norad(earthradius) {
 		B = 2-A+i;
 		i = (365.25*year) | 0;
 		i += (30.6001*14) | 0;
-		jdoy = i+1720994.5+B;
-		return (jdoy);
+		return (i+1720994.5+B);
+	}
+
+	this.Julian_Now = Julian_Now;
+	function Julian_Now()
+	{
+		var date = new Date();
+		var year = date.getUTCFullYear();
+		var month = date.getUTCMonth();
+		var hour = date.getUTCHours();
+		var minute = date.getUTCMinutes();
+		var second = date.getUTCSeconds();
+		var ms = date.getUTCMilliseconds();
+		var jdoy = Julian_Date_of_Year(year);
+		var day = mdays[month] +
+				(date.getUTCDate()) +
+				(hour/24) +
+				(minute/1440) +
+				(second/86400) +
+				(ms/86400000);
+		if((year%4 == 0)&&((yearr%100 != 0)||(yearr%400 == 0))&&(month > 2))
+			day++;
+		//console.log("TIME: "+hour+":"+minute+":"+second+"."+ms);
+		return jdoy + day - (70/86400);
+	}
+
+	this.sinceEpoch = sinceEpoch;
+	function sinceEpoch(epoch, julian)
+	{
+		var val = norad.modf(epoch*1E-3);
+		var year = (val[0] < 57)?(val[0]+2000):(val[0]+1900);
+		var day = val[1]*1E3;
+		var jul_epoch = Julian_Date_of_Year(year) + day;
+		var since = (julian - jul_epoch) * 1440.0;
+		return since;
 	}
 
 	function Modulus(arg1, arg2)
@@ -483,7 +531,7 @@ function Norad(earthradius) {
 		}
 	}
 
-	/* SGP implementation */
+	/* SGP4 implementation */
 	var aodp,aycof,c1,c4,c5,cosio,d2,d3,d4,delmo,omgcof,
 		eta,omgdot,sinio,xnodp,sinmo,t2cof,t3cof,t4cof,t5cof,
 		x1mth2,x3thm1,x7thm1,xmcof,xmdot,xnodcf,xnodot,xlcof;
@@ -1528,6 +1576,32 @@ function Norad(earthradius) {
 			return false;
 		}
 	}
+
+	this.Calculate_LatLonAlt = Calculate_LatLonAlt;
+	function Calculate_LatLonAlt(time, pos, geodetic)
+	{
+		/* Reference:  The 1992 Astronomical Almanac, page K12. */
+		var r,e2,phi,c,sp;
+		geodetic.theta = AcTan(pos.y,pos.x);/*radians*/
+		geodetic.lon = FMod2p(geodetic.theta - ThetaG_JD(time));/*radians*/
+		r = Math.sqrt((pos.x*pos.x) + (pos.y*pos.y));
+		e2 = f*(2 - f);
+		geodetic.lat = AcTan(pos.z,r);/*radians*/
+
+		do
+		{
+			phi = geodetic.lat;
+			sp = Math.sin(phi);
+			c = 1/Math.sqrt(1 - e2*sp*sp);
+			geodetic.lat = AcTan(pos.z + earthrad*c*e2*sp,r);
+		}
+		while(Math.abs(geodetic.lat - phi) >= 1E-10);
+
+		geodetic.alt = r/Math.cos(geodetic.lat) - earthrad*c;/*kilometers*/
+
+		if( geodetic.lat > pio2 )
+			geodetic.lat -= twopi;
+	}
 }
 
 Norad.prototype.getTrack = function(tle, start, end, delta, deep) {
@@ -1560,14 +1634,19 @@ Norad.prototype.getOrbit = function(tle, points, start, deep) {
 	return track;
 }
 
-Norad.prototype.getPoint = function(tle, time, deep) {
+Norad.prototype.getPoint = function(tle, time, deep, julian) {
 	var pos = new vector_t();
-	var sfunc = (deep)?this.sdp4:this.sgp4;
+	var sfunc = (deep)?this.sdp4:this.sgp;
 	if(tle.id == "38913U")
 		sfunc = this.sgp;
 
 	this.Flags = 0;
 	sfunc(time, tle, pos);
+
+	var geo = new geodetic_t();
+	this.Calculate_LatLonAlt(julian, pos, geo);
+	//geo.print();
+
 	return [-pos.x, pos.z, pos.y];
 }
 
