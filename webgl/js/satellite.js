@@ -74,6 +74,7 @@ SatelliteArray.prototype.refresh = function() {
 	var shader = this.shaderProgram;
 
 	var julian = norad.Julian_Now();
+	var thetaJD = norad.ThetaG_JD(julian);
 	var vertexData = [];
 	var indexData = [];
 	var idx = 0;
@@ -81,7 +82,7 @@ SatelliteArray.prototype.refresh = function() {
 	{
 		var sat = this.satarray[s];
 		var t = norad.sinceEpoch(sat.tle.epoch, julian);
-		sat.position = norad.getPoint(sat.tle, t, sat.deep, julian);
+		sat.position = norad.getPoint(sat.tle, t, sat.deep, julian, thetaJD);
 //		vertexData = norad.getOrbit(sat.tle, 100, t, sat.deep);
 //		for(var i = 0; i <= 97; i++)
 //			indexData[i] = i%100;

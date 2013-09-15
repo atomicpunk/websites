@@ -92,6 +92,14 @@ function GeocentricModel() {
 			self.terminator.push(x, y, z);
 			self.tidx.push(i);
 		}
+		for (var i = 0; i < 360; i++) {
+			var a = Math.PI*i/180;
+			var x = earthsize * Math.cos(a);
+			var y = earthsize * Math.sin(a);
+			var z = 0;
+			self.terminator.push(x, y, z);
+			self.tidx.push(i+360);
+		}
 	}
 
     function moonSync() {

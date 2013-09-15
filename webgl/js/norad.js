@@ -278,6 +278,7 @@ function Norad(earthradius) {
 		return (ThetaG);
 	}
 
+	this.ThetaG_JD = ThetaG_JD;
 	function ThetaG_JD(jd)
 	{
 		var UT,TU,GMST,ThetaG;
@@ -325,7 +326,7 @@ function Norad(earthradius) {
 		if((year%4 == 0)&&((yearr%100 != 0)||(yearr%400 == 0))&&(month > 2))
 			day++;
 		//console.log("TIME: "+hour+":"+minute+":"+second+"."+ms);
-		return jdoy + day - (70/86400);
+		return jdoy + day - (80/86400);
 	}
 
 	this.sinceEpoch = sinceEpoch;
@@ -380,6 +381,47 @@ function Norad(earthradius) {
 			else
 				return ( pi + Math.atan(sinx/cosx) );
 		}
+	}
+
+	this.translateXYZ = translateXYZ;
+	function translateXYZ(thetaJD, pos, vel)
+	{
+		/* cartesian conversion */
+		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
+		pos.y = pos.y*earthrad/ae; /* Cartesian Position y */
+		pos.z = pos.z*earthrad/ae; /* Cartesian Position z */
+		if(vel) {
+			vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
+			vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
+			vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
+		}
+
+		/* earth is static in this app, rotate the norad XYZ */
+		/* by the angle from noon in greenwich (sun at X:0) */
+		var theta = AcTan(pos.y, pos.x);
+		theta = FMod2p(theta - thetaJD);
+		var r = Math.sqrt((pos.x*pos.x) + (pos.y*pos.y));
+		pos.x = r*Math.cos(theta);
+		pos.y = r*Math.sin(theta);
+
+	    // WebGL
+	    // XZ plane = equator
+	    // XY plane = prime meridian
+	    // X = leftright
+	    // Y = updown
+	    // Z = forwardback
+
+	    // Norad
+	    // XZ plane = prime meridian
+	    // XY plane = equator
+	    // X = rightleft
+	    // Y = forwardback
+	    // Z = updown
+
+		pos.x = -pos.x;
+		var y = pos.y;
+		pos.y = pos.z;
+		pos.z = y;
 	}
 
 	/* SGP implementation */
@@ -518,16 +560,6 @@ function Norad(earthradius) {
 			vel.x = rvdot*vx+vel.x;
 			vel.y = rvdot*vy+vel.y;
 			vel.z = rvdot*vz+vel.z;
-		}
-
-		/* cartesian conversion */
-		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
-		pos.y = pos.y*earthrad/ae; /* Cartesian Position y */
-		pos.z = pos.z*earthrad/ae; /* Cartesian Position z */
-		if(vel) {
-			vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
-			vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
-			vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
 		}
 	}
 
@@ -763,16 +795,6 @@ function Norad(earthradius) {
 			vel.y = rdotk*uy+rfdotk*vy;
 			vel.z = rdotk*uz+rfdotk*vz;
 		}
-
-		/* cartesian conversion */
-		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
-		pos.y = pos.y*earthrad/ae; /* Cartesian Position y */
-		pos.z = pos.z*earthrad/ae; /* Cartesian Position z */
-		if(vel) {
-			vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
-			vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
-			vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
-		}
 	}
 
 	/* SDP4 implementation */
@@ -987,16 +1009,6 @@ function Norad(earthradius) {
 			vel.x = rdotk*ux+rfdotk*vx;
 			vel.y = rdotk*uy+rfdotk*vy;
 			vel.z = rdotk*uz+rfdotk*vz;
-		}
-
-		/* cartesian conversion */
-		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
-		pos.y = pos.y*earthrad/ae; /* Cartesian Position y */
-		pos.z = pos.z*earthrad/ae; /* Cartesian Position z */
-		if(vel) {
-			vel.x = vel.x*earthrad/(ae*xmnpda/86400.0);
-			vel.y = vel.y*earthrad/(ae*xmnpda/86400.0);
-			vel.z = vel.z*earthrad/(ae*xmnpda/86400.0);
 		}
 	}
 
@@ -1578,12 +1590,13 @@ function Norad(earthradius) {
 	}
 
 	this.Calculate_LatLonAlt = Calculate_LatLonAlt;
-	function Calculate_LatLonAlt(time, pos, geodetic)
+	function Calculate_LatLonAlt(time, pos, geodetic, thetaJD)
 	{
 		/* Reference:  The 1992 Astronomical Almanac, page K12. */
 		var r,e2,phi,c,sp;
+		var td = (thetaJD)?thetaJD:ThetaG_JD(time);
 		geodetic.theta = AcTan(pos.y,pos.x);/*radians*/
-		geodetic.lon = FMod2p(geodetic.theta - ThetaG_JD(time));/*radians*/
+		geodetic.lon = FMod2p(geodetic.theta - td);/*radians*/
 		r = Math.sqrt((pos.x*pos.x) + (pos.y*pos.y));
 		e2 = f*(2 - f);
 		geodetic.lat = AcTan(pos.z,r);/*radians*/
@@ -1634,7 +1647,7 @@ Norad.prototype.getOrbit = function(tle, points, start, deep) {
 	return track;
 }
 
-Norad.prototype.getPoint = function(tle, time, deep, julian) {
+Norad.prototype.getPoint = function(tle, time, deep, julian, thetaJD) {
 	var pos = new vector_t();
 	var sfunc = (deep)?this.sdp4:this.sgp;
 	if(tle.id == "38913U")
@@ -1642,12 +1655,13 @@ Norad.prototype.getPoint = function(tle, time, deep, julian) {
 
 	this.Flags = 0;
 	sfunc(time, tle, pos);
+	this.translateXYZ(thetaJD, pos);
 
-	var geo = new geodetic_t();
-	this.Calculate_LatLonAlt(julian, pos, geo);
-	//geo.print();
+	// var geo = new geodetic_t();
+	// this.Calculate_LatLonAlt(julian, pos, geo, thetaJD);
+	// geo.print();
 
-	return [-pos.x, pos.z, pos.y];
+	return [pos.x, pos.y, pos.z];
 }
 
 Norad.prototype.test = function(tle, deep) {
