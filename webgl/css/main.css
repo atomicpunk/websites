@@ -17,6 +17,26 @@ body {
 }
 
 #main_canvas {
+	position: absolute;
     border: none;
     background-color: black;
+}
+
+@-webkit-keyframes loading_anim {
+    0% { opacity: 0.5;}
+	50% { opacity: 1;}
+    100% { opacity: 0.5;}
+}
+
+#loading {
+	position: absolute;
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+	color: white;
+	font-family: Arial;
+	font-size: 150px;
+	text-align: center;
+	-webkit-animation: loading_anim 1s linear infinite;
+	animation: loading_anim 1s linear infinite;
 }

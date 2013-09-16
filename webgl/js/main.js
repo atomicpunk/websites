@@ -392,9 +392,6 @@ function WebGl() {
         gl.viewportHeight = canvas.height;
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
-		var ctx = canvas.getContext("2d");
-		ctx.font="100px Arial";
-		ctx.fillText("Hello World",10,50);
     }
 
     function init()
@@ -679,10 +676,12 @@ if(window.addEventListener)
 		"use strict";
 		setWindowSize();
 		webgl = new WebGl();
+		var e = document.getElementById("loading");
+		e.style.display="none";
 	});
 	window.addEventListener('resize', function () {
 		"use strict";
-		if(loading <= 0) return;
+		if(loading > 0) return;
 		setWindowSize();
 		webgl.resize();
 	});
