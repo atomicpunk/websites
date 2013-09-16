@@ -30,6 +30,18 @@ var display = {
 	sat: true
 };
 
+function startLoading() {
+	loading++;
+}
+
+function doneLoading() {
+	loading--;
+	if(loading <= 0) {
+		var e = document.getElementById("loading");
+		e.style.display="none";
+	}
+}
+
 function GeocentricModel() {
     "use strict";
 
@@ -167,6 +179,7 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, lighting) {
     function initTexture(idx) {
         self.texture[idx] = gl.createTexture();
         self.texture[idx].image = new Image();
+		startLoading();
         self.texture[idx].image.onload = function () {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
             gl.bindTexture(gl.TEXTURE_2D, self.texture[idx]);
@@ -177,6 +190,7 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, lighting) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.generateMipmap(gl.TEXTURE_2D);
             gl.bindTexture(gl.TEXTURE_2D, null);
+			doneLoading();
         }
         self.texture[idx].image.src = imgfile[idx];
     }
@@ -396,7 +410,7 @@ function WebGl() {
 
     function init()
     {
-		loading++;
+		startLoading();
         var canvas = document.getElementById("main_canvas");
         try {
             gl = canvas.getContext("experimental-webgl");
@@ -444,7 +458,7 @@ function WebGl() {
         window.ontouchstart = handleTouchStart;
         window.ontouchend = handleTouchEnd;
         window.ontouchmove = handleTouchMove;
-		loading--;
+		doneLoading();
     }
 
     function getShader(gl, id) {
@@ -548,7 +562,7 @@ function WebGl() {
 
 
     function handleMouseDown(event) {
-        if(event.button != 0) return;
+        if(loading > 0 || event.button != 0) return;
         mouseDown = true;
         lastMouseX = event.clientX;
         lastMouseY = event.clientY;
@@ -676,8 +690,6 @@ if(window.addEventListener)
 		"use strict";
 		setWindowSize();
 		webgl = new WebGl();
-		var e = document.getElementById("loading");
-		e.style.display="none";
 	});
 	window.addEventListener('resize', function () {
 		"use strict";

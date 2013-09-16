@@ -106,7 +106,7 @@ function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
 	this.group = new SatelliteGroup(groupfile);
 
 	function init() {
-		loading++;
+		startLoading();
 		var request = new XMLHttpRequest();
 		request.open("GET", tlefile, false);
 		request.onload = function(e) {
@@ -131,7 +131,7 @@ function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
 			}
 			delete self.group.hash;
 			self.group.hash = null;
-			loading--;
+			doneLoading();
 			self.refresh();
 			window.setInterval(function() {if(!mouseDown && !loading) self.refresh();}, 1000);
 		}

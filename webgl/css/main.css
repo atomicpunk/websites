@@ -29,6 +29,7 @@ body {
 }
 
 #loading {
+	background: url(../images/loading.jpg) no-repeat;
 	position: absolute;
     margin: 0px;
     height: 100%;
