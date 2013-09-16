@@ -636,12 +636,19 @@ function WebGl() {
         if(moondata) moondata.drawMoon(zval);
     }
 
+	var lastframe = 0;
 	var framebusy = false;
 	function tick(timestamp) {
 		requestAnimFrame(tick);
 		if(!framebusy) {
 			framebusy = true;
-			drawScene();
+			var date = new Date();
+			var curr = date.getTime();
+			/* keep the frame rate under 50 fps */
+			if(curr - lastframe > 20) {
+				drawScene();
+				lastframe = curr;
+			}
 			framebusy = false;
 		}
 	}
