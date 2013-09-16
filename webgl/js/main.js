@@ -7,6 +7,7 @@
  *
  */
 
+var loading = 0;
 var mouseDown = false;
 var starsize = 200;
 var earthsize = 2;
@@ -58,8 +59,8 @@ function GeocentricModel() {
         }
         sunSync();
         moonSync();
-        window.setInterval(function() {if(!mouseDown) sunSync();}, 5000);
-        window.setInterval(function() {if(!mouseDown) moonSync();}, 60000);
+        window.setInterval(function() {if(!mouseDown && !loading) sunSync();}, 5000);
+        window.setInterval(function() {if(!mouseDown && !loading) moonSync();}, 60000);
     }
 
     function currentTime() {
@@ -160,7 +161,7 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, lighting) {
             initTexture(i);
         initVectors();
         if(self.id == "earth")
-            window.setInterval(function() {if(!mouseDown) initVectors();}, 5000);
+            window.setInterval(function() {if(!mouseDown && !loading) initVectors();}, 5000);
     }
 
     function initTexture(idx) {
@@ -331,6 +332,8 @@ CosmicBody.prototype.drawHelper = function() {
 }
 
 CosmicBody.prototype.draw = function(zoom) {
+	if(loading > 0) return;
+
     mat4.identity(mvMatrix);
     mat4.translate(mvMatrix, [0, 0, zoom]);
     mat4.rotate(mvMatrix, povAzi, [0, 1, 0]);
@@ -339,6 +342,8 @@ CosmicBody.prototype.draw = function(zoom) {
 }
 
 CosmicBody.prototype.drawStar = function() {
+	if(loading > 0) return;
+
     var inc = aristotle.inc + povInc;
     var azi = povAzi - aristotle.azi;
     mat4.identity(mvMatrix);
@@ -348,6 +353,8 @@ CosmicBody.prototype.drawStar = function() {
 }
 
 CosmicBody.prototype.drawMoon = function(zoom, pos, rot) {
+	if(loading > 0) return;
+
     var inc = aristotle.inc + povInc;
     var azi = povAzi - aristotle.azi;
     mat4.identity(mvMatrix);
@@ -385,10 +392,14 @@ function WebGl() {
         gl.viewportHeight = canvas.height;
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+		var ctx = canvas.getContext("2d");
+		ctx.font="100px Arial";
+		ctx.fillText("Hello World",10,50);
     }
 
     function init()
     {
+		loading++;
         var canvas = document.getElementById("main_canvas");
         try {
             gl = canvas.getContext("experimental-webgl");
@@ -436,6 +447,7 @@ function WebGl() {
         window.ontouchstart = handleTouchStart;
         window.ontouchend = handleTouchEnd;
         window.ontouchmove = handleTouchMove;
+		loading--;
     }
 
     function getShader(gl, id) {
@@ -661,20 +673,17 @@ function setWindowSize() {
 }
 
 var webgl;
-var busy = false;
 if(window.addEventListener)
 {
-    window.addEventListener('load', function () {
-        "use strict";
-        busy = true;
-        setWindowSize();
-        webgl = new WebGl();
-        setTimeout(function(){busy = false;},1000);
-    });
-    window.addEventListener('resize', function () {
-        "use strict";
-        if(busy) return;
-        setWindowSize();
-        webgl.resize();
-    });
+	window.addEventListener('load', function () {
+		"use strict";
+		setWindowSize();
+		webgl = new WebGl();
+	});
+	window.addEventListener('resize', function () {
+		"use strict";
+		if(loading <= 0) return;
+		setWindowSize();
+		webgl.resize();
+	});
 }
