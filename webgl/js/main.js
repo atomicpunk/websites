@@ -24,7 +24,7 @@ var nightlight = null;
 var norad = new Norad(earthsize);
 var display = {
 	earth: true,
-	moon: false,
+	moon: true,
 	stars: true,
 	sun: true,
 	sat: true
@@ -50,8 +50,8 @@ function GeocentricModel() {
     this.inc = 0;
     this.azi = 0;
     this.sunvector = [0, 0, 0];
-    this.moonvector = [0, 0, 0];
-    this.moonrot = 0;
+    this.moonazi = 0;
+    this.moonpos = [earthsize * 30.103480715, 0, 0];
     this.latlon = [];
     this.terminator = [];
     this.tidx = [];
@@ -70,16 +70,15 @@ function GeocentricModel() {
             }
         }
         sunSync();
-        moonSync();
         window.setInterval(function() {if(!mouseDown && !loading) sunSync();}, 5000);
-        window.setInterval(function() {if(!mouseDown && !loading) moonSync();}, 60000);
     }
 
     function currentTime() {
         var date = new Date();
         var day = self.days[date.getUTCMonth()] + date.getUTCDate();
         var sec = (date.getUTCHours()*3600) + (date.getUTCMinutes()*60) + date.getUTCSeconds();
-        return [day, sec];
+		var t = date.getTime()/1000;
+        return [day, sec, t];
     }
 
     function vecFromIncAzi(inclination, azimuth) {
@@ -114,25 +113,12 @@ function GeocentricModel() {
 			self.terminator.push(x, y, z);
 			self.tidx.push(i+360);
 		}
-	}
 
-    function moonSync() {
-        var date = new Date();
-        var t = date.getTime()/1000 + 200000;
-        var a = earthsize * 30.103480715;
-        var e = 0.0549;
-        var i = (5.145*Math.PI)/180
-        // northern major standstill = 9/15/2006
-        // a = 384000 km  Er = 6378 km
-        // orbital rotation period = 18.6 years = 6794 days
-        // rotation counterclockwise from above
-        // period = 27.321582 days
-        var ang = -1 * (t/2360585)*2.0*Math.PI;
-        var r = a*(1-(e*e))/(1 + e*Math.cos(ang));
-        self.moonvector[0] = r * Math.cos(ang);
-        self.moonvector[2] = r * Math.sin(ang);
-        self.moonrot = -1 * ang;
-    }
+		ang = ((t[2] + 200000)/2360585)*2.0*Math.PI;
+		var mooninc = self.inc*Math.cos(ang);
+		self.moonazi = self.azi - ang;
+		self.moonpos[1] = self.moonpos[0]*Math.sin(mooninc);
+	}
 
     init();
 }
@@ -366,17 +352,15 @@ CosmicBody.prototype.drawStar = function() {
     this.drawHelper();
 }
 
-CosmicBody.prototype.drawMoon = function(zoom, pos, rot) {
+CosmicBody.prototype.drawMoon = function(zoom) {
 	if(loading > 0) return;
 
-    var inc = aristotle.inc + povInc;
-    var azi = povAzi - aristotle.azi;
+	var azi = povAzi - aristotle.moonazi;
     mat4.identity(mvMatrix);
     mat4.translate(mvMatrix, [0, 0, zoom]);
     mat4.rotate(mvMatrix, azi, [0, 1, 0]);
-    mat4.rotate(mvMatrix, inc, [Math.cos(azi), 0, Math.sin(azi)]);
-    mat4.translate(mvMatrix, pos);
-    mat4.rotate(mvMatrix, rot, [0, 1, 0]);
+    mat4.rotate(mvMatrix, povInc, [Math.cos(azi), 0, Math.sin(azi)]);
+    mat4.translate(mvMatrix, aristotle.moonpos);
     this.drawHelper();
 }
 
@@ -649,7 +633,7 @@ function WebGl() {
         if(sundata) sundata.drawStar();
         if(earthdata) earthdata.draw(zval);
 		if(satarray) satarray.draw(zval);
-        if(moondata) moondata.drawMoon(zval, aristotle.moonvector, aristotle.moonrot);
+        if(moondata) moondata.drawMoon(zval);
     }
 
 	var framebusy = false;
