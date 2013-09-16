@@ -7,10 +7,80 @@
  *
  */
 
+function satinfo_t(s_name, s_group) {
+	"use strict";
+
+	this.name = s_name;
+	this.group = s_group;
+}
+
+function Group(gname, hexcolor, psize) {
+	"use strict";
+
+	this.name = gname;
+	this.satarray = [];
+	this.size = parseFloat(psize);
+	this.r = parseInt("0x"+hexcolor.slice(1, 3))/255.0;
+	this.g = parseInt("0x"+hexcolor.slice(3, 5))/255.0;
+	this.b = parseInt("0x"+hexcolor.slice(5, 7))/255.0;
+    this.vertexPositionBuffer = null;
+    this.vertexIndexBuffer = null;
+}
+
+function SatelliteGroup(file) {
+	"use strict";
+
+	var self = this;
+	this.list = [];
+	this.hash = [];
+
+	function init() {
+		var request = new XMLHttpRequest();
+		request.open("GET", file, false);
+		request.onload = function(e) {
+			var text = this.responseText;
+			var lines = text.split("\n");
+			var group = new Group("Other", "#FFFFFF", "1.500");
+			self.list.push(group);
+			for(var i in lines)
+			{
+				var l = lines[i];
+				var i = l.indexOf(";");
+				if(i >= 0 && l[0] != ' ') {
+					var j = l.indexOf("#");
+					group = new Group(l.slice(0, i),
+									  l.slice(j, j+7),
+									  l.slice(j+8, j+13));
+					self.list.push(group);
+				} else if(l[0] == ' ' && l[1] != ' ' && group) {
+					var id = parseInt(l.slice(1, 6));
+					var name = l.slice(8);
+					self.hash[id] = new satinfo_t(name, group);
+				}
+			}
+		}
+		request.send();
+	}
+	init();
+}
+
+SatelliteGroup.prototype.add = function(sat) {
+	var id = sat.tle.id;
+	if(id in this.hash)
+	{
+		var info = this.hash[id];
+		sat.name = info.name;
+		info.group.satarray.push(sat);
+		return;
+	}
+	this.list[0].satarray.push(sat);
+}
+
 function Satellite(tledata) {
 	"use strict";
 
 	this.tle = new tle_t(tledata);
+	this.name = "";
 	this.deep = norad.is_deep_space(this.tle);
 	this.position = [];
 }
@@ -27,15 +97,13 @@ Satellite.prototype.print = function() {
 	console.log("X: "+x+" Y: "+y+" Z: "+z);
 }
 
-function SatelliteArray(gl, shaderProgram, tlefile) {
+function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
 	"use strict";
 
 	var self = this;
-	this.vertexPositionBuffer = null;
-	this.vertexIndexBuffer = null;
 	this.gl = gl;
 	this.shaderProgram = shaderProgram;
-	this.satarray = [];
+	this.group = new SatelliteGroup(groupfile);
 
 	function init() {
 		var request = new XMLHttpRequest();
@@ -58,11 +126,10 @@ function SatelliteArray(gl, shaderProgram, tlefile) {
 			for(var t in tledata)
 			{
 				var s = new Satellite(tledata[t]);
-//				if(s.tle.id == "25544U")
-					self.satarray.push(s);
+				self.group.add(s);
 			}
 			self.refresh();
-			window.setInterval(function() {self.refresh();}, 1000);
+			window.setInterval(function() {if(!mouseDown) self.refresh();}, 1000);
 		}
 		request.send();
 	}
@@ -75,33 +142,37 @@ SatelliteArray.prototype.refresh = function() {
 
 	var julian = norad.Julian_Now();
 	var thetaJD = norad.ThetaG_JD(julian);
-	var vertexData = [];
-	var indexData = [];
-	var idx = 0;
-	for(var s in this.satarray)
+	for(var gidx in this.group.list)
 	{
-		var sat = this.satarray[s];
-		var t = norad.sinceEpoch(sat.tle.epoch, julian);
-		sat.position = norad.getPoint(sat.tle, t, sat.deep, julian, thetaJD);
-//		vertexData = norad.getOrbit(sat.tle, 100, t, sat.deep);
-//		for(var i = 0; i <= 97; i++)
-//			indexData[i] = i%100;
-		vertexData.push(sat.position[0], sat.position[1], sat.position[2]);
-		indexData.push(idx);
-		idx++;
+		var vertexData = [];
+		var indexData = [];
+		var idx = 0;
+		var g = this.group.list[gidx];
+		for(var s in g.satarray)
+		{
+			var sat = g.satarray[s];
+			var t = norad.sinceEpoch(sat.tle.epoch, julian);
+			sat.position = norad.getPoint(sat.tle, t, sat.deep, julian, thetaJD);
+//			vertexData = norad.getOrbit(sat.tle, 100, t, sat.deep, thetaJD);
+//			for(var i = 0; i <= 97; i++)
+//				indexData[i] = i%100;
+			vertexData.push(sat.position[0], sat.position[1], sat.position[2]);
+			indexData.push(idx);
+			idx++;
+		}
+
+		g.vertexPositionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, g.vertexPositionBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
+		g.vertexPositionBuffer.itemSize = 3;
+		g.vertexPositionBuffer.numItems = vertexData.length / 3;
+
+		g.vertexIndexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g.vertexIndexBuffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STATIC_DRAW);
+		g.vertexIndexBuffer.itemSize = 1;
+		g.vertexIndexBuffer.numItems = indexData.length;
 	}
-
-	this.vertexPositionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
-	this.vertexPositionBuffer.itemSize = 3;
-	this.vertexPositionBuffer.numItems = vertexData.length / 3;
-
-	this.vertexIndexBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STATIC_DRAW);
-	this.vertexIndexBuffer.itemSize = 1;
-	this.vertexIndexBuffer.numItems = indexData.length;
 }
 
 SatelliteArray.prototype.draw = function(zoom) {
@@ -121,8 +192,14 @@ SatelliteArray.prototype.draw = function(zoom) {
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
 	gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-	gl.vertexAttribPointer(shader.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
-	gl.drawElements(gl.POINTS, this.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+	for(var gidx in this.group.list)
+	{
+		var g = this.group.list[gidx];
+		gl.uniform3f(shader.monoColor, g.r, g.g, g.b)
+		gl.uniform1f(shader.pointSize, g.size);
+		gl.bindBuffer(gl.ARRAY_BUFFER, g.vertexPositionBuffer);
+		gl.vertexAttribPointer(shader.vertexPositionAttribute, g.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g.vertexIndexBuffer);
+		gl.drawElements(gl.POINTS, g.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+	}
 }

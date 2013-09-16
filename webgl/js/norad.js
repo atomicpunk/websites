@@ -52,7 +52,7 @@ tle_t.prototype.getFloat = function(data)
 
 tle_t.prototype.extract = function(data)
 {
-	this.id = data.slice(2, 8).trim();
+	this.id = parseInt(data.slice(2, 7).trim());
 	this.designator = data.slice(9, 17).trim();
 	this.epoch  = parseFloat(data.slice(18, 32));
 	this.xndt2o = parseFloat(data.slice(33, 43));
@@ -1631,9 +1631,9 @@ Norad.prototype.getTrack = function(tle, start, end, delta, deep) {
 	return track;
 }
 
-Norad.prototype.getOrbit = function(tle, points, start, deep) {
+Norad.prototype.getOrbit = function(tle, points, start, deep, thetaJD) {
 	var pos = new vector_t();
-	var sfunc = (deep)?this.sdp4:this.sgp4;
+	var sfunc = (deep)?this.sdp4:this.sgp;
 	var delta = tle.period/points;
 	var e = start + tle.period;
 	var track = [];
@@ -1641,7 +1641,8 @@ Norad.prototype.getOrbit = function(tle, points, start, deep) {
 	for(var t = start; t < e; t += delta)
 	{
 		sfunc(t, tle, pos);
-		track.push(-pos.x, pos.z, pos.y);
+		this.translateXYZ(thetaJD, pos);
+		track.push(pos.x, pos.y, pos.z);
 	}
 
 	return track;
@@ -1650,7 +1651,7 @@ Norad.prototype.getOrbit = function(tle, points, start, deep) {
 Norad.prototype.getPoint = function(tle, time, deep, julian, thetaJD) {
 	var pos = new vector_t();
 	var sfunc = (deep)?this.sdp4:this.sgp;
-	if(tle.id == "38913U")
+	if(tle.id == 38913)
 		sfunc = this.sgp;
 
 	this.Flags = 0;

@@ -7,6 +7,7 @@
  *
  */
 
+var mouseDown = false;
 var starsize = 200;
 var earthsize = 2;
 var myWidth = 0;
@@ -22,7 +23,7 @@ var nightlight = null;
 var norad = new Norad(earthsize);
 var display = {
 	earth: true,
-	moon: true,
+	moon: false,
 	stars: true,
 	sun: true,
 	sat: true
@@ -57,8 +58,8 @@ function GeocentricModel() {
         }
         sunSync();
         moonSync();
-        window.setInterval(function() {sunSync();}, 5000);
-        window.setInterval(function() {moonSync();}, 60000);
+        window.setInterval(function() {if(!mouseDown) sunSync();}, 5000);
+        window.setInterval(function() {if(!mouseDown) moonSync();}, 60000);
     }
 
     function currentTime() {
@@ -159,7 +160,7 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, lighting) {
             initTexture(i);
         initVectors();
         if(self.id == "earth")
-            window.setInterval(function() {initVectors();}, 5000);
+            window.setInterval(function() {if(!mouseDown) initVectors();}, 5000);
     }
 
     function initTexture(idx) {
@@ -370,7 +371,6 @@ function WebGl() {
     var sundata = null;
     var satarray = null;
     var mvMatrixStack = [];
-    var mouseDown = false;
     var lastMouseX = null;
     var lastMouseY = null;
     var zval = -6.0
@@ -426,7 +426,7 @@ function WebGl() {
 			moondata = new CosmicBody(gl, shaderProgram, "moon",
 				[imgmoon], earthsize*0.272798619, true);
 		if(display.sat)
-			satarray = new SatelliteArray(gl, shaderProgram, "tle.txt");
+			satarray = new SatelliteArray(gl, shaderProgram, "tle.txt", "groups.txt");
 
         var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
         window.addEventListener(mousewheelevt, handleMouseWheel);
@@ -509,11 +509,15 @@ function WebGl() {
         shaderProgram.nightlightDirection = gl.getUniformLocation(shaderProgram, "nightlightDirection");
         shaderProgram.nightAmbientColor = gl.getUniformLocation(shaderProgram, "nightAmbientColor");
         shaderProgram.nightDirectColor = gl.getUniformLocation(shaderProgram, "nightDirectColor");
+        shaderProgram.monoColor = gl.getUniformLocation(shaderProgram, "monoColor");
+        shaderProgram.pointSize = gl.getUniformLocation(shaderProgram, "pointSize");
 
         gl.uniform3f(shaderProgram.dayAmbientColor, 0.3, 0.3, 0.3);
         gl.uniform3f(shaderProgram.dayDirectColor, 2, 2, 2);
         gl.uniform3f(shaderProgram.nightAmbientColor, 0.8, 0.8, 0.8);
         gl.uniform3f(shaderProgram.nightDirectColor, 1, 1, 1);
+        gl.uniform3f(shaderProgram.monoColor, 1, 1, 1);
+		gl.uniform1f(shaderProgram.pointSize, 1.5);
     }
 
     function mvPushMatrix() {
