@@ -232,20 +232,6 @@ function CosmicBody(gl, shaderProgram, idstr, imgfile, radius, lighting) {
     }
 
     function initVectors() {
-		if(self.id == "earth") {
-			self.tbuf = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, self.tbuf);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(aristotle.terminator), gl.STATIC_DRAW);
-			self.tbuf.itemSize = 3;
-			self.tbuf.numItems = aristotle.terminator.length / 3;
-
-			self.tidx = gl.createBuffer();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.tidx);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(aristotle.tidx), gl.STATIC_DRAW);
-			self.tidx.itemSize = 1;
-			self.tidx.numItems = aristotle.tidx.length;
-		}
-
         self.vertexPositionData = [];
         self.normalData = [];
         self.textureCoordData = [];
@@ -319,16 +305,6 @@ CosmicBody.prototype.drawHelper = function() {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer[i]);
 		gl.drawElements(gl.TRIANGLES, this.vertexIndexBuffer[i].numItems, gl.UNSIGNED_SHORT, 0);
 	}
-
-/*
-	if(this.id == "earth") {
-	    gl.uniform1i(shader.monochromatic, 1);
-	    gl.bindBuffer(gl.ARRAY_BUFFER, this.tbuf);
-	    gl.vertexAttribPointer(shader.vertexPositionAttribute, this.tbuf.itemSize, gl.FLOAT, false, 0, 0);
-	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.tidx);
-	    gl.drawElements(gl.POINTS, this.tidx.numItems, gl.UNSIGNED_SHORT, 0);
-	}
-*/
 }
 
 CosmicBody.prototype.draw = function(zoom) {
@@ -630,11 +606,11 @@ function WebGl() {
         gl.uniform3fv(shaderProgram.daylightDirection, daylight);
         gl.uniform3fv(shaderProgram.nightlightDirection, nightlight);
 
-        if(stardata) stardata.drawStar();
-        if(sundata) sundata.drawStar();
+        if(stardata && display.stars) stardata.drawStar();
+        if(sundata && display.sun) sundata.drawStar();
         if(earthdata) earthdata.draw(zval);
 		if(satarray) satarray.draw(zval);
-        if(moondata) moondata.drawMoon(zval);
+        if(moondata && display.moon) moondata.drawMoon(zval);
     }
 
 	var lastframe = 0;
@@ -686,6 +662,36 @@ function initMenu() {
 		} else {
 			menu.className = "slide";
 			menuopen = true;
+		}
+	}
+	var showmoon = document.getElementById("showmoon");
+	showmoon.onclick = function(e) {
+		if(e.target.className == "switchbtn") {
+			e.target.className = "switchbtn on";
+			display.moon = true;
+		} else {
+			e.target.className = "switchbtn";
+			display.moon = false;
+		}
+	}
+	var showsun = document.getElementById("showsun");
+	showsun.onclick = function(e) {
+		if(e.target.className == "switchbtn") {
+			e.target.className = "switchbtn on";
+			display.sun = true;
+		} else {
+			e.target.className = "switchbtn";
+			display.sun = false;
+		}
+	}
+	var showstars = document.getElementById("showstars");
+	showstars.onclick = function(e) {
+		if(e.target.className == "switchbtn") {
+			e.target.className = "switchbtn on";
+			display.stars = true;
+		} else {
+			e.target.className = "switchbtn";
+			display.stars = false;
 		}
 	}
 }
