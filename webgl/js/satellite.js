@@ -20,6 +20,7 @@ function Group(gname, hexcolor, psize) {
 	this.name = gname;
 	this.satarray = [];
 	this.size = parseFloat(psize);
+	this.show = true;
 	this.r = parseInt("0x"+hexcolor.slice(1, 3))/255.0;
 	this.g = parseInt("0x"+hexcolor.slice(3, 5))/255.0;
 	this.b = parseInt("0x"+hexcolor.slice(5, 7))/255.0;
@@ -33,6 +34,31 @@ function SatelliteGroup(file) {
 	var self = this;
 	this.list = [];
 	this.hash = [];
+
+	function initGroupsList() {
+		var grouphtml = "";
+		var groups = document.getElementById("groups");
+		for(var gidx in self.list)
+		{
+			var g = self.list[gidx];
+			grouphtml += '<div id="g'+gidx+'" class="listitem select">'+g.name+'</div>';
+		}
+		groups.innerHTML = grouphtml;
+		var items = groups.getElementsByClassName('listitem');
+		for (var i = 0; i < items.length; i++) {
+			items[i].onclick = function(e) {
+				var idx = parseInt(e.target.id.slice(1));
+				var g = self.list[idx];
+				if(e.target.className == "listitem") {
+					e.target.className = "listitem select";
+					g.show = true;
+				} else {
+					e.target.className = "listitem";
+					g.show = false;
+				}
+			}
+		}
+	}
 
 	function init() {
 		var request = new XMLHttpRequest();
@@ -58,6 +84,7 @@ function SatelliteGroup(file) {
 					self.hash[id] = new satinfo_t(name, group);
 				}
 			}
+			initGroupsList();
 		}
 		request.send();
 	}
@@ -152,6 +179,7 @@ SatelliteArray.prototype.refresh = function() {
 		var indexData = [];
 		var idx = 0;
 		var g = this.group.list[gidx];
+		if(!g.show) continue;
 		for(var s in g.satarray)
 		{
 			var sat = g.satarray[s];
@@ -201,6 +229,7 @@ SatelliteArray.prototype.draw = function(zoom) {
 	for(var gidx in this.group.list)
 	{
 		var g = this.group.list[gidx];
+		if(!g.show) continue;
 		gl.uniform3f(shader.monoColor, g.r, g.g, g.b)
 		gl.uniform1f(shader.pointSize, g.size);
 		gl.bindBuffer(gl.ARRAY_BUFFER, g.vertexPositionBuffer);

@@ -379,15 +379,16 @@ function WebGl() {
     var lastMouseX = null;
     var lastMouseY = null;
     var zval = -6.0
+	this.canvas = 0;
     this.resize = resize;
 
     function resize()
     {
-        var canvas = document.getElementById("main_canvas");
-        canvas.width = myWidth;
-        canvas.height = myHeight;
-        gl.viewportWidth = canvas.width;
-        gl.viewportHeight = canvas.height;
+        self.canvas = document.getElementById("main_canvas");
+        self.canvas.width = myWidth;
+        self.canvas.height = myHeight;
+        gl.viewportWidth = self.canvas.width;
+        gl.viewportHeight = self.canvas.height;
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
     }
@@ -395,9 +396,9 @@ function WebGl() {
     function init()
     {
 		startLoading();
-        var canvas = document.getElementById("main_canvas");
+        self.canvas = document.getElementById("main_canvas");
         try {
-            gl = canvas.getContext("experimental-webgl");
+            gl = self.canvas.getContext("experimental-webgl");
             self.resize();
         } catch (e) {}
 
@@ -435,13 +436,13 @@ function WebGl() {
 			satarray = new SatelliteArray(gl, shaderProgram, "tle.txt", "groups.txt");
 
         var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
-        window.addEventListener(mousewheelevt, handleMouseWheel);
-        window.onmousedown = handleMouseDown;
-        window.onmouseup = handleMouseUp;
-        window.onmousemove = handleMouseMove;
-        window.ontouchstart = handleTouchStart;
-        window.ontouchend = handleTouchEnd;
-        window.ontouchmove = handleTouchMove;
+        self.canvas.addEventListener(mousewheelevt, handleMouseWheel);
+        self.canvas.onmousedown = handleMouseDown;
+        self.canvas.onmouseup = handleMouseUp;
+        self.canvas.onmousemove = handleMouseMove;
+        self.canvas.ontouchstart = handleTouchStart;
+        self.canvas.ontouchend = handleTouchEnd;
+        self.canvas.ontouchmove = handleTouchMove;
 		doneLoading();
     }
 
@@ -674,6 +675,21 @@ function setWindowSize() {
     }
 }
 
+var menuopen = false;
+function initMenu() {
+	var menu_tab = document.getElementById("menu_tab");
+	menu_tab.onclick = function() {
+		var menu = document.getElementById("menu");
+		if(menuopen) {
+			menu.className = "";
+			menuopen = false;
+		} else {
+			menu.className = "slide";
+			menuopen = true;
+		}
+	}
+}
+
 var webgl;
 if(window.addEventListener)
 {
@@ -681,6 +697,7 @@ if(window.addEventListener)
 		"use strict";
 		setWindowSize();
 		webgl = new WebGl();
+		initMenu();
 	});
 	window.addEventListener('resize', function () {
 		"use strict";
