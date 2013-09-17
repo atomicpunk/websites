@@ -58,6 +58,24 @@ function SatelliteGroup(file) {
 				}
 			}
 		}
+		var all = document.getElementById("grpselectall");
+		all.onclick = function(e) {
+			for (var i = 0; i < items.length; i++) {
+				items[i].className = "listitem select";
+			}
+			for(var gidx in self.list) {
+				self.list[gidx].show = true;
+			}
+		}
+		var none = document.getElementById("grpclearall");
+		none.onclick = function(e) {
+			for (var i = 0; i < items.length; i++) {
+				items[i].className = "listitem";
+			}
+			for(var gidx in self.list) {
+				self.list[gidx].show = false;
+			}
+		}
 	}
 
 	function init() {
