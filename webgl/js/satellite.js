@@ -14,18 +14,31 @@ function satinfo_t(s_name, s_group) {
 	this.group = s_group;
 }
 
-function Group(gname, hexcolor, psize) {
+function Group(gid, gname, hcolor, psize) {
 	"use strict";
 
+	this.id = gid;
 	this.name = gname;
 	this.satarray = [];
 	this.size = parseFloat(psize);
 	this.show = true;
-	this.r = parseInt("0x"+hexcolor.slice(1, 3))/255.0;
-	this.g = parseInt("0x"+hexcolor.slice(3, 5))/255.0;
-	this.b = parseInt("0x"+hexcolor.slice(5, 7))/255.0;
+	this.hexcolor = hcolor;
+	this.r = parseInt("0x"+hcolor.slice(1, 3))/255.0;
+	this.g = parseInt("0x"+hcolor.slice(3, 5))/255.0;
+	this.b = parseInt("0x"+hcolor.slice(5, 7))/255.0;
     this.vertexPositionBuffer = null;
     this.vertexIndexBuffer = null;
+}
+
+Group.prototype.display = function(doshow) {
+	var item = document.getElementById(this.id);
+	if(doshow) {
+		item.className = "listitem select";
+		this.show = true;
+	} else {
+		item.className = "listitem";
+		this.show = false;
+	}
 }
 
 function SatelliteGroup(file) {
@@ -41,7 +54,7 @@ function SatelliteGroup(file) {
 		for(var gidx in self.list)
 		{
 			var g = self.list[gidx];
-			grouphtml += '<div id="g'+gidx+'" class="listitem select">'+g.name+'</div>';
+			grouphtml += '<div id="g'+gidx+'" class="listitem select"><div class="gcolor" style="background-color:'+g.hexcolor+';"></div>'+g.name+'</div>';
 		}
 		groups.innerHTML = grouphtml;
 		var items = groups.getElementsByClassName('listitem');
@@ -84,7 +97,7 @@ function SatelliteGroup(file) {
 		request.onload = function(e) {
 			var text = this.responseText;
 			var lines = text.split("\n");
-			var group = new Group("Other", "#FFFFFF", "1.500");
+			var group = new Group("g0", "Other", "#FFFFFF", "1.500");
 			self.list.push(group);
 			for(var i in lines)
 			{
@@ -92,7 +105,7 @@ function SatelliteGroup(file) {
 				var i = l.indexOf(";");
 				if(i >= 0 && l[0] != ' ') {
 					var j = l.indexOf("#");
-					group = new Group(l.slice(0, i),
+					group = new Group("g"+self.list.length, l.slice(0, i),
 									  l.slice(j, j+7),
 									  l.slice(j+8, j+13));
 					self.list.push(group);
@@ -178,6 +191,7 @@ function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
 			self.group.hash = null;
 			doneLoading();
 			self.refresh();
+			self.group.list[0].display(false);
 			window.setInterval(function() {if(!mouseDown && !loading) self.refresh();}, 1000);
 		}
 		request.send();

@@ -132,7 +132,6 @@ body {
 }
 
 .listitem {
-	padding-left: 10px;
 	width: 97%;
 	height: 30px;
 	border: 1px solid #e5e2c0;
@@ -145,6 +144,17 @@ body {
 
 .listitem.select {
     background-color: #307f9a;
+}
+
+.listitem .gcolor {
+	position: relative;
+    pointer-events: none;
+	float: left;
+	height: 30px;
+	width: 30px;
+	margin-right: 10px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 .btn {
