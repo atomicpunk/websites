@@ -19,6 +19,8 @@ body {
 #main_canvas {
 	position: absolute;
     border: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
     background-color: black;
 }
 
@@ -155,6 +157,9 @@ body {
 	margin-right: 10px;
     -webkit-user-select: none;
     -moz-user-select: none;
+	background-image: url(../images/generic.png);
+	background-size: 30px 30px;
+	background-repeat: no-repeat;
 }
 
 .btn {

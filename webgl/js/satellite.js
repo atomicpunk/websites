@@ -14,20 +14,51 @@ function satinfo_t(s_name, s_group) {
 	this.group = s_group;
 }
 
-function Group(gid, gname, hcolor, psize) {
+function Group(gl, gid, gname, cfgtext) {
 	"use strict";
 
+	var self = this;
+	this.gl = gl;
 	this.id = gid;
 	this.name = gname;
 	this.satarray = [];
-	this.size = parseFloat(psize);
+	this.size = 1.0;
 	this.show = true;
-	this.hexcolor = hcolor;
-	this.r = parseInt("0x"+hcolor.slice(1, 3))/255.0;
-	this.g = parseInt("0x"+hcolor.slice(3, 5))/255.0;
-	this.b = parseInt("0x"+hcolor.slice(5, 7))/255.0;
+	this.hexcolor = "";
+	this.r = 1.0;
+	this.g = 1.0;
+	this.b = 1.0;
+	this.texture = null;
+	this.imgpath = "";
     this.vertexPositionBuffer = null;
     this.vertexIndexBuffer = null;
+
+	function init() {
+		var field = cfgtext.split(" ");
+		self.hexcolor = field[0];
+		self.r = parseInt("0x"+self.hexcolor.slice(1, 3))/255.0;
+		self.g = parseInt("0x"+self.hexcolor.slice(3, 5))/255.0;
+		self.b = parseInt("0x"+self.hexcolor.slice(5, 7))/255.0;
+		self.size = parseFloat(field[1]);
+		if(field.length > 2) {
+			self.texture = self.gl.createTexture();
+			self.texture.image = new Image();
+			startLoading();
+			self.texture.image.onload = function () {
+				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+				gl.bindTexture(gl.TEXTURE_2D, self.texture);
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self.texture.image);
+				gl.generateMipmap(gl.TEXTURE_2D);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+				gl.bindTexture(gl.TEXTURE_2D, null);
+				doneLoading();
+			}
+			self.texture.image.src = "images/"+field[2];
+			self.imgpath = "url(images/"+field[2]+")";
+		}
+	}
+	init();
 }
 
 Group.prototype.display = function(doshow) {
@@ -41,10 +72,11 @@ Group.prototype.display = function(doshow) {
 	}
 }
 
-function SatelliteGroup(file) {
+function SatelliteGroup(gl, file) {
 	"use strict";
 
 	var self = this;
+	this.gl = gl;
 	this.list = [];
 	this.hash = [];
 
@@ -54,7 +86,15 @@ function SatelliteGroup(file) {
 		for(var gidx in self.list)
 		{
 			var g = self.list[gidx];
-			grouphtml += '<div id="g'+gidx+'" class="listitem select"><div class="gcolor" style="background-color:'+g.hexcolor+';"></div>'+g.name+'</div>';
+			if(g.texture) {
+				grouphtml += '<div id="g'+gidx+
+					'" class="listitem select"><div class="gcolor" style="background-image:'+
+					g.imgpath+';background-color:'+g.hexcolor+';"></div>'+g.name+'</div>';
+			} else {
+				grouphtml += '<div id="g'+gidx+
+					'" class="listitem select"><div class="gcolor" style="background-color:'+
+					g.hexcolor+';"></div>'+g.name+'</div>';
+			}
 		}
 		groups.innerHTML = grouphtml;
 		var items = groups.getElementsByClassName('listitem');
@@ -97,17 +137,15 @@ function SatelliteGroup(file) {
 		request.onload = function(e) {
 			var text = this.responseText;
 			var lines = text.split("\n");
-			var group = new Group("g0", "Other", "#FFFFFF", "1.500");
+			var group = new Group(self.gl, "g0", "All Other Satellites", "#FFFFFF 1.500");
 			self.list.push(group);
 			for(var i in lines)
 			{
 				var l = lines[i];
 				var i = l.indexOf(";");
 				if(i >= 0 && l[0] != ' ') {
-					var j = l.indexOf("#");
-					group = new Group("g"+self.list.length, l.slice(0, i),
-									  l.slice(j, j+7),
-									  l.slice(j+8, j+13));
+					group = new Group(self.gl, "g"+self.list.length,
+						l.slice(0, i), l.slice(i+2));
 					self.list.push(group);
 				} else if(l[0] == ' ' && l[1] != ' ' && group) {
 					var id = parseInt(l.slice(1, 6));
@@ -161,7 +199,7 @@ function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
 	var self = this;
 	this.gl = gl;
 	this.shaderProgram = shaderProgram;
-	this.group = new SatelliteGroup(groupfile);
+	this.group = new SatelliteGroup(gl, groupfile);
 
 	function init() {
 		startLoading();
@@ -253,7 +291,6 @@ SatelliteArray.prototype.draw = function(zoom) {
 	mat3.transpose(normalMatrix);
 
 	gl.uniform1i(shader.uselighting, 0);
-	gl.uniform1i(shader.monochromatic, 1);
 	gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
 	gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
@@ -262,8 +299,15 @@ SatelliteArray.prototype.draw = function(zoom) {
 	{
 		var g = this.group.list[gidx];
 		if(!g.show) continue;
-		gl.uniform3f(shader.monoColor, g.r, g.g, g.b)
 		gl.uniform1f(shader.pointSize, g.size);
+		if(g.texture) {
+			gl.uniform1i(shader.monochromatic, 2.0);
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, g.texture);
+		} else {
+			gl.uniform1i(shader.monochromatic, 1.0);
+			gl.uniform3f(shader.monoColor, g.r, g.g, g.b)
+		}
 		gl.bindBuffer(gl.ARRAY_BUFFER, g.vertexPositionBuffer);
 		gl.vertexAttribPointer(shader.vertexPositionAttribute, g.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g.vertexIndexBuffer);
