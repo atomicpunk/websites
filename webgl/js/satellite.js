@@ -298,13 +298,8 @@ SatelliteArray.prototype.draw = function(zoom) {
 	mat4.translate(mvMatrix, [0, 0, zoom]);
 	mat4.rotate(mvMatrix, povAzi, [0, 1, 0]);
 	mat4.rotate(mvMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
-	mat4.toInverseMat3(mvMatrix, normalMatrix);
-	mat3.transpose(normalMatrix);
-
 	gl.uniform1i(shader.uselighting, 0);
-	gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
-	gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
 
 	for(var gidx in this.group.list)
 	{

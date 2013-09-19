@@ -19,6 +19,7 @@ var pMatrix = mat4.create();
 var normalMatrix = mat3.create();
 var povAzi = Math.PI*(190/180);
 var povInc = Math.PI*(35/180);
+var zoomval = -6.0
 var daylight = null;
 var nightlight = null;
 var norad = new Norad(earthsize);
@@ -285,12 +286,13 @@ CosmicBody.prototype.drawHelper = function() {
 	var gl = this.gl;
 	var shader = this.shaderProgram;
 
-	mat4.toInverseMat3(mvMatrix, normalMatrix);
-	mat3.transpose(normalMatrix);
+	if(this.lighting) {
+		mat4.toInverseMat3(mvMatrix, normalMatrix);
+		mat3.transpose(normalMatrix);
+		gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
+	}
 	gl.uniform1i(shader.monochromatic, 0);
-	gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
-	gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
 
 	for (var i = 0; i < this.texture.length; i++) {
 		gl.uniform1i(shader.uselighting, (this.lighting)?(i+1):0);
@@ -359,20 +361,38 @@ function WebGl() {
     var mvMatrixStack = [];
     var lastMouseX = null;
     var lastMouseY = null;
-    var zval = -6.0
 	this.canvas = 0;
     this.resize = resize;
 
-    function resize()
-    {
-        self.canvas = document.getElementById("main_canvas");
-        self.canvas.width = myWidth;
-        self.canvas.height = myHeight;
-        gl.viewportWidth = self.canvas.width;
-        gl.viewportHeight = self.canvas.height;
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
-    }
+	function resize()
+	{
+		self.canvas = document.getElementById("main_canvas");
+		self.canvas.width = myWidth;
+		self.canvas.height = myHeight;
+		gl.viewportWidth = self.canvas.width;
+		gl.viewportHeight = self.canvas.height;
+		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+	}
+
+	this.lastview = [];
+	this.groundView = groundView;
+	function groundView(on) {
+		if(on) {
+			self.lastview[0] = povAzi;
+			self.lastview[1] = povInc;
+			self.lastview[2] = zoomval;
+			povAzi = Math.PI*(190/180);
+			povInc = Math.PI*(35/180);
+			zoomval = -6.0;
+			mat4.perspective(15, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+		} else {
+			povAzi = self.lastview[0];
+			povInc = self.lastview[1];
+			zoomval = self.lastview[2];
+			mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+		}
+	}
 
     function init()
     {
@@ -504,7 +524,7 @@ function WebGl() {
         shaderProgram.pointSize = gl.getUniformLocation(shaderProgram, "pointSize");
 
         gl.uniform3f(shaderProgram.dayAmbientColor, 0.3, 0.3, 0.3);
-        gl.uniform3f(shaderProgram.dayDirectColor, 2, 2, 2);
+        gl.uniform3f(shaderProgram.dayDirectColor, 1.5, 1.5, 1.5);
         gl.uniform3f(shaderProgram.nightAmbientColor, 0.8, 0.8, 0.8);
         gl.uniform3f(shaderProgram.nightDirectColor, 1, 1, 1);
         gl.uniform3f(shaderProgram.monoColor, 1, 1, 1);
@@ -587,38 +607,39 @@ function WebGl() {
         var delta = (/Firefox/i.test(navigator.userAgent)) ? (event.detail*-1) : event.wheelDelta;
         if(delta > 0)
         {
-            if(zval < -2.5)
-                zval *= 0.97;
+            if(zoomval < -2.5)
+                zoomval *= 0.97;
         }
         else
         {
-            if(zval > -100)
-                zval *= 1.03;
+            if(zoomval > -100)
+                zoomval *= 1.03;
         }
     }
 
-    function drawScene() {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	function drawScene() {
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
 
-        var azi = povAzi - aristotle.azi;
-        var light = mat4.create();
-        mat4.identity(light);
-        mat4.rotate(light, azi, [0, 1, 0]);
-        mat4.rotate(light, povInc, [Math.cos(azi), 0, Math.sin(azi)]);
-        mat4.rotate(light, aristotle.inc, [0, 0, 1]);
+		var azi = povAzi - aristotle.azi;
+		var light = mat4.create();
+		mat4.identity(light);
+		mat4.rotate(light, azi, [0, 1, 0]);
+		mat4.rotate(light, povInc, [Math.cos(azi), 0, Math.sin(azi)]);
+		mat4.rotate(light, aristotle.inc, [0, 0, 1]);
 
-        daylight = vec3.create(light);
-        nightlight = vec3.create(light);
-        vec3.scale(nightlight, -1);
-        gl.uniform3fv(shaderProgram.daylightDirection, daylight);
-        gl.uniform3fv(shaderProgram.nightlightDirection, nightlight);
+		daylight = vec3.create(light);
+		//nightlight = vec3.create(light);
+		//vec3.scale(nightlight, -1);
+		gl.uniform3fv(shaderProgram.daylightDirection, daylight);
+		//gl.uniform3fv(shaderProgram.nightlightDirection, nightlight);
 
-        if(stardata && display.stars) stardata.drawStar();
-        if(sundata && display.sun) sundata.drawStar();
-        if(earthdata) earthdata.draw(zval);
-		if(satarray) satarray.draw(zval);
-        if(moondata && display.moon) moondata.drawMoon(zval);
-    }
+		if(stardata && display.stars) stardata.drawStar();
+		if(sundata && display.sun) sundata.drawStar();
+		if(earthdata) earthdata.draw(zoomval);
+		if(satarray) satarray.draw(zoomval);
+		if(moondata && display.moon) moondata.drawMoon(zoomval);
+	}
 
 	var lastframe = 0;
 	var framebusy = false;
@@ -699,6 +720,16 @@ function initMenu() {
 		} else {
 			e.target.className = "switchbtn";
 			display.stars = false;
+		}
+	}
+	var viewpointbtn = document.getElementById("viewpointbtn");
+	viewpointbtn.onclick = function(e) {
+		if(e.target.className == "switchbtn") {
+			e.target.className = "switchbtn on";
+			webgl.groundView(false);
+		} else {
+			e.target.className = "switchbtn";
+			webgl.groundView(true);
 		}
 	}
 }
