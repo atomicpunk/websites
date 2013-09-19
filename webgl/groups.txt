@@ -1,4 +1,4 @@
-Amateur Radio; #000000 20.0 radio.png
+Amateur Radio; #E69980 20.0 radio.png
  07530  OSCAR 7 (AO-7)
  14129  PHASE 3B (AO-10)
  14781  UOSAT 2 (UO-11)
@@ -34,7 +34,7 @@ Amateur Radio; #000000 20.0 radio.png
  37854  AUBIESAT-1 (AO-71)
  37855  M-CUBED and EXP-1 PRIME
  38051  CHIBIS-M (RS-39)
-Beidou; #000000 30.0 beidou.png
+Beidou; #CCFF33 30.0 beidou.png
  26599  BEIDOU 1A
  26643  BEIDOU 1B
  27813  BEIDOU 1C
@@ -55,7 +55,7 @@ Beidou; #000000 30.0 beidou.png
  38774  BEIDOU M5
  38775  BEIDOU M6
  38953  BEIDOU G6
-CubeSats; #000000 40.0 cubesat.gif
+CubeSats; #CC9900 40.0 cubesat.gif
  27842  DTUSAT
  27844  CUTE-1 (CO-55)
  27845  QUAKESAT
@@ -4460,7 +4460,7 @@ Geodetic; #FF66FF 3.500
  27392  GRACE-2
  34602  GOCE
  38077  LARES
-Geostationary; #000000 10.0 geostationary.png
+Geostationary; #F5C243 10.0 geostationary.png
  08747  LES 9
  12309  ESIAFI 1 (COMSTAR 4)
  13631  SATCOM C5
@@ -4858,7 +4858,7 @@ Geostationary; #000000 10.0 geostationary.png
  39199  IRNSS-1A
  39215  ALPHASAT
  39216  INSAT 3D
-Global Positioning System; #000000 30.0 gps.png
+Global Positioning System; #FF0000 30.0 gps.png
  20959  GPS BIIA-10 (PRN 32)
  22014  GPS BIIA-14 (PRN 26)
  22700  GPS BIIA-21 (PRN 09)
@@ -4891,7 +4891,7 @@ Global Positioning System; #000000 30.0 gps.png
  37753  GPS BIIF-2  (PRN 01)
  38833  GPS BIIF-3  (PRN 24)
  39166  GPS BIIF-4  (PRN 27)
-Globalstar; #000000 30.0 globalstar.gif
+Globalstar; #00FFFF 30.0 globalstar.gif
  25162  GLOBALSTAR M001
  25163  GLOBALSTAR M004
  25164  GLOBALSTAR M002
@@ -4976,7 +4976,7 @@ Globalstar; #000000 30.0 globalstar.gif
  39075  GLOBALSTAR M095
  39076  GLOBALSTAR M096
  39077  GLOBALSTAR M097
-Glonass Operational; #000000 30.0 glonass.gif
+Glonass Operational; #7401DF 30.0 glonass.gif
  28509  COSMOS 2413 (712)
  28915  COSMOS 2419 (714)
  29670  COSMOS 2425 (716)
@@ -5008,7 +5008,7 @@ Glonass Operational; #000000 30.0 glonass.gif
  37868  COSMOS 2477 (745)
  37869  COSMOS 2475 (743)
  37938  COSMOS 2478 (746)
-GOES; #000000 30.0 goes.png
+GOES; #A366A3 30.0 goes.png
  08366  GOES 1 [-]
  10061  GOES 2 [-]
  10953  GOES 3 [P]
@@ -5024,7 +5024,7 @@ GOES; #000000 30.0 goes.png
  29155  GOES 13 [+]
  35491  GOES 14 [S]
  36411  GOES 15 [S]
-Gorizont; #000000 30.0 gorizont.gif
+Gorizont; #FFB2CC 30.0 gorizont.gif
  11158  GORIZONT 1
  11440  GORIZONT 2
  11648  GORIZONT 3
@@ -5058,9 +5058,9 @@ Gorizont; #000000 30.0 gorizont.gif
  23775  GORIZONT 31
  23880  GORIZONT 32
  26372  GORIZONT 33
-Hubble Space Telescope; #000000 30.0 hubble.png
+Hubble Space Telescope; #a342e1 30.0 hubble.png
  20580  HST
-Intelsat; #000000 30.0 intelsat.png
+Intelsat; #66A3FF 30.0 intelsat.png
  20315  INTELSAT 602 (IS-602)
  20523  INTELSAT 603 (IS-603)
  20872  SBS-6
@@ -5126,9 +5126,9 @@ Intelsat; #000000 30.0 intelsat.png
  38740  INTELSAT 20 (IS-20)
  38749  INTELSAT 21 (IS-21)
  38867  INTELSAT 23 (IS-23)
-International Space Station; #000000 60.000 iss_64.png
+International Space Station; #00FF00 60.000 iss_64.png
  25544  ISS (ZARYA)
-Iridium; #000000 30.0 iridium.gif
+Iridium; #B87070 30.0 iridium.gif
  24792  IRIDIUM 8 [+]
  24793  IRIDIUM 7 [+]
  24794  IRIDIUM 6 [+]
@@ -5221,7 +5221,7 @@ Iridium; #000000 30.0 iridium.gif
  27376  IRIDIUM 96 [S]
  27450  IRIDIUM 97 [+]
  27451  IRIDIUM 98 [S]
-Military US; #000000 25.0 deathstar.png
+Military US; #895050 25.0 deathstar.png
  22698  RADCAL
  23125  STRV 1A
  23126  STRV 1B
@@ -5237,7 +5237,7 @@ Military US; #000000 25.0 deathstar.png
  33751  SPIRALE A
  33752  SPIRALE B
  39088  SAPPHIRE
-Molniya; #000000 30.0 molniya.gif
+Molniya; #A366FF 30.0 molniya.gif
  07276  MOLNIYA 2-9
  07376  MOLNIYA 2-10
  07392  MOLNIYA 1-S
@@ -5302,7 +5302,7 @@ Navy Navigation Satellite System; #99FFCC 3.500
  19223  NOVA 11
  19419  OSCAR 25
  19420  OSCAR 31
-NOAA; #000000 50.0 noaa.png
+NOAA; #FF6666 50.0 noaa.png
  04793  NOAA 1 [-]
  06235  NOAA 2 [-]
  06920  NOAA 3 [-]
@@ -5324,7 +5324,7 @@ NOAA; #000000 50.0 noaa.png
  28654  NOAA 18 [B]
  33591  NOAA 19 [+]
  37849  NPP [+]
-Orbcomm; #000000 40.0 orbcomm.png
+Orbcomm; #00FF99 40.0 orbcomm.png
  21576  ORBCOMM-X [-]
  23545  ORBCOMM FM01 [-]
  23546  ORBCOMM FM02 [-]
@@ -5557,7 +5557,7 @@ Tracking and Data Relay Satellite System; #7070B8 3.500
  33053  FGRST (GLAST)
  36119  WISE
  39070  TDRS 11
-Weather; #000000 30.0 weather.png
+Weather; #4343F5 30.0 weather.png
  24883  ORBVIEW 2 (SEASTAR)
  24932  METEOSAT-7
  27431  FENGYUN 1D

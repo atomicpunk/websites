@@ -24,10 +24,10 @@ function Group(gl, gid, gname, cfgtext) {
 	this.satarray = [];
 	this.size = 1.0;
 	this.show = true;
-	this.hexcolor = "";
-	this.r = 1.0;
-	this.g = 1.0;
-	this.b = 1.0;
+	this.hexcolor = "#000000";
+	this.r = 0.0;
+	this.g = 0.0;
+	this.b = 0.0;
 	this.texture = null;
 	this.imgpath = "";
     this.vertexPositionBuffer = null;
@@ -35,11 +35,11 @@ function Group(gl, gid, gname, cfgtext) {
 
 	function init() {
 		var field = cfgtext.split(" ");
+		self.size = parseFloat(field[1]);
 		self.hexcolor = field[0];
 		self.r = parseInt("0x"+self.hexcolor.slice(1, 3))/255.0;
 		self.g = parseInt("0x"+self.hexcolor.slice(3, 5))/255.0;
 		self.b = parseInt("0x"+self.hexcolor.slice(5, 7))/255.0;
-		self.size = parseFloat(field[1]);
 		if(field.length > 2) {
 			self.texture = self.gl.createTexture();
 			self.texture.image = new Image();
@@ -200,6 +200,7 @@ function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
 	this.gl = gl;
 	this.shaderProgram = shaderProgram;
 	this.group = new SatelliteGroup(gl, groupfile);
+	this.useimages = true;
 
 	function init() {
 		startLoading();
@@ -233,6 +234,16 @@ function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
 			window.setInterval(function() {if(!mouseDown && !loading) self.refresh();}, 1000);
 		}
 		request.send();
+		var useimgs = document.getElementById("satuseimages");
+		useimgs.onclick = function(e) {
+			if(e.target.className == "switchbtn") {
+				e.target.className = "switchbtn on";
+				self.useimages = true;
+			} else {
+				e.target.className = "switchbtn";
+				self.useimages = false;
+			}
+		}
 	}
 	init();
 }
@@ -299,8 +310,13 @@ SatelliteArray.prototype.draw = function(zoom) {
 	{
 		var g = this.group.list[gidx];
 		if(!g.show) continue;
-		gl.uniform1f(shader.pointSize, g.size);
-		if(g.texture) {
+		if(!this.useimages && g.texture) {
+			gl.uniform1f(shader.pointSize, 2.5);
+		} else {
+			gl.uniform1f(shader.pointSize, g.size);
+		}
+
+		if(this.useimages && g.texture) {
 			gl.uniform1i(shader.monochromatic, 2.0);
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, g.texture);
