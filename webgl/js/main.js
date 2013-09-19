@@ -39,6 +39,11 @@ function doneLoading() {
 	if(loading <= 0) {
 		var e = document.getElementById("loading");
 		e.style.display="none";
+
+		/* start with an open menu */
+		var menu = document.getElementById("menu");
+		menu.className = "slide";
+		menuopen = true;
 	}
 }
 
