@@ -13,7 +13,7 @@ var starsize = 200;
 var earthsize = 2;
 var myWidth = 0;
 var myHeight = 0;
-var aristotle = new GeocentricModel();
+var aristotle = null;
 var mvMatrix = mat4.create();
 var pMatrix = mat4.create();
 var normalMatrix = mat3.create();
@@ -25,6 +25,9 @@ var nightlight = null;
 var norad = new Norad(earthsize);
 var gl = null;
 var shader = null;
+var earthMatrix = mat4.create();
+var starMatrix = mat4.create();
+var moonMatrix = mat4.create();
 
 var display = {
 	earth: true,
@@ -49,6 +52,30 @@ function doneLoading() {
 		menu.className = "slide";
 		menuopen = true;
 	}
+}
+
+function updateMatrices(newAlt, newAzi, newZoom, geomodel) {
+	povAlt = newAlt;
+	povAzi = newAzi;
+	zoomval = newZoom;
+
+	mat4.identity(earthMatrix);
+	mat4.translate(earthMatrix, [0, 0, zoomval]);
+	mat4.rotate(earthMatrix, povAzi, [0, 1, 0]);
+	mat4.rotate(earthMatrix, povAlt, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
+
+	var s_alt = geomodel.inc + povAlt;
+	var s_azi = povAzi - geomodel.azi;
+	mat4.identity(starMatrix);
+	mat4.rotate(starMatrix, s_azi, [0, 1, 0]);
+	mat4.rotate(starMatrix, s_alt, [Math.cos(s_azi), 0, Math.sin(s_azi)]);
+
+	var m_azi = povAzi - geomodel.moonazi;
+	mat4.identity(moonMatrix);
+	mat4.translate(moonMatrix, [0, 0, zoomval]);
+	mat4.rotate(moonMatrix, m_azi, [0, 1, 0]);
+	mat4.rotate(moonMatrix, povAlt, [Math.cos(m_azi), 0, Math.sin(m_azi)]);
+	mat4.translate(moonMatrix, geomodel.moonpos);
 }
 
 function GeocentricModel() {
@@ -128,6 +155,8 @@ function GeocentricModel() {
 		var mooninc = self.inc*Math.cos(ang);
 		self.moonazi = self.azi - ang;
 		self.moonpos[1] = self.moonpos[0]*Math.sin(mooninc);
+
+		updateMatrices(povAlt, povAzi, zoomval, self);
 	}
 
     init();
@@ -284,14 +313,16 @@ function CosmicBody(idstr, imgfile, radius, lighting) {
 	init();
 }
 
-CosmicBody.prototype.drawHelper = function() {
+CosmicBody.prototype.draw = function(bodyMatrix) {
+	if(loading > 0) return;
+
 	if(this.lighting) {
-		mat4.toInverseMat3(mvMatrix, normalMatrix);
+		mat4.toInverseMat3(bodyMatrix, normalMatrix);
 		mat3.transpose(normalMatrix);
 		gl.uniformMatrix3fv(shader.nMatrixUniform, false, normalMatrix);
 	}
 	gl.uniform1i(shader.monochromatic, 0);
-	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
+	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, bodyMatrix);
 
 	for (var i = 0; i < this.texture.length; i++) {
 		gl.uniform1i(shader.uselighting, (this.lighting)?(i+1):0);
@@ -311,39 +342,6 @@ CosmicBody.prototype.drawHelper = function() {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer[i]);
 		gl.drawElements(gl.TRIANGLES, this.vertexIndexBuffer[i].numItems, gl.UNSIGNED_SHORT, 0);
 	}
-}
-
-CosmicBody.prototype.draw = function(zoom) {
-	if(loading > 0) return;
-
-    mat4.identity(mvMatrix);
-    mat4.translate(mvMatrix, [0, 0, zoom]);
-    mat4.rotate(mvMatrix, povAzi, [0, 1, 0]);
-    mat4.rotate(mvMatrix, povAlt, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
-    this.drawHelper();
-}
-
-CosmicBody.prototype.drawStar = function() {
-	if(loading > 0) return;
-
-    var inc = aristotle.inc + povAlt;
-    var azi = povAzi - aristotle.azi;
-    mat4.identity(mvMatrix);
-    mat4.rotate(mvMatrix, azi, [0, 1, 0]);
-    mat4.rotate(mvMatrix, inc, [Math.cos(azi), 0, Math.sin(azi)]);
-    this.drawHelper();
-}
-
-CosmicBody.prototype.drawMoon = function(zoom) {
-	if(loading > 0) return;
-
-	var azi = povAzi - aristotle.moonazi;
-    mat4.identity(mvMatrix);
-    mat4.translate(mvMatrix, [0, 0, zoom]);
-    mat4.rotate(mvMatrix, azi, [0, 1, 0]);
-    mat4.rotate(mvMatrix, povAlt, [Math.cos(azi), 0, Math.sin(azi)]);
-    mat4.translate(mvMatrix, aristotle.moonpos);
-    this.drawHelper();
 }
 
 function WebGl() {
@@ -372,25 +370,6 @@ function WebGl() {
 		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
 	}
 
-	this.lastview = [];
-	this.groundView = groundView;
-	function groundView(on) {
-		if(on) {
-			self.lastview[0] = povAzi;
-			self.lastview[1] = povAlt;
-			self.lastview[2] = zoomval;
-			povAzi = Math.PI*(190/180);
-			povAlt = Math.PI*(35/180);
-			zoomval = -6.0;
-			mat4.perspective(15, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
-		} else {
-			povAzi = self.lastview[0];
-			povAlt = self.lastview[1];
-			zoomval = self.lastview[2];
-			mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
-		}
-	}
-
     function init()
     {
 		startLoading();
@@ -404,6 +383,8 @@ function WebGl() {
             alert("Could not initialise WebGL");
             return;
         }
+
+		aristotle = new GeocentricModel();
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -565,8 +546,8 @@ function WebGl() {
         var deltaX = newX - lastMouseX;
         var deltaY = newY - lastMouseY;
 
-        povAzi += degToRad(deltaX / 10);
-        povAlt += degToRad(deltaY / 10);
+		updateMatrices(povAlt + degToRad(deltaY / 10),
+			povAzi + degToRad(deltaX / 10), zoomval, aristotle);
 
         lastMouseX = newX
         lastMouseY = newY;
@@ -593,8 +574,8 @@ function WebGl() {
         var deltaX = newX - lastMouseX;
         var deltaY = newY - lastMouseY;
 
-        povAzi += degToRad(deltaX / 10);
-        povAlt += degToRad(deltaY / 10);
+		updateMatrices(povAlt + degToRad(deltaY / 10),
+			povAzi + degToRad(deltaX / 10), zoomval, aristotle);
 
         lastMouseX = newX
         lastMouseY = newY;
@@ -605,12 +586,12 @@ function WebGl() {
         if(delta > 0)
         {
             if(zoomval < -2.5)
-                zoomval *= 0.97;
+				updateMatrices(povAlt, povAzi, zoomval * 0.97, aristotle);
         }
         else
         {
             if(zoomval > -100)
-                zoomval *= 1.03;
+				updateMatrices(povAlt, povAzi, zoomval * 1.03, aristotle);
         }
     }
 
@@ -631,11 +612,11 @@ function WebGl() {
 		//vec3.scale(nightlight, -1);
 		//gl.uniform3fv(shader.nightlightDirection, nightlight);
 
-		if(stardata && display.stars) stardata.drawStar();
-		if(sundata && display.sun) sundata.drawStar();
-		if(earthdata) earthdata.draw(zoomval);
-		if(satarray) satarray.draw(zoomval);
-		if(moondata && display.moon) moondata.drawMoon(zoomval);
+		if(stardata && display.stars) stardata.draw(starMatrix);
+		if(sundata && display.sun) sundata.draw(starMatrix);
+		if(earthdata) earthdata.draw(earthMatrix);
+		if(satarray) satarray.draw(earthMatrix);
+		if(moondata && display.moon) moondata.draw(moonMatrix);
 	}
 
 	var lastframe = 0;
@@ -719,18 +700,6 @@ function initMenu() {
 			display.stars = false;
 		}
 	}
-/*
-	var viewpointbtn = document.getElementById("viewpointbtn");
-	viewpointbtn.onclick = function(e) {
-		if(e.target.className == "switchbtn") {
-			e.target.className = "switchbtn on";
-			webgl.groundView(false);
-		} else {
-			e.target.className = "switchbtn";
-			webgl.groundView(true);
-		}
-	}
-*/
 }
 
 var webgl;

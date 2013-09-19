@@ -281,15 +281,11 @@ SatelliteArray.prototype.refresh = function() {
 	}
 }
 
-SatelliteArray.prototype.draw = function(zoom) {
+SatelliteArray.prototype.draw = function(bodyMatrix) {
 	if(loading > 0) return;
 
-	mat4.identity(mvMatrix);
-	mat4.translate(mvMatrix, [0, 0, zoom]);
-	mat4.rotate(mvMatrix, povAzi, [0, 1, 0]);
-	mat4.rotate(mvMatrix, povAlt, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 	gl.uniform1i(shader.uselighting, 0);
-	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
+	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, bodyMatrix);
 
 	for(var gidx in this.group.list)
 	{
