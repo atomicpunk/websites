@@ -14,11 +14,10 @@ function satinfo_t(s_name, s_group) {
 	this.group = s_group;
 }
 
-function Group(gl, gid, gname, cfgtext) {
+function Group(gid, gname, cfgtext) {
 	"use strict";
 
 	var self = this;
-	this.gl = gl;
 	this.id = gid;
 	this.name = gname;
 	this.satarray = [];
@@ -41,7 +40,7 @@ function Group(gl, gid, gname, cfgtext) {
 		self.g = parseInt("0x"+self.hexcolor.slice(3, 5))/255.0;
 		self.b = parseInt("0x"+self.hexcolor.slice(5, 7))/255.0;
 		if(field.length > 2) {
-			self.texture = self.gl.createTexture();
+			self.texture = gl.createTexture();
 			self.texture.image = new Image();
 			startLoading();
 			self.texture.image.onload = function () {
@@ -72,11 +71,10 @@ Group.prototype.display = function(doshow) {
 	}
 }
 
-function SatelliteGroup(gl, file) {
+function SatelliteGroup(file) {
 	"use strict";
 
 	var self = this;
-	this.gl = gl;
 	this.list = [];
 	this.hash = [];
 
@@ -137,14 +135,14 @@ function SatelliteGroup(gl, file) {
 		request.onload = function(e) {
 			var text = this.responseText;
 			var lines = text.split("\n");
-			var group = new Group(self.gl, "g0", "All Other Satellites", "#FFFFFF 1.500");
+			var group = new Group("g0", "All Other Satellites", "#FFFFFF 1.500");
 			self.list.push(group);
 			for(var i in lines)
 			{
 				var l = lines[i];
 				var i = l.indexOf(";");
 				if(i >= 0 && l[0] != ' ') {
-					group = new Group(self.gl, "g"+self.list.length,
+					group = new Group("g"+self.list.length,
 						l.slice(0, i), l.slice(i+2));
 					self.list.push(group);
 				} else if(l[0] == ' ' && l[1] != ' ' && group) {
@@ -193,13 +191,11 @@ Satellite.prototype.print = function() {
 	console.log("X: "+x+" Y: "+y+" Z: "+z);
 }
 
-function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
+function SatelliteArray(tlefile, groupfile) {
 	"use strict";
 
 	var self = this;
-	this.gl = gl;
-	this.shaderProgram = shaderProgram;
-	this.group = new SatelliteGroup(gl, groupfile);
+	this.group = new SatelliteGroup(groupfile);
 	this.useimages = true;
 
 	function init() {
@@ -249,9 +245,6 @@ function SatelliteArray(gl, shaderProgram, tlefile, groupfile) {
 }
 
 SatelliteArray.prototype.refresh = function() {
-	var gl = this.gl;
-	var shader = this.shaderProgram;
-
 	var julian = norad.Julian_Now();
 	var thetaJD = norad.ThetaG_JD(julian);
 	for(var gidx in this.group.list)
@@ -291,13 +284,10 @@ SatelliteArray.prototype.refresh = function() {
 SatelliteArray.prototype.draw = function(zoom) {
 	if(loading > 0) return;
 
-	var gl = this.gl;
-	var shader = this.shaderProgram;
-
 	mat4.identity(mvMatrix);
 	mat4.translate(mvMatrix, [0, 0, zoom]);
 	mat4.rotate(mvMatrix, povAzi, [0, 1, 0]);
-	mat4.rotate(mvMatrix, povInc, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
+	mat4.rotate(mvMatrix, povAlt, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 	gl.uniform1i(shader.uselighting, 0);
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, mvMatrix);
 
