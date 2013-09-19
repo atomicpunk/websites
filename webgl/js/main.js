@@ -151,7 +151,7 @@ function GeocentricModel() {
 			self.tidx.push(i+360);
 		}
 
-		ang = ((t[2] + 200000)/2360585)*2.0*Math.PI;
+		ang = ((t[2] + 170000)/2360585.0)*2.0*Math.PI;
 		var mooninc = self.inc*Math.cos(ang);
 		self.moonazi = self.azi - ang;
 		self.moonpos[1] = self.moonpos[0]*Math.sin(mooninc);
