@@ -14,9 +14,6 @@ var earthsize = 2;
 var myWidth = 0;
 var myHeight = 0;
 var aristotle = null;
-var mvMatrix = mat4.create();
-var pMatrix = mat4.create();
-var normalMatrix = mat3.create();
 var povAzi = Math.PI*(190/180);
 var povAlt = Math.PI*(35/180);
 var zoomval = -6.0
@@ -25,9 +22,12 @@ var nightlight = null;
 var norad = new Norad(earthsize);
 var gl = null;
 var shader = null;
+var pMatrix = mat4.create();
+var normalMatrix = mat3.create();
 var earthMatrix = mat4.create();
 var starMatrix = mat4.create();
 var moonMatrix = mat4.create();
+var satarray = null;
 
 var display = {
 	earth: true,
@@ -352,8 +352,6 @@ function WebGl() {
     var stardata = null;
     var moondata = null;
     var sundata = null;
-    var satarray = null;
-    var mvMatrixStack = [];
     var lastMouseX = null;
     var lastMouseY = null;
 	this.canvas = 0;
@@ -507,19 +505,6 @@ function WebGl() {
         gl.uniform3f(shader.nightDirectColor, 1, 1, 1);
         gl.uniform3f(shader.monoColor, 1, 1, 1);
 		gl.uniform1f(shader.pointSize, 1.5);
-    }
-
-    function mvPushMatrix() {
-        var copy = mat4.create();
-        mat4.set(mvMatrix, copy);
-        mvMatrixStack.push(copy);
-    }
-
-    function mvPopMatrix() {
-        if (mvMatrixStack.length == 0) {
-            throw "Invalid popMatrix!";
-        }
-        mvMatrix = mvMatrixStack.pop();
     }
 
     function degToRad(degrees) {

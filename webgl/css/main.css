@@ -50,7 +50,7 @@ body {
     position: absolute;
 	cursor: pointer;
     pointer-events: auto;
-    width: 466px;
+    width: 700px;
     height: 405px;
     right: 0px;
     top: -365px;
@@ -102,6 +102,8 @@ body {
 }
 
 #viewctl {
+	position: relative;
+	float: left;
 	width: 100%;
 	height: 30px;
 	border: 1px solid #e5e2c0;
@@ -114,7 +116,16 @@ body {
 /* -------------------------------- list ----------------------------- */
 
 #groups {
-	width: 100%;
+	position: relative;
+	float: left;
+	width: 50%;
+	height: 300px;
+}
+
+#satellites {
+	position: relative;
+	float: left;
+	width: 50%;
 	height: 300px;
 }
 
@@ -123,7 +134,9 @@ body {
 }
 
 .listctl {
-	width: 100%;
+	position: relative;
+	float: left;
+	width: 49.7%;
 	height: 30px;
 	border: 1px solid #e5e2c0;
 	color: white;
@@ -149,6 +162,19 @@ body {
 }
 
 .listitem .gcolor {
+	position: relative;
+	float: left;
+	height: 30px;
+	width: 30px;
+	margin-right: 10px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+	background-image: url(../images/generic.png);
+	background-size: 30px 30px;
+	background-repeat: no-repeat;
+}
+
+.listitem .scolor {
 	position: relative;
     pointer-events: none;
 	float: left;

@@ -5058,8 +5058,6 @@ Gorizont; #FFB2CC 30.0 gorizont.gif
  23775  GORIZONT 31
  23880  GORIZONT 32
  26372  GORIZONT 33
-Hubble Space Telescope; #a342e1 30.0 hubble.png
- 20580  HST
 Intelsat; #66A3FF 30.0 intelsat.png
  20315  INTELSAT 602 (IS-602)
  20523  INTELSAT 603 (IS-603)
@@ -5283,7 +5281,7 @@ Molniya; #A366FF 30.0 molniya.gif
  25847  MOLNIYA 3-50
  26867  MOLNIYA 3-51
  28163  MOLNIYA 1-93
-Navy Navigation Satellite System; #99FFCC 3.500
+Navy Navigation; #99FFCC 3.500
  02807  TRANSIT 16
  02965  TRANSIT 17
  03133  TRANSIT 18
@@ -5405,7 +5403,7 @@ Russian LEO Navigation; #999962 3.500
  32052  COSMOS 2429
  35635  COSMOS 2454
  36519  COSMOS 2463
-Satellite-Based Augmentation System; #00CC99 3.500
+Satellite-Based Augmentation; #00CC99 3.500
  24307  AOR-E (EGNOS/PRN 120)
  26863  ARTEMIS (EGNOS/PRN 124)
  28622  MTSAT-1R (MSAS/PRN 129)
@@ -5437,6 +5435,7 @@ Space and Earth Science; #FF00FF 3.500
  19822  AKEBONO (EXOS-D)
  20261  INTERCOSMOS 24
  20322  COBE
+ 20580  Hubble Space Telescope;hubble.png
  20712  CRRES
  21578  SARA
  23547  ORBVIEW 1 (MICROLAB)
@@ -5452,7 +5451,7 @@ Space and Earth Science; #FF00FF 3.500
  25721  ABRIXAS
  25735  TERRIERS
  25791  FUSE 1
- 25867  CXO
+ 25867  Chandra XRay Observatory
  25978  CLEMENTINE
  25989  XMM-NEWTON
  25994  TERRA
@@ -5521,7 +5520,7 @@ Space and Earth Science; #FF00FF 3.500
 Space Stations; #9EFCA8 3.500
  37820  TIANGONG 1
  39221  HTV-4 (KOUNOTORI 4)
-Tracking and Data Relay Satellite System; #7070B8 3.500
+Tracking and Data Relay; #7070B8 3.500
  13367  LANDSAT 4
  13969  TDRS 1
  14780  LANDSAT 5
