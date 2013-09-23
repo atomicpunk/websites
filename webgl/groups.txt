@@ -5429,20 +5429,19 @@ Search and Rescue; #C266E0 3.500
  38857  GALILEO-FM3 (GSAT0103)
  38858  GALILEO-FM4 (GSAT0104)
 Space and Earth Science; #FF00FF 3.500
- 00424  ALOUETTE 1 (S-27)
  10637  IUE
  13777  IRAS
  19822  AKEBONO (EXOS-D)
  20261  INTERCOSMOS 24
- 20322  COBE
- 20580  Hubble Space Telescope;hubble.png
+ 20322  Cosmic Background Explorer;cobe.gif
+ 20580  Hubble Space Telescope;hubble.gif
  20712  CRRES
  21578  SARA
  23547  ORBVIEW 1 (MICROLAB)
  23757  RXTE (XTE)
  23802  POLAR
  24285  FAST
- 25280  TRACE
+ 25280  TRACE;trace.gif
  25399  SAFIR 2
  25560  SWAS
  25568  ASTRID 2
@@ -5451,7 +5450,7 @@ Space and Earth Science; #FF00FF 3.500
  25721  ABRIXAS
  25735  TERRIERS
  25791  FUSE 1
- 25867  Chandra XRay Observatory
+ 25867  Chandra XRay Observatory;chandra.gif
  25978  CLEMENTINE
  25989  XMM-NEWTON
  25994  TERRA
@@ -5479,6 +5478,7 @@ Space and Earth Science; #FF00FF 3.500
  27845  QUAKESAT
  27846  AAU CUBESAT
  27858  SCISAT 1
+ 27871  Spitzer Space Telescope
  27945  STSAT-1
  28230  GP-B
  28368  DEMETER

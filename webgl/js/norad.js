@@ -90,7 +90,9 @@ function vector_t() {
 	this.x = 0.0;
 	this.y = 0.0;
 	this.z = 0.0;
-	this.mag = 0.0;
+	this.lat = 0.0;
+	this.lon = 0.0;
+	this.alt = 0.0;
 }
 
 function geodetic_t() {
@@ -251,9 +253,9 @@ function Norad(earthradius) {
 	this.modf = modf;
 	function modf(val)
 	{
-		var i = val | 0;
-		var f = val - i;
-		return [i, f];
+		var iv = val | 0;
+		var fv = val - iv;
+		return [iv, fv];
 	}
 
 	function ThetaG(epoch, deep_arg)
@@ -326,7 +328,7 @@ function Norad(earthradius) {
 		if((year%4 == 0)&&((yearr%100 != 0)||(yearr%400 == 0))&&(month > 2))
 			day++;
 		//console.log("TIME: "+hour+":"+minute+":"+second+"."+ms);
-		return jdoy + day - (80/86400);
+		return jdoy + day;
 	}
 
 	this.sinceEpoch = sinceEpoch;
@@ -348,6 +350,15 @@ function Norad(earthradius) {
 		ret_val -= i*arg2;
 		if (ret_val < 0) ret_val += arg2;
 		return (ret_val);
+	}
+
+	function Pow(arg1, arg2)
+	{
+		var a = arg1;
+		if(arg1 < 0) a *= -1;
+		var res = Math.pow(a, arg2);
+		if(arg1 < 0 && res >= 0) res *= -1;
+		return res;
 	}
 
 	function FMod2p(x)
@@ -384,7 +395,7 @@ function Norad(earthradius) {
 	}
 
 	this.translateXYZ = translateXYZ;
-	function translateXYZ(thetaJD, pos, vel)
+	function translateXYZ(thetaJD, pos, vel, mapit)
 	{
 		/* cartesian conversion */
 		pos.x = pos.x*earthrad/ae; /* Cartesian Position x */
@@ -403,6 +414,25 @@ function Norad(earthradius) {
 		var r = Math.sqrt((pos.x*pos.x) + (pos.y*pos.y));
 		pos.x = r*Math.cos(theta);
 		pos.y = r*Math.sin(theta);
+
+		if(mapit) {
+			var phi, c, sp;
+			var e2 = f*(2 - f);
+			pos.lon = theta*180/Math.PI;
+			pos.lat = AcTan(pos.z, r);
+			do
+			{
+				phi = pos.lat;
+				sp = Math.sin(phi);
+				c = 1/Math.sqrt(1 - e2*sp*sp);
+				pos.lat = AcTan(pos.z + earthrad*c*e2*sp, r);
+			}
+			while(Math.abs(pos.lat - phi) >= 1E-10);
+			pos.alt = (r/Math.cos(pos.lat) - earthrad*c)*xkmper/earthrad;
+			pos.lat = pos.lat*180/Math.PI;
+			if(pos.lat > 90) pos.lat -= 360;
+			if(pos.lon > 180) pos.lon -= 360;
+		}
 
 	    // WebGL
 	    // XZ plane = equator
@@ -452,9 +482,9 @@ function Norad(earthradius) {
 			sinio = Math.sin(tle.xincl);
 			dd1 = (xke/tle.xno);
 			dd2 = tothrd;
-			a1 = Math.pow(dd1, dd2);
+			a1 = Pow(dd1, dd2);
 			dd1 = (1.0-tle.eo*tle.eo);
-			d1 = c1/a1/a1*(cosio*3.0*cosio-1.0)/Math.pow(dd1, 1.5);
+			d1 = c1/a1/a1*(cosio*3.0*cosio-1.0)/Pow(dd1, 1.5);
 			ao = a1*(1.0-d1*.33333333333333331-d1*d1-d1*
 				1.654320987654321*d1*d1);
 			po = ao*(1.0-tle.eo*tle.eo);
@@ -475,7 +505,7 @@ function Norad(earthradius) {
 		a = tle.xno+(tle.xndt2o*2.0+tle.xndd6o*3.0*tsince)*tsince;
 		dd1 = (tle.xno/a);
 		dd2 = tothrd;
-		a = ao*Math.pow(dd1, dd2);
+		a = ao*Pow(dd1, dd2);
 		e = e6a;
 		if (a > qo) e = 1.0-qo/a;
 		p = a*(1.0-e*e);
@@ -590,7 +620,7 @@ function Norad(earthradius) {
 
 			/* Recover original mean motion (xnodp) and   */
 			/* semimajor axis (aodp) from input elements. */
-			a1 = Math.pow(xke/tle.xno,tothrd);
+			a1 = Pow(xke/tle.xno,tothrd);
 			cosio = Math.cos(tle.xincl);
 			theta2 = cosio*cosio;
 			x3thm1 = 3*theta2-1.0;
@@ -623,7 +653,7 @@ function Norad(earthradius) {
 					s4 = 20;
 				else
 					s4 = perige-78;
-				qoms24 = Math.pow((120-s4)*ae/xkmper,4);
+				qoms24 = Pow((120-s4)*ae/xkmper,4);
 				s4 = s4/xkmper+ae;
 			}; /* End of if(perige <= 98) */
 
@@ -633,13 +663,13 @@ function Norad(earthradius) {
 			etasq = eta*eta;
 			eeta = tle.eo*eta;
 			psisq = Math.abs(1-etasq);
-			coef = qoms24*Math.pow(tsi,4);
-			coef1 = coef/Math.pow(psisq,3.5);
+			coef = qoms24*Pow(tsi,4);
+			coef1 = coef/Pow(psisq,3.5);
 			c2 = coef1*xnodp*(aodp*(1+1.5*etasq+eeta*(4+etasq))+
 				0.75*ck2*tsi/psisq*x3thm1*(8+3*etasq*(8+etasq)));
 			c1 = tle.bstar*c2;
 			sinio = Math.sin(tle.xincl);
-			a3ovk2 = -xj3/ck2*Math.pow(ae,3);
+			a3ovk2 = -xj3/ck2*Pow(ae,3);
 			c3 = coef*tsi*a3ovk2*xnodp*ae*sinio/tle.eo;
 			x1mth2 = 1-theta2;
 			c4 = 2*xnodp*coef1*aodp*betao2*(eta*(2+0.5*etasq)+
@@ -665,7 +695,7 @@ function Norad(earthradius) {
 			t2cof = 1.5*c1;
 			xlcof = 0.125*a3ovk2*sinio*(3+5*cosio)/(1+cosio);
 			aycof = 0.25*a3ovk2*sinio;
-			delmo = Math.pow(1+eta*Math.cos(tle.xmo),3);
+			delmo = Pow(1+eta*Math.cos(tle.xmo),3);
 			sinmo = Math.sin(tle.xmo);
 			x7thm1 = 7*theta2-1;
 			if (isFlagClear(SIMPLE_FLAG))
@@ -695,7 +725,7 @@ function Norad(earthradius) {
 		if (isFlagClear(SIMPLE_FLAG))
 		{
 			delomg = omgcof*tsince;
-			delm = xmcof*(Math.pow(1+eta*Math.cos(xmdf),3)-delmo);
+			delm = xmcof*(Pow(1+eta*Math.cos(xmdf),3)-delmo);
 			temp = delomg+delm;
 			xmp = xmdf+temp;
 			omega = omgadf-temp;
@@ -706,11 +736,11 @@ function Norad(earthradius) {
 			templ = templ+t3cof*tcube+tfour*(t4cof+tsince*t5cof);
 		}; /* End of if (isFlagClear(SIMPLE_FLAG)) */
 
-		a = aodp*Math.pow(tempa,2);
+		a = aodp*Pow(tempa,2);
 		e = tle.eo-tempe;
 		xl = xmp+omega+xnode+xnodp*templ;
 		beta = Math.sqrt(1-e*e);
-		xn = xke/Math.pow(a,1.5);
+		xn = xke/Pow(a,1.5);
 
 		/* Long period periodics */
 		axn = e*Math.cos(omega);
@@ -821,7 +851,7 @@ function Norad(earthradius) {
 
 			/* Recover original mean motion (xnodp) and   */
 			/* semimajor axis (aodp) from input elements. */
-			a1 = Math.pow(xke/tle.xno,tothrd);
+			a1 = Pow(xke/tle.xno,tothrd);
 			deep_arg.cosio = Math.cos(tle.xincl);
 			deep_arg.theta2 = deep_arg.cosio*deep_arg.cosio;
 			x3thm1 = 3*deep_arg.theta2-1;
@@ -845,7 +875,7 @@ function Norad(earthradius) {
 					s4 = 20;
 				else
 					s4 = perige-78;
-				qoms24 = Math.pow((120-s4)*ae/xkmper,4);
+				qoms24 = Pow((120-s4)*ae/xkmper,4);
 				s4 = s4/xkmper+ae;
 			}
 			pinvsq = 1/(deep_arg.aodp*deep_arg.aodp*
@@ -857,13 +887,13 @@ function Norad(earthradius) {
 			etasq = eta*eta;
 			eeta = tle.eo*eta;
 			psisq = Math.abs(1-etasq);
-			coef = qoms24*Math.pow(tsi,4);
-			coef1 = coef/Math.pow(psisq,3.5);
+			coef = qoms24*Pow(tsi,4);
+			coef1 = coef/Pow(psisq,3.5);
 			c2 = coef1*deep_arg.xnodp*(deep_arg.aodp*(1+1.5*etasq+eeta*
 				(4+etasq))+0.75*ck2*tsi/psisq*x3thm1*(8+3*etasq*(8+etasq)));
 			c1 = tle.bstar*c2;
 			deep_arg.sinio = Math.sin(tle.xincl);
-			a3ovk2 = -xj3/ck2*Math.pow(ae,3);
+			a3ovk2 = -xj3/ck2*Pow(ae,3);
 			x1mth2 = 1-deep_arg.theta2;
 			c4 = 2*deep_arg.xnodp*coef1*deep_arg.aodp*deep_arg.betao2*
 				(eta*(2+0.5*etasq)+tle.eo*(0.5+2*etasq)-2*ck2*tsi/
@@ -913,7 +943,7 @@ function Norad(earthradius) {
 		Deep(dpsec, tle, deep_arg);
 
 		xmdf = deep_arg.xll;
-		a = Math.pow(xke/deep_arg.xn,tothrd)*tempa*tempa;
+		a = Pow(xke/deep_arg.xn,tothrd)*tempa*tempa;
 		deep_arg.em = deep_arg.em-tempe;
 		xmam = xmdf+deep_arg.xnodp*templ;
 
@@ -925,7 +955,7 @@ function Norad(earthradius) {
 		xmam = deep_arg.xll;
 		xl = xmam+deep_arg.omgadf+deep_arg.xnode;
 		beta = Math.sqrt(1-deep_arg.em*deep_arg.em);
-		deep_arg.xn = xke/Math.pow(a,1.5);
+		deep_arg.xn = xke/Pow(a,1.5);
 
 		/* Long period periodics */
 		axn = deep_arg.em*Math.cos(deep_arg.omgadf);
@@ -1568,10 +1598,10 @@ function Norad(earthradius) {
 		/* Period > 225 minutes is deep space */
 		dd1 = (xke/tle.xno);
 		dd2 = tothrd;
-		a1 = Math.pow(dd1, dd2);
+		a1 = Pow(dd1, dd2);
 		r1 = Math.cos(tle.xincl);
 		dd1 = (1.0-tle.eo*tle.eo);
-		temp = ck2*1.5*(r1*r1*3.0-1.0)/Math.pow(dd1, 1.5);
+		temp = ck2*1.5*(r1*r1*3.0-1.0)/Pow(dd1, 1.5);
 		del1 = temp/(a1*a1);
 		ao = a1*(1.0-del1*(tothrd*0.5+del1*
 			(del1*1.654320987654321+1.0)));
@@ -1587,33 +1617,6 @@ function Norad(earthradius) {
 			ClearFlag(DEEP_SPACE_EPHEM_FLAG);
 			return false;
 		}
-	}
-
-	this.Calculate_LatLonAlt = Calculate_LatLonAlt;
-	function Calculate_LatLonAlt(time, pos, geodetic, thetaJD)
-	{
-		/* Reference:  The 1992 Astronomical Almanac, page K12. */
-		var r,e2,phi,c,sp;
-		var td = (thetaJD)?thetaJD:ThetaG_JD(time);
-		geodetic.theta = AcTan(pos.y,pos.x);/*radians*/
-		geodetic.lon = FMod2p(geodetic.theta - td);/*radians*/
-		r = Math.sqrt((pos.x*pos.x) + (pos.y*pos.y));
-		e2 = f*(2 - f);
-		geodetic.lat = AcTan(pos.z,r);/*radians*/
-
-		do
-		{
-			phi = geodetic.lat;
-			sp = Math.sin(phi);
-			c = 1/Math.sqrt(1 - e2*sp*sp);
-			geodetic.lat = AcTan(pos.z + earthrad*c*e2*sp,r);
-		}
-		while(Math.abs(geodetic.lat - phi) >= 1E-10);
-
-		geodetic.alt = r/Math.cos(geodetic.lat) - earthrad*c;/*kilometers*/
-
-		if( geodetic.lat > pio2 )
-			geodetic.lat -= twopi;
 	}
 }
 
@@ -1655,30 +1658,33 @@ Norad.prototype.getPoint = function(tle, time, deep, julian, thetaJD) {
 		sfunc = this.sgp;
 
 	this.Flags = 0;
-	sfunc(time, tle, pos);
+	sfunc(time - (252/60), tle, pos);
 	this.translateXYZ(thetaJD, pos);
-
-	// var geo = new geodetic_t();
-	// this.Calculate_LatLonAlt(julian, pos, geo, thetaJD);
-	// geo.print();
 
 	return [pos.x, pos.y, pos.z];
 }
 
 Norad.prototype.test = function(tle, deep) {
 	var pos = new vector_t();
-	var vel = new vector_t();
+	var sfunc = (deep)?this.sdp4:this.sgp;
+	if(tle.id == 38913)
+		sfunc = this.sgp;
 
-	this.Flags = 0;
-	for(var t = 0.0; t <= 1440.0; t += 360.0)
-	{
-		if(deep)
-			this.sdp4(t, tle, pos, vel);
-		else
-			this.sgp(t, tle, pos, vel);
-
-		console.log("TIME: "+t);
-		console.log(" POS: "+pos.x+" "+pos.y+" "+pos.z);
-		console.log(" VEL: "+vel.x+" "+vel.y+" "+vel.z);
+	if((tle.id == 27871)||(tle.id == 25544)) {
+		var vel = new vector_t();
+		this.Flags = 0;
+		this.sgp(time - (252/60), tle, pos, vel);
+		this.translateXYZ(thetaJD, pos, vel, true);
+		console.log("SGP:  "+pos.lat+" "+pos.lon+" "+pos.alt+" ["+vel.x+", "+vel.y+", "+vel.z+"]");
+		this.Flags = 0;
+		this.sgp4(time + (133/60), tle, pos, vel);
+		this.translateXYZ(thetaJD, pos, vel, true);
+		console.log("SGP4: "+pos.lat+" "+pos.lon+" "+pos.alt+" ["+vel.x+", "+vel.y+", "+vel.z+"]");
+	} else {
+		this.Flags = 0;
+		sfunc(time, tle, pos);
+		this.translateXYZ(thetaJD, pos);
 	}
+
+	return [pos.x, pos.y, pos.z];
 }

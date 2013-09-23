@@ -90,6 +90,7 @@ Group.prototype.list = function() {
 	var self = this;
 	var sathtml = "";
 	var sats = document.getElementById("satellites");
+	selected_group = self.name;
 	for(var idx in this.satarray)
 	{
 		var s = this.satarray[idx];
@@ -180,7 +181,6 @@ function SatelliteGroup(file) {
 					var g = self.list[idx];
 					if(selected_group != g.name) {
 						g.list();
-						selected_group = g.name;
 						return;
 					}
 					if(e.target.className == "listitem") {
@@ -195,7 +195,6 @@ function SatelliteGroup(file) {
 					var g = self.list[idx];
 					if(selected_group != g.name) {
 						g.list();
-						selected_group = g.name;
 					}
 				}
 			}
@@ -339,7 +338,12 @@ function SatelliteArray(tlefile, groupfile) {
 			self.group.hash = null;
 			doneLoading();
 			self.refresh();
-			self.group.list[0].display(false);
+			var igroup = 35;
+			for(var g in self.group.list) {
+				if(g != igroup)
+					self.group.list[g].display(false);
+			}
+			self.group.list[igroup].list();
 			window.setInterval(function() {if(!mouseDown && !loading) self.refresh();}, 1000);
 		}
 		request.send();
@@ -432,6 +436,7 @@ SatelliteArray.prototype.draw = function(bodyMatrix) {
 		for(var sidx in g.imgsatarray)
 		{
 			var s = g.imgsatarray[sidx];
+			if(!s.show) continue;
 			if(this.useimages && s.texture) {
 				gl.uniform1f(shader.pointSize, 20.0);
 				gl.uniform1i(shader.monochromatic, 2.0);
