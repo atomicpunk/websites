@@ -310,6 +310,7 @@ function SatelliteArray(tlefile, groupfile) {
 	this.group = new SatelliteGroup(groupfile);
 	this.useimages = true;
 
+
 	function init() {
 		startLoading();
 		var request = new XMLHttpRequest();
@@ -338,12 +339,11 @@ function SatelliteArray(tlefile, groupfile) {
 			self.group.hash = null;
 			doneLoading();
 			self.refresh();
-			var igroup = 35;
 			for(var g in self.group.list) {
-				if(g != igroup)
+				if((g != 35)&&(g != 15)&&(g != 23))
 					self.group.list[g].display(false);
 			}
-			self.group.list[igroup].list();
+			self.group.list[35].list();
 			window.setInterval(function() {if(!mouseDown && !loading) self.refresh();}, 1000);
 		}
 		request.send();
@@ -415,17 +415,17 @@ SatelliteArray.prototype.draw = function(bodyMatrix) {
 		var g = this.group.list[gidx];
 		if(!g.show) continue;
 		if(!this.useimages && g.texture) {
-			gl.uniform1f(shader.pointSize, 2.5);
+			gl.uniform1f(shader.pointSize, 3.5);
 		} else {
 			gl.uniform1f(shader.pointSize, g.size);
 		}
 
 		if(this.useimages && g.texture) {
-			gl.uniform1i(shader.monochromatic, 2.0);
+			gl.uniform1i(shader.monochromatic, 2);
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, g.texture);
 		} else {
-			gl.uniform1i(shader.monochromatic, 1.0);
+			gl.uniform1i(shader.monochromatic, 1);
 			gl.uniform3f(shader.monoColor, g.r, g.g, g.b)
 		}
 
@@ -433,13 +433,14 @@ SatelliteArray.prototype.draw = function(bodyMatrix) {
 		gl.vertexAttribPointer(shader.vertexPositionAttribute, g.posBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g.idxBuffer);
 		gl.drawElements(gl.POINTS, g.idxBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
 		for(var sidx in g.imgsatarray)
 		{
 			var s = g.imgsatarray[sidx];
 			if(!s.show) continue;
 			if(this.useimages && s.texture) {
 				gl.uniform1f(shader.pointSize, 20.0);
-				gl.uniform1i(shader.monochromatic, 2.0);
+				gl.uniform1i(shader.monochromatic, 2);
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, s.texture);
 			}
