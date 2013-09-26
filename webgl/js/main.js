@@ -15,8 +15,8 @@ var earthsize = 2;
 var myWidth = 0;
 var myHeight = 0;
 var aristotle = null;
-var povAzi = Math.PI*(190/180);
-var povAlt = Math.PI*(35/180);
+var povAzi = 0;
+var povAlt = 0;
 var defzoom = [-6.0, -50.0];
 var daylight = null;
 var norad = new Norad(earthsize);
@@ -28,16 +28,16 @@ var earthMatrix = mat4.create();
 var starMatrix = mat4.create();
 var moonMatrix = mat4.create();
 var satarray = null;
-var updateMatrices = updateMatricesSpace;
+var updateMatrices = updateMatricesGround;
 var zoomval = (updateMatrices == updateMatricesSpace)?defzoom[0]:defzoom[1];
 
 var display = {
-	earth: true,
+	earth: false,
 	moon: true,
 	stars: true,
 	sun: true,
 	sat: true,
-	initmenu: true
+	initmenu: false
 };
 
 function startLoading() {
@@ -65,12 +65,12 @@ function updateMatricesSpace(newAlt, newAzi, newZoom, geomodel) {
 	zoomval = newZoom;
 
 	if(shader && gl) {
+		var azi = povAzi - geomodel.sunazi;
 		var light = mat4.create();
 		mat4.identity(light);
-		var azi = povAzi - geomodel.azi;
 		mat4.rotate(light, azi, [0, 1, 0]);
 		mat4.rotate(light, povAlt, [Math.cos(azi), 0, Math.sin(azi)]);
-		mat4.rotate(light, geomodel.inc, [0, 0, 1]);
+		mat4.rotate(light, geomodel.sunalt, [0, 0, 1]);
 		daylight = vec3.create(light);
 		gl.uniform3fv(shader.daylightDirection, daylight);
 		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
@@ -81,8 +81,8 @@ function updateMatricesSpace(newAlt, newAzi, newZoom, geomodel) {
 	mat4.rotate(earthMatrix, povAzi, [0, 1, 0]);
 	mat4.rotate(earthMatrix, povAlt, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
-	var s_alt = geomodel.inc + povAlt;
-	var s_azi = povAzi - geomodel.azi;
+	var s_alt = povAlt;
+	var s_azi = povAzi - geomodel.starazi;
 	mat4.identity(starMatrix);
 	mat4.rotate(starMatrix, s_azi, [0, 1, 0]);
 	mat4.rotate(starMatrix, s_alt, [Math.cos(s_azi), 0, Math.sin(s_azi)]);
@@ -104,12 +104,12 @@ function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
 	var azi = -povAzi;
 
 	if(shader && gl) {
-		var lazi = azi - geomodel.azi;
+		var lazi = azi - geomodel.sunazi;
 		var light = mat4.create();
 		mat4.identity(light);
 		mat4.rotate(light, lazi, [0, 1, 0]);
 		mat4.rotate(light, alt, [Math.cos(lazi), 0, Math.sin(lazi)]);
-		mat4.rotate(light, geomodel.inc, [0, 0, 1]);
+		mat4.rotate(light, geomodel.sunalt, [0, 0, 1]);
 		daylight = vec3.create(light);
 		gl.uniform3fv(shader.daylightDirection, daylight);
 		var p = 15 + ((-zoomval - 2.5)/97.5)*75.0;
@@ -121,13 +121,12 @@ function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
 	mat4.rotate(earthMatrix, azi, [0, 1, 0]);
 	mat4.rotate(earthMatrix, alt, [Math.cos(azi), 0, Math.sin(azi)]);
 
-	alt = geomodel.inc - povAlt;
-	azi = -povAzi - geomodel.azi;
+	alt = -povAlt;
+	azi = -povAzi - geomodel.starazi;
 	mat4.identity(starMatrix);
 	mat4.rotate(starMatrix, azi, [0, 1, 0]);
 	mat4.rotate(starMatrix, alt, [Math.cos(azi), 0, Math.sin(azi)]);
 
-	alt = -povAlt;
 	azi = -povAzi - geomodel.moonazi;
 	mat4.identity(moonMatrix);
 	mat4.rotate(moonMatrix, azi, [0, 1, 0]);
@@ -136,43 +135,46 @@ function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
 }
 
 function GeocentricModel() {
-    "use strict";
+	"use strict";
 
-    var self = this;
-    this.days = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-    this.inc = 0;
-    this.azi = 0;
-    this.sunvector = [0, 0, 0];
-    this.moonazi = 0;
-    this.moonpos = [earthsize * 30.103480715, 0, 0];
-    this.latlon = [];
-    this.terminator = [];
-    this.tidx = [];
-    function init() {
-        for (var lat = 0; lat <= 180; lat++) {
-            self.latlon[lat] = [];
-            var theta = lat * Math.PI / 180;
-            var sinTheta = Math.sin(theta);
-            var cosTheta = Math.cos(theta);
-            for (var lon = 0; lon <= 360; lon++) {
-                var phi = lon * 2 * Math.PI / 360;
-                var x = Math.cos(phi) * sinTheta;
-                var y = cosTheta;
-                var z = Math.sin(phi) * sinTheta;
-                self.latlon[lat][lon] = { x: x, y: y, z: z };
-            }
-        }
-        sunSync();
-        window.setInterval(function() {if(!mouseDown && !loading) sunSync();}, 5000);
-    }
+	var self = this;
+	this.days = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+	this.sunalt = 0;
+	this.sunazi = 0;
+	this.sunvector = [0, 0, 0];
+	this.moonazi = 0;
+	this.moonpos = [earthsize * 30.103480715, 0, 0];
+	this.latlon = [];
+	this.starazi = Math.PI/2 + 0.027378508*2.0*Math.PI;
 
-    function currentTime() {
-        var date = new Date();
-        var day = self.days[date.getUTCMonth()] + date.getUTCDate();
-        var sec = (date.getUTCHours()*3600) + (date.getUTCMinutes()*60) + date.getUTCSeconds();
+	/* initial solar system position, time = Jan 1 12:00AM UTC */
+	/* 10 days after winter solstice (10/365.25)*2*pi */
+	function init() {
+		/* create the 3D representation of a sphere with lat/lon as vertices */
+		for (var lat = 0; lat <= 180; lat++) {
+			self.latlon[lat] = [];
+			var theta = lat * Math.PI / 180;
+			var sinTheta = Math.sin(theta);
+			var cosTheta = Math.cos(theta);
+			for (var lon = 0; lon <= 360; lon++) {
+				var phi = lon * 2 * Math.PI / 360;
+				var x = Math.cos(phi) * sinTheta;
+				var y = cosTheta;
+				var z = Math.sin(phi) * sinTheta;
+				self.latlon[lat][lon] = { x: x, y: y, z: z };
+			}
+		}
+		sunSync();
+		window.setInterval(function() {if(!mouseDown && !loading) sunSync();}, 5000);
+	}
+
+	function currentTime() {
+		var date = new Date();
+		var day = self.days[date.getUTCMonth()] + date.getUTCDate();
+		var sec = (date.getUTCHours()*3600) + (date.getUTCMinutes()*60) + date.getUTCSeconds();
 		var t = date.getTime()/1000;
-        return [day, sec, t];
-    }
+		return [day, sec, t];
+	}
 
     function vecFromIncAzi(inclination, azimuth) {
         var vec = [];
@@ -182,35 +184,29 @@ function GeocentricModel() {
         return vec;
     }
 
+	this.sunpos = sunPos;
+	function sunPos() {
+		var t = currentTime();
+		var fyear = ((t[0] * 86400) + t[1]) / 31557600;
+		var azi = (0.027378508 + fyear)*2.0*Math.PI;
+		var alt = -0.41 * Math.cos(azi);
+		return [azi, alt];
+	}
+
 	this.sync = sunSync;
 	function sunSync() {
 		var t = currentTime();
-		var ang = (((t[0] * 86400) + t[1]) * Math.PI) / 15768000;
-		self.inc = -23.4 * (Math.PI/180) * Math.cos(ang + (0.054794521*Math.PI));
-		self.azi = (t[1]/86400)*2.0*Math.PI;
-		self.sunvector = vecFromIncAzi(self.inc, self.azi);
-		self.terminator = [];
-		self.tidx = [];
-		for (var i = 0; i < 360; i++) {
-			var a = Math.PI*i/180;
-			var x = earthsize * Math.cos(a);
-			var y = 0;
-			var z = earthsize * Math.sin(a);
-			self.terminator.push(x, y, z);
-			self.tidx.push(i);
-		}
-		for (var i = 0; i < 360; i++) {
-			var a = Math.PI*i/180;
-			var x = earthsize * Math.cos(a);
-			var y = earthsize * Math.sin(a);
-			var z = 0;
-			self.terminator.push(x, y, z);
-			self.tidx.push(i+360);
-		}
+		var fyear = ((t[0] * 86400) + t[1]) / 31557600;
+		var fday = (t[1]/86400);
+		self.starazi = Math.PI/2 + (0.027378508 + fyear + fday)*2.0*Math.PI;
 
-		ang = ((t[2] + 170000)/2360585.0)*2.0*Math.PI;
-		var mooninc = self.inc*Math.cos(ang);
-		self.moonazi = self.azi - ang;
+		self.suninc = 0.41 * Math.cos((0.027378508 + fyear + fday)*2.0*Math.PI);
+		self.sunazi = fday*2.0*Math.PI;
+		self.sunvector = vecFromIncAzi(self.suninc, self.sunazi);
+
+		var ang = ((t[2] + 170000)/2360585.0)*2.0*Math.PI;
+		var mooninc = self.suninc*Math.cos(ang);
+		self.moonazi = self.sunazi - ang;
 		self.moonpos[0] = earthsize*30.103480715*Math.cos(mooninc);
 		self.moonpos[1] = earthsize*30.103480715*Math.sin(mooninc);
 		self.moonpos[2] = 0;
@@ -258,12 +254,12 @@ function CosmicBody(idstr, imgfile, radius, lighting) {
             window.setInterval(function() {if(!mouseDown && !loading) initVectors();}, 5000);
     }
 
-    function initTexture(idx) {
+	function initTexture(idx) {
         self.texture[idx] = gl.createTexture();
         self.texture[idx].image = new Image();
 		startLoading();
         self.texture[idx].image.onload = function () {
-            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
             gl.bindTexture(gl.TEXTURE_2D, self.texture[idx]);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self.texture[idx].image);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -277,7 +273,7 @@ function CosmicBody(idstr, imgfile, radius, lighting) {
         self.texture[idx].image.src = imgfile[idx];
     }
 
-    function vectorDefault() {
+    function vectorDefault(reverse) {
         for (var lat=0; lat <= 180; lat++) {
             for (var lon=0; lon <= 360; lon++) {
                 var x = aristotle.latlon[lat][lon].x;
@@ -285,6 +281,8 @@ function CosmicBody(idstr, imgfile, radius, lighting) {
                 var z = aristotle.latlon[lat][lon].z;
                 var v = 1 - (lat / 180);
                 var u = 1 - (lon / 360);
+				if(reverse)
+					u = (lon / 360);
 
                 self.normalData.push(x, y, z);
                 self.vertexPositionData.push(radius * x, radius * y, radius * z);
@@ -307,25 +305,28 @@ function CosmicBody(idstr, imgfile, radius, lighting) {
         }
     }
 
-    function vectorSun() {
-        var square = []
-        var dA = Math.PI/18;
-        square[0] = [-1*dA, -1*dA];
-        square[1] = [   dA, -1*dA];
-        square[2] = [-1*dA,    dA];
-        square[3] = [   dA,    dA];
-        for(var i = 0; i < 4; i++) {
-            var x = Math.cos(square[i][1]);
-            var y = Math.tan(square[i][0]);
-            var z = Math.sin(square[i][1]);
-            var v = i%2;
-            var u = parseInt(i/2);
-            self.normalData.push(x, y, z);
-            self.vertexPositionData.push(radius * x, radius * y, radius * z);
-            self.textureCoordData.push(u, v);
-        }
-        self.indexData[0].push(0, 1, 2, 1, 3, 2);
-    }
+	function vectorSun() {
+		var ang = aristotle.sunpos();
+		var square = []
+		var dA = Math.PI/18;
+		square[0] = [-1*dA, -1*dA];
+		square[1] = [   dA, -1*dA];
+		square[2] = [-1*dA,    dA];
+		square[3] = [   dA,    dA];
+		for(var i = 0; i < 4; i++) {
+			var theta = square[i][1] - ang[0];
+			var phi = square[i][0] + ang[1];
+			var x = Math.sin(theta)*Math.cos(phi);
+			var y = Math.sin(phi);
+			var z = -1*Math.cos(theta)*Math.cos(phi);
+			var v = i%2;
+			var u = parseInt(i/2);
+			self.normalData.push(x, y, z);
+			self.vertexPositionData.push(radius * x, radius * y, radius * z);
+			self.textureCoordData.push(u, v);
+		}
+		self.indexData[0].push(0, 1, 2, 1, 3, 2);
+	}
 
     function initVectors() {
         self.vertexPositionData = [];
@@ -337,10 +338,12 @@ function CosmicBody(idstr, imgfile, radius, lighting) {
             self.indexData[i] = [];
         }
 
-        if(self.id == "sun")
-            vectorSun();
-        else
-            vectorDefault();
+		if(self.id == "sun")
+			vectorSun();
+		else if(self.id == "stars")
+			vectorDefault(true);
+		else
+			vectorDefault(false);
 
         self.vertexNormalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, self.vertexNormalBuffer);
@@ -425,7 +428,12 @@ function WebGl() {
 		gl.viewportWidth = self.canvas.width;
 		gl.viewportHeight = self.canvas.height;
 		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+		if(updateMatrices == updateMatricesGround) {
+			var p = 15 + ((-defzoom[1] - 2.5)/97.5)*75.0;
+			mat4.perspective(p, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+		} else {
+			mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
+		}
 	}
 
     function init()
@@ -455,7 +463,7 @@ function WebGl() {
 		var imgearthday = (n)?"images/earth_day.jpg":"images/earth_day_small.jpg";
 		var imgearthnight = (n)?"images/earth_night.jpg":"images/earth_night_small.jpg";
 		var imgmoon = (n)?"images/moon.jpg":"images/moon_small.jpg";
-		var imgstars = "images/stars.png";
+		var imgstars = "images/skymap.jpg";
 		var imgsun = "images/sun.png";
 
 		earthdata = new CosmicBody("earth",
