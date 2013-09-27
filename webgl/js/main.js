@@ -7,7 +7,6 @@
  *
  */
 
-
 var loading = 0;
 var mouseDown = false;
 var starsize = 200;
@@ -28,11 +27,12 @@ var earthMatrix = mat4.create();
 var starMatrix = mat4.create();
 var moonMatrix = mat4.create();
 var satarray = null;
-var updateMatrices = updateMatricesGround;
+var updateMatrices = updateMatricesSpace;
 var zoomval = (updateMatrices == updateMatricesSpace)?defzoom[0]:defzoom[1];
+var home = { lat: 45.518259, lon: -122.902044, x:0, y:0, z:0 };
 
 var display = {
-	earth: false,
+	earth: true,
 	moon: true,
 	stars: true,
 	sun: true,
@@ -101,14 +101,14 @@ function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
 	zoomval = newZoom;
 
 	var alt = -povAlt;
-	var azi = -povAzi;
+	var azi = -povAzi - 2;
 
 	if(shader && gl) {
-		var lazi = azi - geomodel.sunazi;
+		var l_azi = azi - geomodel.sunazi;
 		var light = mat4.create();
 		mat4.identity(light);
-		mat4.rotate(light, lazi, [0, 1, 0]);
-		mat4.rotate(light, alt, [Math.cos(lazi), 0, Math.sin(lazi)]);
+		mat4.rotate(light, l_azi, [0, 1, 0]);
+		mat4.rotate(light, alt, [Math.cos(l_azi), 0, Math.sin(l_azi)]);
 		mat4.rotate(light, geomodel.sunalt, [0, 0, 1]);
 		daylight = vec3.create(light);
 		gl.uniform3fv(shader.daylightDirection, daylight);
@@ -121,17 +121,22 @@ function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
 	mat4.rotate(earthMatrix, azi, [0, 1, 0]);
 	mat4.rotate(earthMatrix, alt, [Math.cos(azi), 0, Math.sin(azi)]);
 
-	alt = -povAlt;
-	azi = -povAzi - geomodel.starazi;
+	var s_alt = alt;
+	var s_azi = azi - geomodel.starazi;
 	mat4.identity(starMatrix);
-	mat4.rotate(starMatrix, azi, [0, 1, 0]);
-	mat4.rotate(starMatrix, alt, [Math.cos(azi), 0, Math.sin(azi)]);
+	mat4.rotate(starMatrix, s_azi, [0, 1, 0]);
+	mat4.rotate(starMatrix, s_alt, [Math.cos(s_azi), 0, Math.sin(s_azi)]);
 
-	azi = -povAzi - geomodel.moonazi;
+	var m_azi = azi - geomodel.moonazi;
 	mat4.identity(moonMatrix);
-	mat4.rotate(moonMatrix, azi, [0, 1, 0]);
-	mat4.rotate(moonMatrix, alt, [Math.cos(azi), 0, Math.sin(azi)]);
+	mat4.rotate(moonMatrix, m_azi, [0, 1, 0]);
+	mat4.rotate(moonMatrix, alt, [Math.cos(m_azi), 0, Math.sin(m_azi)]);
 	mat4.translate(moonMatrix, geomodel.moonpos);
+}
+
+function povLatLon(latitude, longitude) {
+	povAlt = (90 - latitude)*Math.PI/180;
+	povAzi = (90 - longitude)*Math.PI/180;
 }
 
 function GeocentricModel() {
@@ -150,6 +155,10 @@ function GeocentricModel() {
 	/* initial solar system position, time = Jan 1 12:00AM UTC */
 	/* 10 days after winter solstice (10/365.25)*2*pi */
 	function init() {
+		var pos = posFromLatLon(home.lat, home.lon);
+		home.x = pos[0];
+		home.y = pos[1];
+		home.z = pos[2];
 		/* create the 3D representation of a sphere with lat/lon as vertices */
 		for (var lat = 0; lat <= 180; lat++) {
 			self.latlon[lat] = [];
@@ -176,11 +185,21 @@ function GeocentricModel() {
 		return [day, sec, t];
 	}
 
-    function vecFromIncAzi(inclination, azimuth) {
+	function posFromLatLon(latitude, longitude) {
+		var pos = [];
+		var lat = (90 - latitude)*Math.PI/180;
+		var lon = (180 - longitude)*Math.PI/180;
+		pos[0] = earthsize*Math.cos(lon)*Math.sin(lat);
+		pos[1] = earthsize*Math.cos(lat);
+		pos[2] = earthsize*Math.sin(lon)*Math.sin(lat);
+		return pos;
+	}
+
+    function vecFromIncAzi(altitude, azimuth) {
         var vec = [];
-        vec[0] = Math.cos(azimuth);
-        vec[1] = Math.tan(inclination);
-        vec[2] = Math.sin(azimuth);
+        vec[0] = Math.cos(azimuth)*Math.cos(altitude);
+        vec[1] = Math.sin(altitude);
+        vec[2] = Math.sin(azimuth)*Math.cos(altitude);
         return vec;
     }
 
@@ -200,7 +219,7 @@ function GeocentricModel() {
 		var fday = (t[1]/86400);
 		self.starazi = Math.PI/2 + (0.027378508 + fyear + fday)*2.0*Math.PI;
 
-		self.suninc = 0.41 * Math.cos((0.027378508 + fyear + fday)*2.0*Math.PI);
+		self.suninc = -0.41 * Math.cos((0.027378508 + fyear + fday)*2.0*Math.PI);
 		self.sunazi = fday*2.0*Math.PI;
 		self.sunvector = vecFromIncAzi(self.suninc, self.sunazi);
 
@@ -450,6 +469,7 @@ function WebGl() {
             return;
         }
 
+		povLatLon(home.lat, home.lon);
 		aristotle = new GeocentricModel();
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -476,16 +496,30 @@ function WebGl() {
 			[imgmoon], earthsize*0.272798619, true);
 		satarray = new SatelliteArray("tle.txt", "groups.txt");
 
-        var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
-        self.canvas.addEventListener(mousewheelevt, handleMouseWheel);
-        self.canvas.onmousedown = handleMouseDown;
-        self.canvas.onmouseup = handleMouseUp;
-        self.canvas.onmousemove = handleMouseMove;
-        self.canvas.ontouchstart = handleTouchStart;
-        self.canvas.ontouchend = handleTouchEnd;
-        self.canvas.ontouchmove = handleTouchMove;
+/*
+		home.posBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, home.posBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([home.x, home.y, home.z]), gl.STATIC_DRAW);
+		home.posBuffer.itemSize = 3;
+		home.posBuffer.numItems = 1;
+
+		home.idxBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, home.idxBuffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0]), gl.STATIC_DRAW);
+		home.idxBuffer.itemSize = 1;
+		home.idxBuffer.numItems = 1;
+*/
+
+		var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
+		self.canvas.addEventListener(mousewheelevt, handleMouseWheel);
+		self.canvas.onmousedown = handleMouseDown;
+		self.canvas.onmouseup = handleMouseUp;
+		self.canvas.onmousemove = handleMouseMove;
+		self.canvas.ontouchstart = handleTouchStart;
+		self.canvas.ontouchend = handleTouchEnd;
+		self.canvas.ontouchmove = handleTouchMove;
 		doneLoading();
-        tick();
+		tick();
     }
 
     function getShader(gl, id) {
@@ -653,6 +687,18 @@ function WebGl() {
         gl.disableVertexAttribArray(shader.vertexNormalAttribute);
 
 		if(satarray) satarray.draw(earthMatrix);
+
+/*
+		gl.uniform1i(shader.uselighting, 0);
+		gl.uniformMatrix4fv(shader.mvMatrixUniform, false, earthMatrix);
+		gl.uniform1f(shader.pointSize, 10.0);
+		gl.uniform1i(shader.monochromatic, 1);
+		gl.uniform3f(shader.monoColor, 0.0, 1.0, 0.0);
+		gl.bindBuffer(gl.ARRAY_BUFFER, home.posBuffer);
+		gl.vertexAttribPointer(shader.vertexPositionAttribute, home.posBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, home.idxBuffer);
+		gl.drawElements(gl.POINTS, home.idxBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+*/
 	}
 
 	var lastframe = 0;
