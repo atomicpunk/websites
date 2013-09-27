@@ -218,8 +218,7 @@ function GeocentricModel() {
 		var fyear = ((t[0] * 86400) + t[1]) / 31557600;
 		var fday = (t[1]/86400);
 		self.starazi = Math.PI/2 + (0.027378508 + fyear + fday)*2.0*Math.PI;
-
-		self.suninc = -0.41 * Math.cos((0.027378508 + fyear + fday)*2.0*Math.PI);
+		self.suninc = -0.41 * Math.cos((0.027378508 + fyear)*2.0*Math.PI);
 		self.sunazi = fday*2.0*Math.PI;
 		self.sunvector = vecFromIncAzi(self.suninc, self.sunazi);
 
