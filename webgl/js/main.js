@@ -174,7 +174,6 @@ function Home() {
 	function initVectors(geomodel) {
 		if(failure) return;
 
-		self.vec = vectorFromLatLon(self.lat, self.lon);
 		self.vecstar = vectorFromLatLon(self.lat, self.lon + geomodel.starazi*180/Math.PI);
 		self.vecmoon = vectorFromLatLon(self.lat, self.lon + geomodel.moonazi*180/Math.PI);
 		self.vecsun = vectorFromLatLon(self.lat, self.lon + geomodel.sunazi*180/Math.PI);
@@ -187,7 +186,8 @@ function Home() {
 		povLatLon(self.lat, self.lon);
 		self.pos = posFromLatLon(self.lat, self.lon);
 		self.opos = posOpposite(self.pos);
-		initVectors(aristotle);
+		self.vec = vectorFromLatLon(self.lat, self.lon);
+		if(aristotle) initVectors(aristotle);
 
 		if(gl) {
 			var posArray = [self.pos[0], self.pos[1], self.pos[2],
@@ -603,8 +603,8 @@ function WebGl() {
 
 		initShaders();
 
-		aristotle = new GeocentricModel();
 		home.init();
+		aristotle = new GeocentricModel();
 
 		var n = (location.search.indexOf("?normal") == 0);
 		var imgearthday = (n)?"images/earth_day.jpg":"images/earth_day_small.jpg";
