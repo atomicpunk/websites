@@ -7,7 +7,19 @@
  *
  */
 
+var display = {
+	spaceview: true,
+	earth: true,
+	moon: true,
+	stars: true,
+	sun: true,
+	sat: true,
+	initmenu: false
+};
+
 var loading = 0;
+var failure = false;
+var menuopen = false;
 var mouseDown = false;
 var starsize = 200;
 var earthsize = 2;
@@ -16,7 +28,7 @@ var myHeight = 0;
 var aristotle = null;
 var povAzi = 0;
 var povAlt = 0;
-var defzoom = [-6.0, -50.0];
+var defzoom = { space: -6.0, ground: -50.0 };
 var daylight = null;
 var norad = new Norad(earthsize);
 var gl = null;
@@ -26,19 +38,20 @@ var normalMatrix = mat3.create();
 var earthMatrix = mat4.create();
 var starMatrix = mat4.create();
 var moonMatrix = mat4.create();
-var satarray = null;
-var updateMatrices = updateMatricesSpace;
-var zoomval = (updateMatrices == updateMatricesSpace)?defzoom[0]:defzoom[1];
-var home = { lat: 45.518259, lon: -122.902044, x:0, y:0, z:0 };
+var updateMatrices = (display.spaceview)?updateMatricesSpace:updateMatricesGround;
+var zoomval = (display.spaceview)?defzoom.space:defzoom.ground;
+var homepos = [45.518259, -122.902044]; // Portland
+var home = new Home();
+var webgl = null;
 
-var display = {
-	earth: true,
-	moon: true,
-	stars: true,
-	sun: true,
-	sat: true,
-	initmenu: false
-};
+function totalfailure() {
+	failure = true;
+	var e = document.getElementById("main_page");
+	e.style.color = "white";
+	e.innerHTML = '<center><h1><br><br><br>' +
+	'The page has failed to load, sorry for the inconvenience<br>' +
+	'Please contact the administrator';
+}
 
 function startLoading() {
 	loading++;
@@ -60,9 +73,10 @@ function doneLoading() {
 }
 
 function updateMatricesSpace(newAlt, newAzi, newZoom, geomodel) {
-	povAlt = newAlt;
-	povAzi = newAzi;
-	zoomval = newZoom;
+	if(newAlt != undefined) povAlt = newAlt;
+	if(newAzi != undefined) povAzi = newAzi;
+	if(newZoom != undefined) zoomval = newZoom;
+	if(geomodel == undefined) geomodel = aristotle;
 
 	if(shader && gl) {
 		var azi = povAzi - geomodel.sunazi;
@@ -96,12 +110,15 @@ function updateMatricesSpace(newAlt, newAzi, newZoom, geomodel) {
 }
 
 function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
-	povAlt = newAlt;
-	povAzi = newAzi;
-	zoomval = newZoom;
+	if(newAlt != undefined) povAlt = newAlt;
+	if(newAzi != undefined) povAzi = newAzi;
+	if(newZoom != undefined) zoomval = newZoom;
+	if(geomodel == undefined) geomodel = aristotle;
 
 	var alt = -povAlt;
-	var azi = -povAzi - 2;
+	var azi = povAzi + Math.PI;
+	//var alt = Math.PI/2;
+	//var azi = 0;
 
 	if(shader && gl) {
 		var l_azi = azi - geomodel.sunazi;
@@ -116,27 +133,117 @@ function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
 		mat4.perspective(p, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
 	}
 
+	var northpole = [0, -earthsize*3, 0];
+	var h_azi = (90 - home.lon)*Math.PI/180;
+	var h_alt = (home.lat - 90)*Math.PI/180;
+
 	mat4.identity(earthMatrix);
-	//mat4.translate(earthMatrix, [0, 0, earthsize]);
 	mat4.rotate(earthMatrix, azi, [0, 1, 0]);
 	mat4.rotate(earthMatrix, alt, [Math.cos(azi), 0, Math.sin(azi)]);
+	mat4.translate(earthMatrix, northpole);
+//	mat4.rotate(earthMatrix, h_azi, [0, 1, 0]);
+//	mat4.rotate(earthMatrix, h_alt, [Math.cos(h_azi), 0, Math.sin(h_azi)]);
 
 	var s_alt = alt;
 	var s_azi = azi - geomodel.starazi;
+	h_azi = (home.lon)*Math.PI/180;
+	h_alt = (-home.lat)*Math.PI/180;
+
 	mat4.identity(starMatrix);
 	mat4.rotate(starMatrix, s_azi, [0, 1, 0]);
 	mat4.rotate(starMatrix, s_alt, [Math.cos(s_azi), 0, Math.sin(s_azi)]);
+//	mat4.rotate(starMatrix, h_azi, [0, 1, 0]);
+//	mat4.rotate(starMatrix, h_alt, [Math.cos(h_azi), 0, Math.sin(h_azi)]);
 
 	var m_azi = azi - geomodel.moonazi;
 	mat4.identity(moonMatrix);
 	mat4.rotate(moonMatrix, m_azi, [0, 1, 0]);
 	mat4.rotate(moonMatrix, alt, [Math.cos(m_azi), 0, Math.sin(m_azi)]);
+	mat4.translate(moonMatrix, northpole);
 	mat4.translate(moonMatrix, geomodel.moonpos);
 }
 
-function povLatLon(latitude, longitude) {
-	povAlt = (90 - latitude)*Math.PI/180;
-	povAzi = (90 - longitude)*Math.PI/180;
+function Home() {
+	"use strict";
+
+	var self = this;
+	this.lat = homepos[0];
+	this.lon = homepos[1];
+	this.pos = [0, 0, 0];
+	this.opos = [0, 0, 0];
+	this.vec = [0, 0, 0];
+
+	this.init = init;
+	function init() {
+		if(failure) return;
+
+		povLatLon(self.lat, self.lon);
+		self.pos = posFromLatLon(self.lat, self.lon);
+		self.opos = posOpposite(self.pos);
+		self.vec = vectorFromLatLon(self.lat, self.lon);
+
+		if(gl) {
+			var posArray = [self.pos[0], self.pos[1], self.pos[2],
+							self.opos[0], self.opos[1], self.opos[2]];
+			var idxArray = [0, 1];
+
+			self.posBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, self.posBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(posArray), gl.STATIC_DRAW);
+			self.posBuffer.itemSize = 3;
+			self.posBuffer.numItems = posArray.length/3;
+
+			self.idxBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.idxBuffer);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idxArray), gl.STATIC_DRAW);
+			self.idxBuffer.itemSize = 1;
+			self.idxBuffer.numItems = idxArray.length;
+		}
+	}
+
+	function posFromLatLon(latitude, longitude) {
+		var pos = [];
+		var lat = (90 - latitude)*Math.PI/180;
+		var lon = (180 - longitude)*Math.PI/180;
+		pos[0] = earthsize*Math.cos(lon)*Math.sin(lat);
+		pos[1] = earthsize*Math.cos(lat);
+		pos[2] = earthsize*Math.sin(lon)*Math.sin(lat);
+		return pos;
+	}
+
+	function vectorFromLatLon(latitude, longitude) {
+		var vec = [];
+		var lat = (90 - latitude)*Math.PI/180;
+		var lon = (180 - longitude)*Math.PI/180;
+		vec[0] = Math.cos(lon)*Math.sin(lat);
+		vec[1] = Math.cos(lat);
+		vec[2] = Math.sin(lon)*Math.sin(lat);
+		return vec;
+	}
+
+	function posOpposite(pos) {
+		return [-pos[0], -pos[1], -pos[2]];
+	}
+
+	this.povLatLon = povLatLon;
+	function povLatLon(latitude, longitude) {
+		povAlt = (latitude)*Math.PI/180;
+		povAzi = (90 - longitude)*Math.PI/180;
+	}
+}
+
+Home.prototype.draw = function() {
+	if(loading > 0 || failure) return;
+
+	gl.uniform1i(shader.uselighting, 0);
+	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, earthMatrix);
+	gl.uniform1f(shader.pointSize, 10.0);
+	gl.uniform1i(shader.monochromatic, 1);
+	gl.uniform3f(shader.monoColor, 0.0, 1.0, 0.0);
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
+	gl.vertexAttribPointer(shader.vertexPositionAttribute, this.posBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.idxBuffer);
+	gl.drawElements(gl.POINTS, this.idxBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 }
 
 function GeocentricModel() {
@@ -151,14 +258,13 @@ function GeocentricModel() {
 	this.moonpos = [earthsize * 30.103480715, 0, 0];
 	this.latlon = [];
 	this.starazi = Math.PI/2 + 0.027378508*2.0*Math.PI;
+	this.interval = null;
 
 	/* initial solar system position, time = Jan 1 12:00AM UTC */
 	/* 10 days after winter solstice (10/365.25)*2*pi */
 	function init() {
-		var pos = posFromLatLon(home.lat, home.lon);
-		home.x = pos[0];
-		home.y = pos[1];
-		home.z = pos[2];
+		if(failure) return;
+
 		/* create the 3D representation of a sphere with lat/lon as vertices */
 		for (var lat = 0; lat <= 180; lat++) {
 			self.latlon[lat] = [];
@@ -174,7 +280,7 @@ function GeocentricModel() {
 			}
 		}
 		sunSync();
-		window.setInterval(function() {if(!mouseDown && !loading) sunSync();}, 5000);
+		self.interval = window.setInterval(function() {if(!mouseDown && !loading && !failure) sunSync();}, 5000);
 	}
 
 	function currentTime() {
@@ -183,16 +289,6 @@ function GeocentricModel() {
 		var sec = (date.getUTCHours()*3600) + (date.getUTCMinutes()*60) + date.getUTCSeconds();
 		var t = date.getTime()/1000;
 		return [day, sec, t];
-	}
-
-	function posFromLatLon(latitude, longitude) {
-		var pos = [];
-		var lat = (90 - latitude)*Math.PI/180;
-		var lon = (180 - longitude)*Math.PI/180;
-		pos[0] = earthsize*Math.cos(lon)*Math.sin(lat);
-		pos[1] = earthsize*Math.cos(lat);
-		pos[2] = earthsize*Math.sin(lon)*Math.sin(lat);
-		return pos;
 	}
 
     function vecFromIncAzi(altitude, azimuth) {
@@ -263,13 +359,16 @@ function CosmicBody(idstr, imgfile, radius, lighting) {
     this.normalData = [];
     this.textureCoordData = [];
     this.indexData = [];
+	this.interval = null;
 
     function init() {
+		if(failure) return;
+
         for(var i = 0; i < imgfile.length; i++)
             initTexture(i);
         initVectors();
-        if(self.id == "earth")
-            window.setInterval(function() {if(!mouseDown && !loading) initVectors();}, 5000);
+		if(self.id == "earth")
+			self.interval = window.setInterval(function() {if(!mouseDown && !loading && !failure) initVectors();}, 5000);
     }
 
 	function initTexture(idx) {
@@ -394,7 +493,7 @@ function CosmicBody(idstr, imgfile, radius, lighting) {
 }
 
 CosmicBody.prototype.draw = function(bodyMatrix) {
-	if(loading > 0) return;
+	if(loading > 0 || failure) return;
 
 	if(this.lighting) {
 		mat4.toInverseMat3(bodyMatrix, normalMatrix);
@@ -433,10 +532,20 @@ function WebGl() {
     var stardata = null;
     var moondata = null;
     var sundata = null;
+	var satarray = null;
     var lastMouseX = null;
     var lastMouseY = null;
 	this.canvas = 0;
     this.resize = resize;
+	this.fail = fail;
+
+	function fail(e)
+	{
+		failure = true;
+		if(e && e.message) console.log(e.message);
+		if(aristotle) clearInterval(aristotle.interval);
+		if(earthdata) clearInterval(earthdata.interval);
+	}
 
 	function resize()
 	{
@@ -446,45 +555,57 @@ function WebGl() {
 		gl.viewportWidth = self.canvas.width;
 		gl.viewportHeight = self.canvas.height;
 		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-		if(updateMatrices == updateMatricesGround) {
-			var p = 15 + ((-defzoom[1] - 2.5)/97.5)*75.0;
-			mat4.perspective(p, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
-		} else {
-			mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
-		}
+		if(aristotle) updateMatrices();
 	}
 
-    function init()
-    {
+	function init()
+	{
 		startLoading();
-        self.canvas = document.getElementById("main_canvas");
-        try {
-            gl = self.canvas.getContext("experimental-webgl");
-            self.resize();
-        } catch (e) {}
+		self.canvas = document.getElementById("main_canvas");
+		self.canvas.addEventListener("webglcontextlost", function(event) {
+			console.log("CONTEXT LOST");
+			self.fail(event);
+			totalfailure();
+			event.preventDefault();
+		}, false);
+		try {
+			gl = self.canvas.getContext("experimental-webgl");
+		} catch (e) {self.fail(e); return;}
 
-        if (!gl) {
-            alert("Could not initialise WebGL");
-            return;
-        }
+		if (!gl) {
+			failure = true;
+			var e = document.getElementById("main_page");
+			e.style.color = "white";
+			e.innerHTML = '<center><h1><br><br><br>' +
+			'Your browser does not appear to support WebGL<br>' +
+			'Please download firefox or chrome and enable WebGL support<br>' +
+			'<a style="color: red" href="http://www.mozilla.org/en-US/firefox/new/">Download Firefox</a><br>' +
+			'<a style="color: red" href="https://www.google.com/intl/en/chrome/browser/">Download Google Chrome</a><br>' +
+			'<a style="color: red" href="http://download-chromium.appspot.com/">Download Chromium</a><br>' +
+			'<a style="color: pink" href="http://blog.laptopmag.com/how-to-enable-webgl-support-on-chrome-for-android">Enabling WebGL in Chrome</a><br>';
+			return;
+		}
 
-		povLatLon(home.lat, home.lon);
-		aristotle = new GeocentricModel();
+		self.resize();
 
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        gl.enable(gl.DEPTH_TEST);
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-        initShaders();
+		initShaders();
+
+		home.init();
+		aristotle = new GeocentricModel();
 
 		var n = (location.search.indexOf("?normal") == 0);
 		var imgearthday = (n)?"images/earth_day.jpg":"images/earth_day_small.jpg";
 		var imgearthnight = (n)?"images/earth_night.jpg":"images/earth_night_small.jpg";
 		var imgmoon = (n)?"images/moon.jpg":"images/moon_small.jpg";
-		var imgstars = "images/skymap.jpg";
+		var imgstars = (n)?"images/skymap8192.jpg":"images/skymap4096.jpg";
 		var imgsun = "images/sun.png";
 
+		satarray = new SatelliteArray("tle.txt", "groups.txt");
 		earthdata = new CosmicBody("earth",
 			[imgearthday, imgearthnight], earthsize, false);
 		sundata = new CosmicBody("sun", 
@@ -493,21 +614,6 @@ function WebGl() {
 			[imgstars], starsize, false);
 		moondata = new CosmicBody("moon",
 			[imgmoon], earthsize*0.272798619, true);
-		satarray = new SatelliteArray("tle.txt", "groups.txt");
-
-/*
-		home.posBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, home.posBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([home.x, home.y, home.z]), gl.STATIC_DRAW);
-		home.posBuffer.itemSize = 3;
-		home.posBuffer.numItems = 1;
-
-		home.idxBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, home.idxBuffer);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0]), gl.STATIC_DRAW);
-		home.idxBuffer.itemSize = 1;
-		home.idxBuffer.numItems = 1;
-*/
 
 		var mousewheelevt=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
 		self.canvas.addEventListener(mousewheelevt, handleMouseWheel);
@@ -515,11 +621,11 @@ function WebGl() {
 		self.canvas.onmouseup = handleMouseUp;
 		self.canvas.onmousemove = handleMouseMove;
 		self.canvas.ontouchstart = handleTouchStart;
-		self.canvas.ontouchend = handleTouchEnd;
+		self.canvas.ontouchend = handleMouseUp;
 		self.canvas.ontouchmove = handleTouchMove;
 		doneLoading();
 		tick();
-    }
+	}
 
     function getShader(gl, id) {
         var shaderScript = document.getElementById(id);
@@ -597,107 +703,92 @@ function WebGl() {
 		gl.uniform1f(shader.pointSize, 1.5);
     }
 
-    function degToRad(degrees) {
-        return degrees * Math.PI / 180;
-    }
+	function degToRad(degrees) {
+		return degrees * Math.PI / 180;
+	}
 
+	function handleMouseDown(event) {
+		if(loading > 0 || event.button != 0 || failure) return;
+		mouseDown = true;
+		lastMouseX = event.clientX;
+		lastMouseY = event.clientY;
+	}
 
-    function handleMouseDown(event) {
-        if(loading > 0 || event.button != 0) return;
-        mouseDown = true;
-        lastMouseX = event.clientX;
-        lastMouseY = event.clientY;
-    }
+	function handleMouseUp(event) {
+		mouseDown = false;
+	}
 
-    function handleMouseUp(event) {
-        mouseDown = false;
-    }
+	function handleMove(newX, newY) {
+		if (!mouseDown) return;
 
-    function handleMouseMove(event) {
-        if (!mouseDown) return;
+		var dAlt, dAzi;
+		if(display.spaceview) {
+			var deltaX = newX - lastMouseX;
+			var deltaY = newY - lastMouseY;
+			dAzi = degToRad(deltaX / 10);
+			dAlt = degToRad(deltaY / 10);
+		} else {
+			var deltaX = lastMouseX - newX;
+			var deltaY = newY - lastMouseY;
+			dAzi = degToRad(deltaX / 20);
+			dAlt = degToRad(deltaY / 20);
+		}
 
-        var newX = event.clientX;
-        var newY = event.clientY;
-        var deltaX = newX - lastMouseX;
-        var deltaY = newY - lastMouseY;
+		updateMatrices(povAlt + dAlt, povAzi + dAzi);
 
-		updateMatrices(povAlt + degToRad(deltaY / 10),
-			povAzi + degToRad(deltaX / 10), zoomval, aristotle);
+		lastMouseX = newX
+		lastMouseY = newY;
+	}
 
-        lastMouseX = newX
-        lastMouseY = newY;
-    }
+	function handleMouseMove(event) {
+		handleMove(event.clientX, event.clientY);
+	}
 
+	function handleTouchStart(event) {
+		if(loading > 0 || failure) return;
+		var touch = event.changedTouches[0];
+		mouseDown = true;
+		lastMouseX = touch.clientX;
+		lastMouseY = touch.clientY;
+	}
 
-    function handleTouchStart(event) {
-        var touch = event.changedTouches[0];
-        mouseDown = true;
-        lastMouseX = touch.clientX;
-        lastMouseY = touch.clientY;
-    }
+	function handleTouchMove(event) {
+		var touch = event.changedTouches[0];
+		handleMove(touch.clientX, touch.clientY);
+	}
 
-    function handleTouchEnd(event) {
-        mouseDown = false;
-    }
-
-    function handleTouchMove(event) {
-        if (!mouseDown) return;
-
-        var touch = event.changedTouches[0];
-        var newX = touch.clientX;
-        var newY = touch.clientY;
-        var deltaX = newX - lastMouseX;
-        var deltaY = newY - lastMouseY;
-
-		updateMatrices(povAlt + degToRad(deltaY / 10),
-			povAzi + degToRad(deltaX / 10), zoomval, aristotle);
-
-        lastMouseX = newX
-        lastMouseY = newY;
-    }
-
-    function handleMouseWheel(event) {
-        var delta = (/Firefox/i.test(navigator.userAgent)) ? (event.detail*-1) : event.wheelDelta;
-        if(delta > 0)
-        {
-            if(zoomval < -2.5)
-				updateMatrices(povAlt, povAzi, zoomval * 0.97, aristotle);
-        }
-        else
-        {
-            if(zoomval > -100)
-				updateMatrices(povAlt, povAzi, zoomval * 1.03, aristotle);
-        }
-    }
+	function handleMouseWheel(event) {
+		var delta = (/Firefox/i.test(navigator.userAgent)) ? (event.detail*-1) : event.wheelDelta;
+		if(delta > 0)
+		{
+			if(zoomval < -2.5)
+				updateMatrices(povAlt, povAzi, zoomval * 0.97);
+		}
+		else
+		{
+			if(zoomval > -100)
+				updateMatrices(povAlt, povAzi, zoomval * 1.03);
+		}
+	}
 
 	function drawScene() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.uniformMatrix4fv(shader.pMatrixUniform, false, pMatrix);
 
-        gl.enableVertexAttribArray(shader.textureCoordAttribute);
-        gl.enableVertexAttribArray(shader.vertexNormalAttribute);
+		gl.enableVertexAttribArray(shader.textureCoordAttribute);
+		gl.enableVertexAttribArray(shader.vertexNormalAttribute);
 
 		if(stardata && display.stars) stardata.draw(starMatrix);
 		if(sundata && display.sun) sundata.draw(starMatrix);
 		if(earthdata && display.earth) earthdata.draw(earthMatrix);
 		if(moondata && display.moon) moondata.draw(moonMatrix);
 
-        gl.disableVertexAttribArray(shader.textureCoordAttribute);
-        gl.disableVertexAttribArray(shader.vertexNormalAttribute);
+		gl.disableVertexAttribArray(shader.textureCoordAttribute);
+		gl.disableVertexAttribArray(shader.vertexNormalAttribute);
 
 		if(satarray) satarray.draw(earthMatrix);
 
-/*
-		gl.uniform1i(shader.uselighting, 0);
-		gl.uniformMatrix4fv(shader.mvMatrixUniform, false, earthMatrix);
-		gl.uniform1f(shader.pointSize, 10.0);
-		gl.uniform1i(shader.monochromatic, 1);
-		gl.uniform3f(shader.monoColor, 0.0, 1.0, 0.0);
-		gl.bindBuffer(gl.ARRAY_BUFFER, home.posBuffer);
-		gl.vertexAttribPointer(shader.vertexPositionAttribute, home.posBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, home.idxBuffer);
-		gl.drawElements(gl.POINTS, home.idxBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-*/
+		home.draw();
 	}
 
 	var lastframe = 0;
@@ -738,7 +829,6 @@ function setWindowSize() {
     }
 }
 
-var menuopen = false;
 function initMenu() {
 	var menu_tab = document.getElementById("menu_tab");
 	menu_tab.onclick = function() {
@@ -752,6 +842,7 @@ function initMenu() {
 		}
 	}
 	var showmoon = document.getElementById("showmoon");
+	showmoon.className = (display.moon)?"switchbtn on":"switchbtn";
 	showmoon.onclick = function(e) {
 		if(e.target.className == "switchbtn") {
 			e.target.className = "switchbtn on";
@@ -762,6 +853,7 @@ function initMenu() {
 		}
 	}
 	var showearth = document.getElementById("showearth");
+	showearth.className = (display.earth)?"switchbtn on":"switchbtn";
 	showearth.onclick = function(e) {
 		if(e.target.className == "switchbtn") {
 			e.target.className = "switchbtn on";
@@ -772,6 +864,7 @@ function initMenu() {
 		}
 	}
 	var showsun = document.getElementById("showsun");
+	showsun.className = (display.sun)?"switchbtn on":"switchbtn";
 	showsun.onclick = function(e) {
 		if(e.target.className == "switchbtn") {
 			e.target.className = "switchbtn on";
@@ -782,6 +875,7 @@ function initMenu() {
 		}
 	}
 	var showstars = document.getElementById("showstars");
+	showstars.className = (display.stars)?"switchbtn on":"switchbtn";
 	showstars.onclick = function(e) {
 		if(e.target.className == "switchbtn") {
 			e.target.className = "switchbtn on";
@@ -792,36 +886,34 @@ function initMenu() {
 		}
 	}
 	var spaceview = document.getElementById("spaceview");
+	spaceview.className = (display.spaceview)?"switchbtn on":"switchbtn";
 	spaceview.onclick = function(e) {
 		if(e.target.className == "switchbtn") {
 			e.target.className = "switchbtn on";
-			showearth.className = "switchbtn on";
 			updateMatrices = updateMatricesSpace;
-			display.earth = true;
-			zoomval = defzoom[0];
+			zoomval = defzoom.space;
+			display.spaceview = true;
 		} else {
 			e.target.className = "switchbtn";
-			showearth.className = "switchbtn";
 			updateMatrices = updateMatricesGround;
-			display.earth = false;
-			zoomval = defzoom[1];
+			zoomval = defzoom.ground;
+			display.spaceview = false;
 		}
-		updateMatrices(povAlt, povAzi, zoomval, aristotle);
+		updateMatrices();
 	}
 }
 
-var webgl;
 if(window.addEventListener)
 {
 	window.addEventListener('load', function () {
 		"use strict";
 		setWindowSize();
 		webgl = new WebGl();
-		initMenu();
+		if(!failure) initMenu();
 	});
 	window.addEventListener('resize', function () {
 		"use strict";
-		if(loading > 0) return;
+		if(loading > 0 || failure) return;
 		setWindowSize();
 		webgl.resize();
 	});

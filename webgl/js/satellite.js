@@ -17,6 +17,8 @@ function satinfo_t(s_name, s_group, s_options) {
 	this.imgfile = "";
 
 	function init() {
+		if(failure) return;
+
 		if(!s_options)
 			return;
 		var field = s_options.split(" ");
@@ -48,6 +50,8 @@ function Group(gid, gname, cfgtext) {
     this.idxBufferUniq = null;
 
 	function init() {
+		if(failure) return;
+
 		var field = cfgtext.split(" ");
 		self.size = parseFloat(field[1]);
 		self.hexcolor = field[0];
@@ -220,6 +224,8 @@ function SatelliteGroup(file) {
 	}
 
 	function init() {
+		if(failure) return;
+
 		var request = new XMLHttpRequest();
 		request.open("GET", file, false);
 		request.onload = function(e) {
@@ -309,9 +315,18 @@ function SatelliteArray(tlefile, groupfile) {
 	var self = this;
 	this.group = new SatelliteGroup(groupfile);
 	this.useimages = true;
+	this.interval = null;
+	this.fail = fail;
 
+	function fail(e) {
+		totalfailure();
+		console.log(e.message);
+		if(self.interval) clearInterval(self.interval);
+	}
 
 	function init() {
+		if(failure) return;
+
 		startLoading();
 		var request = new XMLHttpRequest();
 		request.open("GET", tlefile, false);
@@ -344,7 +359,7 @@ function SatelliteArray(tlefile, groupfile) {
 					self.group.list[g].display(false);
 			}
 			self.group.list[35].list();
-			window.setInterval(function() {if(!mouseDown && !loading) self.refresh();}, 1000);
+			self.interval = window.setInterval(function() {if(!mouseDown && !loading && !failure) self.refresh();}, 1000);
 		}
 		request.send();
 		var useimgs = document.getElementById("satuseimages");
@@ -390,11 +405,13 @@ SatelliteArray.prototype.refresh = function() {
 			idx++;
 		}
 
-		g.posBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, g.posBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
-		g.posBuffer.itemSize = 3;
-		g.posBuffer.numItems = vertexData.length / 3;
+		try {
+			g.posBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, g.posBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
+			g.posBuffer.itemSize = 3;
+			g.posBuffer.numItems = vertexData.length / 3;
+		} catch(e) {this.fail(e); return;}
 
 		g.idxBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g.idxBuffer);
@@ -405,7 +422,7 @@ SatelliteArray.prototype.refresh = function() {
 }
 
 SatelliteArray.prototype.draw = function(bodyMatrix) {
-	if(loading > 0) return;
+	if(loading > 0 || failure) return;
 
 	gl.uniform1i(shader.uselighting, 0);
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, bodyMatrix);

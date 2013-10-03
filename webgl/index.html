@@ -14,31 +14,33 @@
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
 </head>
 <body>
-	<canvas id="main_canvas"></canvas>
-	<div id="loading"><p>LOADING</p></div>
-	<div id="menu">
-		<div id="menu_content">
-			<div class="listctl">
-				<div title="select all groups" id="grpselectall" class="btn">Select All</div>
-				<div title="clear all groups" id="grpclearall" class="btn">Clear All</div>
-				<div title="use images for satellite positions" id="satuseimages" class="switchbtn on">Use Images</div>
+	<div id="main_page">
+		<canvas id="main_canvas"></canvas>
+		<div id="loading"><p>LOADING</p></div>
+		<div id="menu">
+			<div id="menu_content">
+				<div class="listctl">
+					<div title="select all groups" id="grpselectall" class="btn">Select All</div>
+					<div title="clear all groups" id="grpclearall" class="btn">Clear All</div>
+					<div title="use images for satellite positions" id="satuseimages" class="switchbtn on">Use Images</div>
+				</div>
+				<div class="listctl">
+					<div id="satselectall" class="btn">Select All</div>
+					<div id="satclearall" class="btn">Clear All</div>
+				</div>
+				<div id="groups" class="list"></div>
+				<div id="satellites" class="list"></div>
+				<div id="viewctl">
+					<div title="show/hide the earth" id="showearth" class="switchbtn on">Earth</div>
+					<div title="show/hide the moon" id="showmoon" class="switchbtn on">Moon</div>
+					<div title="show/hide the sun" id="showsun" class="switchbtn on">Sun</div>
+					<div title="show/hide the stars" id="showstars" class="switchbtn on">Stars</div>
+					<div title="space/ground view" id="spaceview" class="switchbtn on">Space View</div>
+				</div>
 			</div>
-			<div class="listctl">
-				<div id="satselectall" class="btn">Select All</div>
-				<div id="satclearall" class="btn">Clear All</div>
+			<div id="menu_tab">
+				<div id="menu_button"></div>
 			</div>
-			<div id="groups" class="list"></div>
-			<div id="satellites" class="list"></div>
-			<div id="viewctl">
-				<div title="show/hide the earth" id="showearth" class="switchbtn on">Earth</div>
-				<div title="show/hide the moon" id="showmoon" class="switchbtn on">Moon</div>
-				<div title="show/hide the sun" id="showsun" class="switchbtn on">Sun</div>
-				<div title="show/hide the stars" id="showstars" class="switchbtn on">Stars</div>
-				<div title="space/ground view" id="spaceview" class="switchbtn on">Space View</div>
-			</div>
-		</div>
-		<div id="menu_tab">
-			<div id="menu_button"></div>
 		</div>
 	</div>
 	<script type="text/javascript" src="js/glMatrix-0.9.5.min.js"></script>
@@ -102,8 +104,7 @@
         if(navigator.appName.search("Microsoft") >= 0)
         {
             var e = document.getElementById("main_page");
-            e.style.color = "black";
-            e.style.background = "white";
+            e.style.color = "white";
             e.innerHTML = '<center><h1><br><br><br>' +
                 'Microsoft Internet Explorer is Not Supported<br>' +
                 'Please download firefox or chrome<br>' +
