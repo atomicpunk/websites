@@ -29,7 +29,6 @@ var aristotle = null;
 var povAzi = 0;
 var povAlt = 0;
 var defzoom = { space: -6.0, ground: -50.0 };
-var daylight = null;
 var norad = new Norad(earthsize);
 var gl = null;
 var shader = null;
@@ -78,89 +77,87 @@ function updateMatricesSpace(newAlt, newAzi, newZoom, geomodel) {
 	if(newZoom != undefined) zoomval = newZoom;
 	if(geomodel == undefined) geomodel = aristotle;
 
+	var l_azi = povAzi - geomodel.sunazi;
+	var s_azi = povAzi - geomodel.starazi;
+	var m_azi = povAzi - geomodel.moonazi;
+
+	var sunlight = mat4.create();
+	mat4.identity(sunlight);
+	mat4.rotate(sunlight, povAlt, [1, 0, 0]);
+
+	mat4.set(sunlight, starMatrix);
+	mat4.rotate(starMatrix, s_azi, [0, 1, 0]);
+
+	mat4.rotate(sunlight, l_azi, [0, 1, 0]);
+	mat4.rotate(sunlight, geomodel.sunalt, [0, 0, 1]);
+
 	if(shader && gl) {
-		var azi = povAzi - geomodel.sunazi;
-		var light = mat4.create();
-		mat4.identity(light);
-		mat4.rotate(light, azi, [0, 1, 0]);
-		mat4.rotate(light, povAlt, [Math.cos(azi), 0, Math.sin(azi)]);
-		mat4.rotate(light, geomodel.sunalt, [0, 0, 1]);
-		daylight = vec3.create(light);
-		gl.uniform3fv(shader.daylightDirection, daylight);
+		gl.uniform3fv(shader.daylightDirection, vec3.create(sunlight));
 		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
 	}
 
 	mat4.identity(earthMatrix);
 	mat4.translate(earthMatrix, [0, 0, zoomval]);
+	mat4.rotate(earthMatrix, povAlt, [1, 0, 0]);
+	mat4.set(earthMatrix, moonMatrix);
 	mat4.rotate(earthMatrix, povAzi, [0, 1, 0]);
-	mat4.rotate(earthMatrix, povAlt, [Math.cos(povAzi), 0, Math.sin(povAzi)]);
 
-	var s_alt = povAlt;
-	var s_azi = povAzi - geomodel.starazi;
-	mat4.identity(starMatrix);
-	mat4.rotate(starMatrix, s_azi, [0, 1, 0]);
-	mat4.rotate(starMatrix, s_alt, [Math.cos(s_azi), 0, Math.sin(s_azi)]);
-
-	var m_azi = povAzi - geomodel.moonazi;
-	mat4.identity(moonMatrix);
-	mat4.translate(moonMatrix, [0, 0, zoomval]);
 	mat4.rotate(moonMatrix, m_azi, [0, 1, 0]);
-	mat4.rotate(moonMatrix, povAlt, [Math.cos(m_azi), 0, Math.sin(m_azi)]);
 	mat4.translate(moonMatrix, geomodel.moonpos);
 }
 
 function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
-	if(newAlt != undefined) povAlt = newAlt;
+	if(newAlt != undefined) {
+		povAlt = (newAlt < 0.3)?0.3:newAlt;
+		povAlt = (povAlt > 1.4)?1.4:povAlt;
+	}
 	if(newAzi != undefined) povAzi = newAzi;
 	if(newZoom != undefined) zoomval = newZoom;
 	if(geomodel == undefined) geomodel = aristotle;
 
+	var e_azi = Math.PI/2 - (home.lon)*Math.PI/180;
+	var e_alt = (home.lat)*Math.PI/180 - Math.PI/2;
+	var northpole = [0, -earthsize, 0];
+
 	var alt = -povAlt;
-	var azi = povAzi + Math.PI;
-	//var alt = Math.PI/2;
-	//var azi = 0;
+	var azi = povAzi - Math.PI;
+
+	var l_azi = e_azi - geomodel.sunazi;
+	var s_azi = e_azi - geomodel.starazi;
+	var m_azi = e_azi - geomodel.moonazi;
+	var m_alt = alt + e_alt;
+
+	var sunlight = mat4.create();
+	mat4.identity(sunlight);
+	mat4.rotate(sunlight, alt, [1, 0, 0]);
+	mat4.set(sunlight, starMatrix);
+	mat4.set(sunlight, earthMatrix);
+
+	mat4.rotate(starMatrix, e_alt, [1, 0, 0]);
+	mat4.rotate(starMatrix, s_azi, [0, 1, 0]);
+	mat4.rotate(starMatrix, azi, home.vecstar);
+
+	mat4.rotate(earthMatrix, e_azi, [0, 1, 0]);
+	mat4.translate(earthMatrix, northpole);
+	mat4.rotate(earthMatrix, e_alt, [Math.cos(e_azi), 0, Math.sin(e_azi)]);
+	mat4.rotate(earthMatrix, azi, home.vec);
+
+	mat4.identity(moonMatrix);
+	mat4.rotate(moonMatrix, m_alt, [1, 0, 0]);
+	mat4.rotate(moonMatrix, m_azi, [0, 1, 0]);
+	mat4.rotate(moonMatrix, azi, home.vecmoon);
+	mat4.translate(moonMatrix, northpole);
+	mat4.translate(moonMatrix, geomodel.moonpos);
+
+	mat4.rotate(sunlight, l_azi, [0, 1, 0]);
+	mat4.rotate(sunlight, geomodel.sunalt, [0, 0, 1]);
+	mat4.rotate(sunlight, azi, home.vecsun);
 
 	if(shader && gl) {
-		var l_azi = azi - geomodel.sunazi;
-		var light = mat4.create();
-		mat4.identity(light);
-		mat4.rotate(light, l_azi, [0, 1, 0]);
-		mat4.rotate(light, alt, [Math.cos(l_azi), 0, Math.sin(l_azi)]);
-		mat4.rotate(light, geomodel.sunalt, [0, 0, 1]);
-		daylight = vec3.create(light);
-		gl.uniform3fv(shader.daylightDirection, daylight);
+		gl.uniform3fv(shader.daylightDirection, vec3.create(sunlight));
 		var p = 15 + ((-zoomval - 2.5)/97.5)*75.0;
 		mat4.perspective(p, gl.viewportWidth / gl.viewportHeight, 0.1, starsize, pMatrix);
 	}
-
-	var northpole = [0, -earthsize*3, 0];
-	var h_azi = (90 - home.lon)*Math.PI/180;
-	var h_alt = (home.lat - 90)*Math.PI/180;
-
-	mat4.identity(earthMatrix);
-	mat4.rotate(earthMatrix, azi, [0, 1, 0]);
-	mat4.rotate(earthMatrix, alt, [Math.cos(azi), 0, Math.sin(azi)]);
-	mat4.translate(earthMatrix, northpole);
-//	mat4.rotate(earthMatrix, h_azi, [0, 1, 0]);
-//	mat4.rotate(earthMatrix, h_alt, [Math.cos(h_azi), 0, Math.sin(h_azi)]);
-
-	var s_alt = alt;
-	var s_azi = azi - geomodel.starazi;
-	h_azi = (home.lon)*Math.PI/180;
-	h_alt = (-home.lat)*Math.PI/180;
-
-	mat4.identity(starMatrix);
-	mat4.rotate(starMatrix, s_azi, [0, 1, 0]);
-	mat4.rotate(starMatrix, s_alt, [Math.cos(s_azi), 0, Math.sin(s_azi)]);
-//	mat4.rotate(starMatrix, h_azi, [0, 1, 0]);
-//	mat4.rotate(starMatrix, h_alt, [Math.cos(h_azi), 0, Math.sin(h_azi)]);
-
-	var m_azi = azi - geomodel.moonazi;
-	mat4.identity(moonMatrix);
-	mat4.rotate(moonMatrix, m_azi, [0, 1, 0]);
-	mat4.rotate(moonMatrix, alt, [Math.cos(m_azi), 0, Math.sin(m_azi)]);
-	mat4.translate(moonMatrix, northpole);
-	mat4.translate(moonMatrix, geomodel.moonpos);
 }
 
 function Home() {
@@ -173,6 +170,16 @@ function Home() {
 	this.opos = [0, 0, 0];
 	this.vec = [0, 0, 0];
 
+	this.initVectors = initVectors;
+	function initVectors(geomodel) {
+		if(failure) return;
+
+		self.vec = vectorFromLatLon(self.lat, self.lon);
+		self.vecstar = vectorFromLatLon(self.lat, self.lon + geomodel.starazi*180/Math.PI);
+		self.vecmoon = vectorFromLatLon(self.lat, self.lon + geomodel.moonazi*180/Math.PI);
+		self.vecsun = vectorFromLatLon(self.lat, self.lon + geomodel.sunazi*180/Math.PI);
+	}
+
 	this.init = init;
 	function init() {
 		if(failure) return;
@@ -180,7 +187,7 @@ function Home() {
 		povLatLon(self.lat, self.lon);
 		self.pos = posFromLatLon(self.lat, self.lon);
 		self.opos = posOpposite(self.pos);
-		self.vec = vectorFromLatLon(self.lat, self.lon);
+		initVectors(aristotle);
 
 		if(gl) {
 			var posArray = [self.pos[0], self.pos[1], self.pos[2],
@@ -318,13 +325,14 @@ function GeocentricModel() {
 		self.sunazi = fday*2.0*Math.PI;
 		self.sunvector = vecFromIncAzi(self.suninc, self.sunazi);
 
-		var ang = ((t[2] + 170000)/2360585.0)*2.0*Math.PI;
+		var ang = ((t[2] + 150000)/2360585.0)*2.0*Math.PI;
 		var mooninc = self.suninc*Math.cos(ang);
 		self.moonazi = self.sunazi - ang;
 		self.moonpos[0] = earthsize*30.103480715*Math.cos(mooninc);
 		self.moonpos[1] = earthsize*30.103480715*Math.sin(mooninc);
 		self.moonpos[2] = 0;
 
+		home.initVectors(self);
 		updateMatrices(povAlt, povAzi, zoomval, self);
 	}
 
@@ -595,8 +603,8 @@ function WebGl() {
 
 		initShaders();
 
-		home.init();
 		aristotle = new GeocentricModel();
+		home.init();
 
 		var n = (location.search.indexOf("?normal") == 0);
 		var imgearthday = (n)?"images/earth_day.jpg":"images/earth_day_small.jpg";
