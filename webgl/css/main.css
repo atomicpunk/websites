@@ -10,32 +10,32 @@
 /* -------------------------------- global ----------------------------- */
 
 body {
-    margin: 0px;
-    height: 100%;
-    width: 100%;
-    background-color: black;
+	margin: 0px;
+	height: 100%;
+	width: 100%;
+	background-color: black;
 }
 
 #main_canvas {
 	position: absolute;
-    border: none;
+	border: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
-    background-color: black;
+	background-color: black;
 }
 
 @-webkit-keyframes loading_anim {
-    0% { opacity: 0.5;}
+	0% { opacity: 0.5;}
 	50% { opacity: 1;}
-    100% { opacity: 0.5;}
+	100% { opacity: 0.5;}
 }
 
 #loading {
 	background: url(../images/loading.jpg) no-repeat;
 	position: absolute;
-    margin: 0px;
-    height: 100%;
-    width: 100%;
+	margin: 0px;
+	height: 100%;
+	width: 100%;
 	color: white;
 	font-family: Arial;
 	font-size: 150px;
@@ -47,58 +47,58 @@ body {
 /* -------------------------------- menu ----------------------------- */
 
 #menu {
-    position: absolute;
+	position: absolute;
 	cursor: pointer;
-    pointer-events: auto;
-    width: 700px;
-    height: 405px;
-    right: 0px;
-    top: -365px;
-    opacity: 0.4;
+	pointer-events: auto;
+	width: 700px;
+	height: 405px;
+	right: 0px;
+	top: -365px;
+	opacity: 0.4;
 	overflow: hidden;
-    -webkit-transition: all 0.4s ease-in-out;
-    transition: all 0.4s ease-in-out;
+	-webkit-transition: all 0.4s ease-in-out;
+	transition: all 0.4s ease-in-out;
 }
 
 #menu:hover {
-    opacity: 1;
+	opacity: 1;
 }
 
 #menu.slide {
-    opacity: 1;
+	opacity: 1;
 	top: 0px;
 }
 
 #menu_content {
-    position: absolute;
-    width: 100%;
-    height: 365px;
+	position: absolute;
+	width: 100%;
+	height: 365px;
 	top: 0px;
-    left: 0px;
+	left: 0px;
 	overflow: hidden;
 }
 
 #menu_tab {
-    position: absolute;
-    width: 100%;
-    height: 41px;
+	position: absolute;
+	width: 100%;
+	height: 41px;
 	top: 365px;
-    left: 0px;
-    background:url(../images/menu_tab.png) no-repeat right bottom;
+	left: 0px;
+	background:url(../images/menu_tab.png) no-repeat right bottom;
 }
 
 #menu_button {
-    position: absolute;
-    background:url(../images/menu_tri_down.png) no-repeat;
-    width: 32px;
-    height: 17px;
-    right: 27px;
-    top: 9px;
-    pointer-events: none;
+	position: absolute;
+	background:url(../images/menu_tri_down.png) no-repeat;
+	width: 32px;
+	height: 17px;
+	right: 27px;
+	top: 9px;
+	pointer-events: none;
 }
 
 .slide #menu_button {
-    background:url(../images/menu_tri_up.png) no-repeat;
+	background:url(../images/menu_tri_up.png) no-repeat;
 }
 
 #viewctl {
@@ -158,7 +158,7 @@ body {
 }
 
 .listitem.select {
-    background-color: #307f9a;
+	background-color: #307f9a;
 }
 
 .listitem .gcolor {
@@ -167,8 +167,8 @@ body {
 	height: 30px;
 	width: 30px;
 	margin-right: 10px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
 	background-image: url(../images/generic.png);
 	background-size: 30px 30px;
 	background-repeat: no-repeat;
@@ -176,77 +176,121 @@ body {
 
 .listitem .scolor {
 	position: relative;
-    pointer-events: none;
+	pointer-events: none;
 	float: left;
 	height: 30px;
 	width: 30px;
 	margin-right: 10px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
 	background-image: url(../images/generic.png);
 	background-size: 30px 30px;
 	background-repeat: no-repeat;
 }
 
 .btn {
-    position: relative;
+	position: relative;
 	float: left;
 	margin-top: 3px;
 	margin-left: 5px;
-    color: #d7d7d7;
-    border: solid 1px #333;
-    text-align: center;
-    text-decoration: none;
-    font: 15px/100% Arial, Helvetica, sans-serif;
-    text-shadow: 0 1px 1px rgba(0,0,0,.3);
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    background: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000));
-    background: -moz-linear-gradient(top, #666, #000);
+	color: #d7d7d7;
+	border: solid 1px #333;
+	text-align: center;
+	text-decoration: none;
+	font: 15px/100% Arial, Helvetica, sans-serif;
+	text-shadow: 0 1px 1px rgba(0,0,0,.3);
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	background: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000));
+	background: -moz-linear-gradient(top, #666, #000);
 	width: 90px;
-    height: 20px;
-    line-height: 20px;
-    cursor: pointer;
-    box-shadow: 2px 2px 14px #000;
+	height: 20px;
+	line-height: 20px;
+	cursor: pointer;
+	box-shadow: 2px 2px 14px #000;
 }
 
 .btn:hover {
-    background: -webkit-gradient(linear, left top, left bottom, from(#444), to(#000));
-    background: -moz-linear-gradient(top, #444, #000);
+	background: -webkit-gradient(linear, left top, left bottom, from(#444), to(#000));
+	background: -moz-linear-gradient(top, #444, #000);
 }
 
 .btn:active {
-    color: #666;
-    background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444));
-    background: -moz-linear-gradient(top, #000, #444);
+	color: #666;
+	background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444));
+	background: -moz-linear-gradient(top, #000, #444);
 }
 
 .switchbtn {
-    position: relative;
+	position: relative;
 	float: left;
-	margin-top: 3px;
-	margin-left: 5px;
-    color: #d7d7d7;
-    border: solid 1px #333;
-    text-align: center;
-    text-decoration: none;
-    font: 15px/100% Arial, Helvetica, sans-serif;
-    text-shadow: 0 1px 1px rgba(0,0,0,.3);
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    background: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000));
-    background: -moz-linear-gradient(top, #666, #000);
+	margin: 3px 0px 0px 5px;
+	color: #d7d7d7;
+	border: solid 1px #333;
+	text-align: center;
+	font: 15px/100% Arial, Helvetica, sans-serif;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	background: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000));
+	background: -moz-linear-gradient(top, #666, #000);
 	width: 90px;
-    height: 20px;
-    line-height: 20px;
-    cursor: pointer;
-    box-shadow: 2px 2px 14px #000;
+	height: 20px;
+	line-height: 20px;
+	cursor: pointer;
 	text-decoration:line-through;
 }
 
 .switchbtn.on {
-    color: #d7d7d7;
-    background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444));
-    background: -moz-linear-gradient(top, #000, #444);
+	background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444));
+	background: -moz-linear-gradient(top, #000, #444);
 	text-decoration:none;
+}
+
+.toggle {
+	position: relative;
+	float: left;
+	margin: 3px 0px 0px 5px;
+	color: #d7d7d7;
+	text-align: center;
+	font: 15px/100% Arial, Helvetica, sans-serif;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	width: 280px;
+	height: 20px;
+	line-height: 20px;
+	cursor: pointer;
+}
+
+.toggle .title {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 20%;
+	height: 20px;
+	line-height: 22px;
+	background: transparent;
+	pointer-events: none;
+}
+
+.toggle .choice {
+	position: absolute;
+	top: 0px;
+	color: #878787;
+	border: solid 1px #333;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	width: 40%;
+	height: 20px;
+	line-height: 20px;
+	background: black;
+	pointer-events: none;
+}
+
+.toggle .choice.ch1 {left: 20%;}
+.toggle .choice.ch2 {left: 60%;}
+
+.toggle.p1 .choice.ch1, .toggle.p2 .choice.ch2 {
+	color: #d7d7d7;
+	background: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000));
+	background: -moz-linear-gradient(top, #666, #000);
 }

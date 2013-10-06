@@ -14,7 +14,7 @@ var display = {
 	stars: true,
 	sun: true,
 	sat: true,
-	initmenu: false
+	initmenu: true
 };
 
 var loading = 0;
@@ -893,16 +893,16 @@ function initMenu() {
 			display.stars = false;
 		}
 	}
-	var spaceview = document.getElementById("spaceview");
-	spaceview.className = (display.spaceview)?"switchbtn on":"switchbtn";
-	spaceview.onclick = function(e) {
-		if(e.target.className == "switchbtn") {
-			e.target.className = "switchbtn on";
+	var viewmode = document.getElementById("viewmode");
+	viewmode.className = (display.spaceview)?"toggle p1":"toggle p2";
+	viewmode.onclick = function(e) {
+		if(e.target.className == "toggle p2") {
+			e.target.className = "toggle p1";
 			updateMatrices = updateMatricesSpace;
 			zoomval = defzoom.space;
 			display.spaceview = true;
 		} else {
-			e.target.className = "switchbtn";
+			e.target.className = "toggle p2";
 			updateMatrices = updateMatricesGround;
 			zoomval = defzoom.ground;
 			display.spaceview = false;
