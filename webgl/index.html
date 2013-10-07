@@ -19,26 +19,38 @@
 		<div id="loading"><p>LOADING</p></div>
 		<div id="menu">
 			<div id="menu_content">
-				<div class="listctl">
-					<div title="select all groups" id="grpselectall" class="btn">Select All</div>
-					<div title="clear all groups" id="grpclearall" class="btn">Clear All</div>
-					<div title="use images for satellite positions" id="satuseimages" class="switchbtn on">Use Images</div>
+				<div class="listctl full">
+					<div title="select mode" id="selectmode" class="toggle p1">
+						<div class="choice ch1">Select Satellites</div>
+						<div class="choice ch2">Set Location</div>
+					</div>
 				</div>
 				<div class="listctl">
-					<div id="satselectall" class="btn">Select All</div>
-					<div id="satclearall" class="btn">Clear All</div>
+					<div id="list1title" class="text">Categories</div>
+					<div id="grpallnone">
+						<div title="select all groups" id="grpselectall" class="btn">All</div>
+						<div title="clear all groups" id="grpclearall" class="btn">None</div>
+					</div>
 				</div>
-				<div id="groups" class="list"></div>
-				<div id="satellites" class="list"></div>
+				<div class="listctl">
+					<div id="list2title" class="text">Satellites</div>
+					<div id="satallnone">
+						<div title="select all satellites" id="satselectall" class="btn">All</div>
+						<div title="clear all satellites" id="satclearall" class="btn">None</div>
+					</div>
+				</div>
+				<div id="list1" class="list"></div>
+				<div id="list2" class="list"></div>
 				<div id="viewctl">
 					<div title="show/hide the earth" id="showearth" class="switchbtn on">Earth</div>
 					<div title="show/hide the moon" id="showmoon" class="switchbtn on">Moon</div>
 					<div title="show/hide the sun" id="showsun" class="switchbtn on">Sun</div>
 					<div title="show/hide the stars" id="showstars" class="switchbtn on">Stars</div>
+					<div title="show/hide images for satellites" id="satuseimages" class="switchbtn on">Sat Images</div>
 					<div title="view mode" id="viewmode" class="toggle p1">
 						<div class="title">View:</div>
 						<div class="choice ch1">Space</div>
-						<div class="choice ch2">Ground</div>
+						<div class="choice ch2">Portland, OR (US)</div>
 					</div>
 				</div>
 			</div>

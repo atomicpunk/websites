@@ -7,7 +7,7 @@
  *
  */
 
-var selected_group = "";
+var selected_group = null;
 function satinfo_t(s_name, s_group, s_options) {
 	"use strict";
 
@@ -93,8 +93,8 @@ Group.prototype.display = function(doshow) {
 Group.prototype.list = function() {
 	var self = this;
 	var sathtml = "";
-	var sats = document.getElementById("satellites");
-	selected_group = self.name;
+	var list2 = document.getElementById("list2");
+	selected_group = self;
 	for(var idx in this.satarray)
 	{
 		var s = this.satarray[idx];
@@ -110,8 +110,8 @@ Group.prototype.list = function() {
 				this.hexcolor+';"></div>'+name+'</div>';
 		}
 	}
-	sats.innerHTML = sathtml;
-	var items = sats.getElementsByClassName('listitem');
+	list2.innerHTML = sathtml;
+	var items = list2.getElementsByClassName('listitem');
 	for (var i = 0; i < items.length; i++) {
 		items[i].onclick = function(e) {
 			if(e.target.className.indexOf("listitem") == 0) {
@@ -124,7 +124,7 @@ Group.prototype.list = function() {
 					e.target.className = "listitem";
 					s.show = false;
 				}
-				satarray.refresh();
+				webgl.satrefresh();
 			} else {
 				var idx = parseInt(e.target.parentNode.id.slice(1));
 				var s = self.satarray[idx];
@@ -139,7 +139,7 @@ Group.prototype.list = function() {
 		for(var idx in self.satarray) {
 			self.satarray[idx].show = true;
 		}
-		satarray.refresh();
+		webgl.satrefresh();
 	}
 	var none = document.getElementById("satclearall");
 	none.onclick = function(e) {
@@ -149,7 +149,7 @@ Group.prototype.list = function() {
 		for(var idx in self.satarray) {
 			self.satarray[idx].show = false;
 		}
-		satarray.refresh();
+		webgl.satrefresh();
 	}
 }
 
@@ -159,31 +159,45 @@ function SatelliteGroup(file) {
 	var self = this;
 	this.list = [];
 	this.hash = [];
+	this.savedhtml = null;
 
-	function initGroupsList() {
-		var grouphtml = "";
-		var groups = document.getElementById("groups");
-		for(var gidx in self.list)
-		{
-			var g = self.list[gidx];
-			if(g.texture) {
-				grouphtml += '<div title="select/unselect group" id="g'+gidx+
-					'" class="listitem select"><div title="view satellite list" class="gcolor" style="background-image:'+
-					g.imgpath+';background-color:'+g.hexcolor+';"></div>'+g.name+'</div>';
-			} else {
-				grouphtml += '<div title="select/unselect group" id="g'+gidx+
-					'" class="listitem select"><div title="view satellite list" class="gcolor" style="background-color:'+
-					g.hexcolor+';"></div>'+g.name+'</div>';
+	this.saveList1 = saveList1;
+	function saveList1() {
+		var list1 = document.getElementById("list1");
+		self.savedhtml = list1.innerHTML;
+	}
+
+	this.loadList1 = loadList1;
+	function loadList1() {
+		var list1 = document.getElementById("list1");
+		if(!self.savedhtml) {
+			var grouphtml = "";
+			for(var gidx in self.list)
+			{
+				var g = self.list[gidx];
+				if(g.texture) {
+					grouphtml += '<div title="select/unselect group" id="g'+gidx+
+						'" class="listitem select"><div title="view satellite list" class="gcolor" style="background-image:'+
+						g.imgpath+';background-color:'+g.hexcolor+';"></div>'+g.name+'</div>';
+				} else {
+					grouphtml += '<div title="select/unselect group" id="g'+gidx+
+						'" class="listitem select"><div title="view satellite list" class="gcolor" style="background-color:'+
+						g.hexcolor+';"></div>'+g.name+'</div>';
+				}
 			}
+			list1.innerHTML = grouphtml;
+		} else {
+			list1.innerHTML = self.savedhtml;
 		}
-		groups.innerHTML = grouphtml;
-		var items = groups.getElementsByClassName('listitem');
+		if(selected_group)
+			selected_group.list();
+		var items = list1.getElementsByClassName('listitem');
 		for (var i = 0; i < items.length; i++) {
 			items[i].onclick = function(e) {
 				if(e.target.className.indexOf("listitem") == 0) {
 					var idx = parseInt(e.target.id.slice(1));
 					var g = self.list[idx];
-					if(selected_group != g.name) {
+					if(selected_group != g) {
 						g.list();
 						return;
 					}
@@ -197,7 +211,7 @@ function SatelliteGroup(file) {
 				} else {
 					var idx = parseInt(e.target.parentNode.id.slice(1));
 					var g = self.list[idx];
-					if(selected_group != g.name) {
+					if(selected_group != g) {
 						g.list();
 					}
 				}
@@ -247,7 +261,7 @@ function SatelliteGroup(file) {
 					self.hash[id] = new satinfo_t(name, group, (i < 0)?"":l.slice(i+1));
 				}
 			}
-			initGroupsList();
+			loadList1();
 		}
 		request.send();
 	}

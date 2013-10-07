@@ -167,7 +167,6 @@ function Home() {
 	this.lat = homepos[0];
 	this.lon = homepos[1];
 	this.pos = [0, 0, 0];
-	this.opos = [0, 0, 0];
 	this.vec = [0, 0, 0];
 
 	this.initVectors = initVectors;
@@ -185,14 +184,33 @@ function Home() {
 
 		povLatLon(self.lat, self.lon);
 		self.pos = posFromLatLon(self.lat, self.lon);
-		self.opos = posOpposite(self.pos);
 		self.vec = vectorFromLatLon(self.lat, self.lon);
 		if(aristotle) initVectors(aristotle);
 
 		if(gl) {
-			var posArray = [self.pos[0], self.pos[1], self.pos[2],
-							self.opos[0], self.opos[1], self.opos[2]];
-			var idxArray = [0, 1];
+			var posArray = [self.pos[0], self.pos[1], self.pos[2]];
+			var idxArray = [0];
+
+			self.posBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, self.posBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(posArray), gl.STATIC_DRAW);
+			self.posBuffer.itemSize = 3;
+			self.posBuffer.numItems = posArray.length/3;
+
+			self.idxBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.idxBuffer);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idxArray), gl.STATIC_DRAW);
+			self.idxBuffer.itemSize = 1;
+			self.idxBuffer.numItems = idxArray.length;
+		}
+	}
+
+	this.newpos = newpos;
+	function newpos(p) {
+		if(gl) {
+			self.pos = p;
+			var posArray = [self.pos[0], self.pos[1], self.pos[2]];
+			var idxArray = [0];
 
 			self.posBuffer = gl.createBuffer();
 			gl.bindBuffer(gl.ARRAY_BUFFER, self.posBuffer);
@@ -536,16 +554,23 @@ function WebGl() {
     "use strict";
 
     var self = this;
+	var satarray = null;
     var earthdata = null;
     var stardata = null;
     var moondata = null;
     var sundata = null;
-	var satarray = null;
     var lastMouseX = null;
     var lastMouseY = null;
+	var click = false;
 	this.canvas = 0;
     this.resize = resize;
 	this.fail = fail;
+
+	this.satrefresh = satrefresh;
+	function satrefresh()
+	{
+		if(satarray) satarray.refresh();
+	}
 
 	function fail(e)
 	{
@@ -631,8 +656,113 @@ function WebGl() {
 		self.canvas.ontouchstart = handleTouchStart;
 		self.canvas.ontouchend = handleMouseUp;
 		self.canvas.ontouchmove = handleTouchMove;
+		initMenu();
 		doneLoading();
 		tick();
+	}
+
+	function initMenu() {
+		var menu_tab = document.getElementById("menu_tab");
+		menu_tab.onclick = function() {
+			var menu = document.getElementById("menu");
+			if(menuopen) {
+				menu.className = "";
+				menuopen = false;
+			} else {
+				menu.className = "slide";
+				menuopen = true;
+			}
+		}
+		var showmoon = document.getElementById("showmoon");
+		showmoon.className = (display.moon)?"switchbtn on":"switchbtn";
+		showmoon.onclick = function(e) {
+			if(e.target.className == "switchbtn") {
+				e.target.className = "switchbtn on";
+				display.moon = true;
+			} else {
+				e.target.className = "switchbtn";
+				display.moon = false;
+			}
+		}
+		var showearth = document.getElementById("showearth");
+		showearth.className = (display.earth)?"switchbtn on":"switchbtn";
+		showearth.onclick = function(e) {
+			if(e.target.className == "switchbtn") {
+				e.target.className = "switchbtn on";
+				display.earth = true;
+			} else {
+				e.target.className = "switchbtn";
+				display.earth = false;
+			}
+		}
+		var showsun = document.getElementById("showsun");
+		showsun.className = (display.sun)?"switchbtn on":"switchbtn";
+		showsun.onclick = function(e) {
+			if(e.target.className == "switchbtn") {
+				e.target.className = "switchbtn on";
+				display.sun = true;
+			} else {
+				e.target.className = "switchbtn";
+				display.sun = false;
+			}
+		}
+		var showstars = document.getElementById("showstars");
+		showstars.className = (display.stars)?"switchbtn on":"switchbtn";
+		showstars.onclick = function(e) {
+			if(e.target.className == "switchbtn") {
+				e.target.className = "switchbtn on";
+				display.stars = true;
+			} else {
+				e.target.className = "switchbtn";
+				display.stars = false;
+			}
+		}
+		var viewmode = document.getElementById("viewmode");
+		viewmode.className = (display.spaceview)?"toggle p1":"toggle p2";
+		viewmode.onclick = function(e) {
+			if(e.target.className == "choice ch1") {
+				e.target.parentNode.className = "toggle p1";
+				updateMatrices = updateMatricesSpace;
+				zoomval = defzoom.space;
+				display.spaceview = true;
+			} else if(e.target.className == "choice ch2") {
+				e.target.parentNode.className = "toggle p2";
+				updateMatrices = updateMatricesGround;
+				zoomval = defzoom.ground;
+				display.spaceview = false;
+			}
+			updateMatrices();
+		}
+		var selectmode = document.getElementById("selectmode");
+		var list1title = document.getElementById("list1title");
+		var list2title = document.getElementById("list2title");
+		var grpallnone = document.getElementById("grpallnone");
+		var satallnone = document.getElementById("satallnone");
+		var list1 = document.getElementById("list1");
+		var list2 = document.getElementById("list2");
+		selectmode.onclick = function(e) {
+			if(e.target.className == "choice ch1") {
+				if(e.target.parentNode.className == "toggle p1")
+					return;
+				e.target.parentNode.className = "toggle p1";
+				list1title.innerText="Categories";
+				list2title.innerText="Satellites";
+				grpallnone.style.display="block";
+				satallnone.style.display="block";
+				satarray.group.loadList1();
+			} else if(e.target.className == "choice ch2") {
+				if(e.target.parentNode.className == "toggle p2")
+					return;
+				e.target.parentNode.className = "toggle p2";
+				list1title.innerText="Countries";
+				list2title.innerText="Cities";
+				grpallnone.style.display="none";
+				satallnone.style.display="none";
+				satarray.group.saveList1();
+				list1.innerHTML = "";
+				list2.innerHTML = "";
+			}
+		}
 	}
 
     function getShader(gl, id) {
@@ -711,35 +841,57 @@ function WebGl() {
 		gl.uniform1f(shader.pointSize, 1.5);
     }
 
-	function degToRad(degrees) {
-		return degrees * Math.PI / 180;
-	}
-
 	function handleMouseDown(event) {
 		if(loading > 0 || event.button != 0 || failure) return;
 		mouseDown = true;
+		click = true;
 		lastMouseX = event.clientX;
 		lastMouseY = event.clientY;
 	}
 
 	function handleMouseUp(event) {
 		mouseDown = false;
+		if(click) {
+			var x = event.clientX/myWidth*2.0-1.0;
+			var y = 1.0-event.clientY/myHeight*2.0;
+			var z = Math.sqrt(earthsize*earthsize - x*x - y*y);
+			//var out = [x, y, z];
+			//home.newpos(out);
+			//console.log(out);
+			//return;
+
+			var inf = [x, y, z, 1.0];
+			var e = mat4.create();
+			var m = mat4.create();
+			var out = vec3.create();
+
+			mat4.identity(e);
+			//mat4.translate(e, [0, 0, zoomval]);
+			mat4.rotate(e, povAlt, [1, 0, 0]);
+			mat4.rotate(e, povAzi, [0, 1, 0]);
+			//mat4.multiply(earthMatrix, pMatrix, m);
+			mat4.inverse(e, m);
+			mat4.multiplyVec4(m, inf, out);
+			home.newpos(out);
+			console.log(out);
+		}
 	}
 
 	function handleMove(newX, newY) {
 		if (!mouseDown) return;
+		click = false;
 
 		var dAlt, dAzi;
 		if(display.spaceview) {
 			var deltaX = newX - lastMouseX;
 			var deltaY = newY - lastMouseY;
-			dAzi = degToRad(deltaX / 10);
-			dAlt = degToRad(deltaY / 10);
+			dAzi = (deltaX / 10) * Math.PI / 180;
+			dAlt = (deltaY / 10) * Math.PI / 180;
 		} else {
 			var deltaX = lastMouseX - newX;
 			var deltaY = newY - lastMouseY;
-			dAzi = degToRad(deltaX / 20);
-			dAlt = degToRad(deltaY / 20);
+			dAzi = (deltaX / 20) * Math.PI / 180;
+			dAlt = (deltaY / 20) * Math.PI / 180;
 		}
 
 		updateMatrices(povAlt + dAlt, povAzi + dAzi);
@@ -766,6 +918,7 @@ function WebGl() {
 	}
 
 	function handleMouseWheel(event) {
+		click = false;
 		var delta = (/Firefox/i.test(navigator.userAgent)) ? (event.detail*-1) : event.wheelDelta;
 		if(delta > 0)
 		{
@@ -837,87 +990,12 @@ function setWindowSize() {
     }
 }
 
-function initMenu() {
-	var menu_tab = document.getElementById("menu_tab");
-	menu_tab.onclick = function() {
-		var menu = document.getElementById("menu");
-		if(menuopen) {
-			menu.className = "";
-			menuopen = false;
-		} else {
-			menu.className = "slide";
-			menuopen = true;
-		}
-	}
-	var showmoon = document.getElementById("showmoon");
-	showmoon.className = (display.moon)?"switchbtn on":"switchbtn";
-	showmoon.onclick = function(e) {
-		if(e.target.className == "switchbtn") {
-			e.target.className = "switchbtn on";
-			display.moon = true;
-		} else {
-			e.target.className = "switchbtn";
-			display.moon = false;
-		}
-	}
-	var showearth = document.getElementById("showearth");
-	showearth.className = (display.earth)?"switchbtn on":"switchbtn";
-	showearth.onclick = function(e) {
-		if(e.target.className == "switchbtn") {
-			e.target.className = "switchbtn on";
-			display.earth = true;
-		} else {
-			e.target.className = "switchbtn";
-			display.earth = false;
-		}
-	}
-	var showsun = document.getElementById("showsun");
-	showsun.className = (display.sun)?"switchbtn on":"switchbtn";
-	showsun.onclick = function(e) {
-		if(e.target.className == "switchbtn") {
-			e.target.className = "switchbtn on";
-			display.sun = true;
-		} else {
-			e.target.className = "switchbtn";
-			display.sun = false;
-		}
-	}
-	var showstars = document.getElementById("showstars");
-	showstars.className = (display.stars)?"switchbtn on":"switchbtn";
-	showstars.onclick = function(e) {
-		if(e.target.className == "switchbtn") {
-			e.target.className = "switchbtn on";
-			display.stars = true;
-		} else {
-			e.target.className = "switchbtn";
-			display.stars = false;
-		}
-	}
-	var viewmode = document.getElementById("viewmode");
-	viewmode.className = (display.spaceview)?"toggle p1":"toggle p2";
-	viewmode.onclick = function(e) {
-		if(e.target.className == "toggle p2") {
-			e.target.className = "toggle p1";
-			updateMatrices = updateMatricesSpace;
-			zoomval = defzoom.space;
-			display.spaceview = true;
-		} else {
-			e.target.className = "toggle p2";
-			updateMatrices = updateMatricesGround;
-			zoomval = defzoom.ground;
-			display.spaceview = false;
-		}
-		updateMatrices();
-	}
-}
-
 if(window.addEventListener)
 {
 	window.addEventListener('load', function () {
 		"use strict";
 		setWindowSize();
 		webgl = new WebGl();
-		if(!failure) initMenu();
 	});
 	window.addEventListener('resize', function () {
 		"use strict";
