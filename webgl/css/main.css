@@ -164,7 +164,7 @@ body {
 	background-color: #307f9a;
 }
 
-.listitem .gcolor {
+.listitem .gcolor, .listitem .scolor, .listitem .ccolor {
 	position: relative;
 	float: left;
 	height: 30px;
@@ -177,18 +177,12 @@ body {
 	background-repeat: no-repeat;
 }
 
-.listitem .scolor {
-	position: relative;
+.listitem .scolor, .listitem .ccolor {
 	pointer-events: none;
-	float: left;
-	height: 30px;
-	width: 30px;
-	margin-right: 10px;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	background-image: url(../images/generic.png);
-	background-size: 30px 30px;
-	background-repeat: no-repeat;
+}
+
+.listitem .ccolor {
+	background-image: url(../images/flag.png);
 }
 
 .text {

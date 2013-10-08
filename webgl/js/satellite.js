@@ -90,24 +90,26 @@ Group.prototype.display = function(doshow) {
 	}
 }
 
-Group.prototype.list = function() {
+Group.prototype.loadList = function(reloadhtml) {
 	var self = this;
-	var sathtml = "";
+	var sathtml = (reloadhtml)?reloadhtml:"";
 	var list2 = document.getElementById("list2");
 	selected_group = self;
-	for(var idx in this.satarray)
-	{
-		var s = this.satarray[idx];
-		var name = (s.name)?s.name:("Satellite number "+s.tle.id);
-		var select = (s.show)?" select":"";
-		if(s.texture) {
-			sathtml += '<div title="select/unselect satellite" id="s'+idx+
-				'" class="listitem'+select+'"><div title="view satellite info" class="scolor" style="background-image:'+
-				s.imgpath+';background-color:'+this.hexcolor+';"></div>'+name+'</div>';
-		} else {
-			sathtml += '<div title="select/unselect satellite" id="s'+idx+
-				'" class="listitem'+select+'"><div title="view satellite info" class="scolor" style="background-color:'+
-				this.hexcolor+';"></div>'+name+'</div>';
+	if(!reloadhtml) {
+		for(var idx in this.satarray)
+		{
+			var s = this.satarray[idx];
+			var name = (s.name)?s.name:("Satellite number "+s.tle.id);
+			var select = (s.show)?" select":"";
+			if(s.texture) {
+				sathtml += '<div title="select/unselect satellite" id="s'+idx+
+					'" class="listitem'+select+'"><div title="view satellite info" class="scolor" style="background-image:'+
+					s.imgpath+';background-color:'+this.hexcolor+';"></div>'+name+'</div>';
+			} else {
+				sathtml += '<div title="select/unselect satellite" id="s'+idx+
+					'" class="listitem'+select+'"><div title="view satellite info" class="scolor" style="background-color:'+
+					this.hexcolor+';"></div>'+name+'</div>';
+			}
 		}
 	}
 	list2.innerHTML = sathtml;
@@ -151,6 +153,7 @@ Group.prototype.list = function() {
 		}
 		webgl.satrefresh();
 	}
+	return sathtml;
 }
 
 function SatelliteGroup(file) {
@@ -159,18 +162,24 @@ function SatelliteGroup(file) {
 	var self = this;
 	this.list = [];
 	this.hash = [];
-	this.savedhtml = null;
+	this.savedhtml = [null, null];
 
-	this.saveList1 = saveList1;
-	function saveList1() {
-		var list1 = document.getElementById("list1");
-		self.savedhtml = list1.innerHTML;
+	this.saveList = saveList;
+	function saveList() {
+		if(self.savedhtml[0]) {
+			var list1 = document.getElementById("list1");
+			self.savedhtml[0] = list1.innerHTML;
+		}
+		if(selected_group) {
+			var list2 = document.getElementById("list2");
+			self.savedhtml[1] = list2.innerHTML;
+		}
 	}
 
-	this.loadList1 = loadList1;
-	function loadList1() {
+	this.loadList = loadList;
+	function loadList() {
 		var list1 = document.getElementById("list1");
-		if(!self.savedhtml) {
+		if(!self.savedhtml[0]) {
 			var grouphtml = "";
 			for(var gidx in self.list)
 			{
@@ -185,12 +194,11 @@ function SatelliteGroup(file) {
 						g.hexcolor+';"></div>'+g.name+'</div>';
 				}
 			}
-			list1.innerHTML = grouphtml;
-		} else {
-			list1.innerHTML = self.savedhtml;
+			self.savedhtml[0] = grouphtml;
 		}
+		list1.innerHTML = self.savedhtml[0];
 		if(selected_group)
-			selected_group.list();
+			selected_group.loadList(self.savedhtml[1]);
 		var items = list1.getElementsByClassName('listitem');
 		for (var i = 0; i < items.length; i++) {
 			items[i].onclick = function(e) {
@@ -198,7 +206,7 @@ function SatelliteGroup(file) {
 					var idx = parseInt(e.target.id.slice(1));
 					var g = self.list[idx];
 					if(selected_group != g) {
-						g.list();
+						g.loadList();
 						return;
 					}
 					if(e.target.className == "listitem") {
@@ -212,7 +220,7 @@ function SatelliteGroup(file) {
 					var idx = parseInt(e.target.parentNode.id.slice(1));
 					var g = self.list[idx];
 					if(selected_group != g) {
-						g.list();
+						g.loadList();
 					}
 				}
 			}
@@ -261,7 +269,7 @@ function SatelliteGroup(file) {
 					self.hash[id] = new satinfo_t(name, group, (i < 0)?"":l.slice(i+1));
 				}
 			}
-			loadList1();
+			loadList();
 		}
 		request.send();
 	}
@@ -372,7 +380,7 @@ function SatelliteArray(tlefile, groupfile) {
 				if((g != 35)&&(g != 15)&&(g != 23))
 					self.group.list[g].display(false);
 			}
-			self.group.list[35].list();
+			self.group.list[35].loadList();
 			self.interval = window.setInterval(function() {if(!mouseDown && !loading && !failure) self.refresh();}, 1000);
 		}
 		request.send();

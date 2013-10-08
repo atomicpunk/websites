@@ -39,8 +39,6 @@ var starMatrix = mat4.create();
 var moonMatrix = mat4.create();
 var updateMatrices = (display.spaceview)?updateMatricesSpace:updateMatricesGround;
 var zoomval = (display.spaceview)?defzoom.space:defzoom.ground;
-var homepos = [45.518259, -122.902044]; // Portland
-var home = new Home();
 var webgl = null;
 
 function totalfailure() {
@@ -554,6 +552,7 @@ function WebGl() {
     "use strict";
 
     var self = this;
+	var locarray = null;
 	var satarray = null;
     var earthdata = null;
     var stardata = null;
@@ -628,7 +627,7 @@ function WebGl() {
 
 		initShaders();
 
-		home.init();
+		home.init(true);
 		aristotle = new GeocentricModel();
 
 		var n = (location.search.indexOf("?normal") == 0);
@@ -749,7 +748,8 @@ function WebGl() {
 				list2title.innerText="Satellites";
 				grpallnone.style.display="block";
 				satallnone.style.display="block";
-				satarray.group.loadList1();
+				list2.removeEventListener("click", home.refresh);
+				satarray.group.loadList();
 			} else if(e.target.className == "choice ch2") {
 				if(e.target.parentNode.className == "toggle p2")
 					return;
@@ -758,9 +758,9 @@ function WebGl() {
 				list2title.innerText="Cities";
 				grpallnone.style.display="none";
 				satallnone.style.display="none";
-				satarray.group.saveList1();
-				list1.innerHTML = "";
-				list2.innerHTML = "";
+				satarray.group.saveList();
+				home.loadList();
+				list2.addEventListener("click", home.refresh);
 			}
 		}
 	}

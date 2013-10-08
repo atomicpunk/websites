@@ -1,0 +1,942 @@
+United States Of America|Adak, Alaska|51.883333|-176.650000
+United States Of America|Albuquerque, New Mexico|35.116667|-106.616667
+United States Of America|Anchorage, Alaska|61.216667|-149.900000
+United States Of America|Atlanta|33.750000|-84.383333
+United States Of America|Augusta, Maine|44.316667|-69.783333
+United States Of America|Austin, Texas|30.250000|-97.750000
+United States Of America|Baltimore|39.283333|-76.616667
+United States Of America|Barrow, Alaska|71.300000|-156.766667
+United States Of America|Birmingham, Alabama|33.650000|-86.816667
+United States Of America|Bismarck, North Dakota|46.816667|-100.783333
+United States Of America|Boise, Idaho|43.616667|-116.200000
+United States Of America|Boston|42.350000|-71.066667
+United States Of America|Boulder, Colorado|40.016667|-105.283333
+United States Of America|Buffalo, New York|42.900000|-78.850000
+United States Of America|Charleston, South Carolina|33.300000|-80.550000
+United States Of America|Charleston, West Virginia|38.350000|-81.633333
+United States Of America|Charlotte Amalie, United States Virgin Islands|18.350000|-64.950000
+United States Of America|Charlotte, North Carolina|35.233333|-80.850000
+United States Of America|Cheyenne, Wyoming|41.150000|-104.800000
+United States Of America|Chicago|41.883333|-87.633333
+United States Of America|Cincinnati|39.100000|-84.516667
+United States Of America|Cleveland|41.483333|-81.666667
+United States Of America|Columbia, South Carolina|34.000000|-81.050000
+United States Of America|Concord, New Hampshire|43.200000|-71.533333
+United States Of America|Dallas|32.783333|-96.800000
+United States Of America|Deadhorse, Alaska|70.200000|-148.516667
+United States Of America|Dededo, Guam|13.516667|144.833333
+United States Of America|Denver|39.733333|-104.983333
+United States Of America|Des Moines, Iowa|41.583333|-93.616667
+United States Of America|Detroit|42.333333|-83.050000
+United States Of America|Dover, Delaware|39.166667|-75.533333
+United States Of America|El Paso, Texas|31.783333|-106.416667
+United States Of America|Fairbanks, Alaska|64.850000|-147.716667
+United States Of America|Fort Wayne, Indiana|41.083333|-85.133333
+United States Of America|Hagåtña, Guam|13.483333|144.750000
+United States Of America|Hartford, Connecticut|41.766667|-72.666667
+United States Of America|Helena, Montana|46.600000|-112.033333
+United States Of America|Hillsboro, Oregon|45.518259|-122.902044
+United States Of America|Hilo, Hawaii|19.700000|-155.083333
+United States Of America|Honolulu|21.316667|-157.833333
+United States Of America|Houston|29.766667|-95.383333
+United States Of America|Indianapolis|39.766667|-86.150000
+United States Of America|Jackson, Mississippi|32.300000|-90.183333
+United States Of America|Jacksonville, Florida|30.333333|-81.666667
+United States Of America|Jersey City, New Jersey|40.716667|-74.066667
+United States Of America|Juneau|58.300000|-134.416667
+United States Of America|Kansas City, Missouri|39.100000|-94.583333
+United States Of America|Key West, Florida|24.566667|-81.783333
+United States Of America|Knoxville, Tennessee|35.966667|-83.950000
+United States Of America|Las Vegas, Nevada|36.183333|-115.133333
+United States Of America|Lincoln, Nebraska|40.816667|-96.683333
+United States Of America|Little Rock, Arkansas|34.733333|-92.333333
+United States Of America|Los Angeles|34.050000|-118.250000
+United States Of America|Louisville, Kentucky|38.250000|-85.766667
+United States Of America|Memphis, Tennessee|35.116667|-89.966667
+United States Of America|Miami|25.783333|-80.216667
+United States Of America|Milwaukee|43.050000|-87.950000
+United States Of America|Minneapolis|44.983333|-93.266667
+United States Of America|Mobile, Alabama|30.700000|-88.050000
+United States Of America|Montpelier, Vermont|44.250000|-72.566667
+United States Of America|Nashville, Tennessee|36.166667|-86.783333
+United States Of America|New Orleans|29.966667|-90.050000
+United States Of America|New York City|40.666667|-73.933333
+United States Of America|Oklahoma City|35.483333|-97.533333
+United States Of America|Orlando, Florida|28.416667|-81.300000
+United States Of America|Pago Pago|-14.283333|-170.700000
+United States Of America|Philadelphia|40.950000|-75.166667
+United States Of America|Phoenix, Arizona|33.450000|-112.066667
+United States Of America|Pierre, South Dakota|44.366667|-100.333333
+United States Of America|Pittsburgh|40.450000|-80.000000
+United States Of America|Portland, Oregon|45.516667|-122.683333
+United States Of America|Providence, Rhode Island|41.816667|-71.416667
+United States Of America|Raleigh, North Carolina|35.816667|-78.650000
+United States Of America|Reno, Nevada|39.533333|-119.816667
+United States Of America|Riverside, California|33.950000|-117.400000
+United States Of America|Rochester, NY|43.166667|-77.616667
+United States Of America|Sacramento, California|38.550000|-121.466667
+United States Of America|Saipan|15.183333|145.750000
+United States Of America|Salt Lake City|40.750000|-111.883333
+United States Of America|San Antonio|29.416667|-98.500000
+United States Of America|San Diego|32.716667|-117.166667
+United States Of America|San Francisco|37.783333|-122.416667
+United States Of America|San Juan, Puerto Rico|18.450000|-66.066667
+United States Of America|Santa Barbara, California|34.433333|-119.716667
+United States Of America|Seattle|47.616667|-122.333333
+United States Of America|Sitka|57.050000|-135.333333
+United States Of America|Springfield, Missouri|37.200000|-93.283333
+United States Of America|St. Louis, Missouri|38.633333|-90.200000
+United States Of America|Tampa, Florida|27.950000|-82.466667
+United States Of America|Trenton, New Jersey|40.216667|-74.766667
+United States Of America|Tucson, Arizona|32.216667|-110.933333
+United States Of America|Tulsa, Oklahoma|36.133333|-95.933333
+United States Of America|Virginia Beach|36.850000|-75.983333
+United States Of America|Washington, D.C.|38.900000|-77.033333
+United States Of America|Wichita, Kansas|37.683333|-97.333333
+United States Of America|Wilmington, North Carolina|34.216667|-77.916667
+Canada|Alert, Nunavut|82.500000|-62.333333
+Canada|Calgary|51.050000|-114.066667
+Canada|Charlottetown|46.233333|-63.150000
+Canada|Edmonton|53.533333|-113.500000
+Canada|Eureka, Nunavut|79.983333|-85.933333
+Canada|Fort McMurray|56.733333|-111.383333
+Canada|Fredericton|45.950000|-66.666667
+Canada|Grande Prairie|55.166667|-118.800000
+Canada|Greater Sudbury|46.483333|-81.016667
+Canada|Grise Fiord|76.416667|-82.900000
+Canada|Halifax Regional Municipality|44.850000|-63.200000
+Canada|Iqaluit|63.750000|-68.516667
+Canada|Kamloops|50.683333|-120.333333
+Canada|Kelowna|49.883333|-119.500000
+Canada|Moncton|46.133333|-64.766667
+Canada|Montreal|45.500000|-73.566667
+Canada|North Bay, Ontario|46.300000|-79.450000
+Canada|Ottawa|45.416667|-75.683333
+Canada|Quebec City|46.816667|-71.216667
+Canada|Regina, Saskatchewan|50.450000|-104.600000
+Canada|Saint John, New Brunswick|45.283333|-66.083333
+Canada|Saskatoon|52.133333|-106.683333
+Canada|Sault Ste. Marie, Ontario|46.533333|-84.350000
+Canada|St. JohnMs, Newfoundland and Labrador|47.566667|-52.700000
+Canada|Thunder Bay|48.383333|-89.250000
+Canada|Toronto|43.700000|-79.400000
+Canada|Tuktoyaktuk|69.450000|-133.033333
+Canada|Vancouver|49.250000|-123.100000
+Canada|Victoria, British Columbia|48.433333|-123.366667
+Canada|Whitehorse, Yukon|60.716667|-135.050000
+Canada|Windsor, Ontario|42.283333|-83.000000
+Canada|Winnipeg|49.900000|-97.133333
+Canada|Yarmouth, Nova Scotia|43.833333|-66.116667
+Canada|Yellowknife|62.450000|-114.400000
+United Kingdom|Aberdeen|57.150000|-4.116667
+United Kingdom|Adamstown, Pitcairn Islands|-25.066667|-130.100000
+United Kingdom|Bath, Somerset|51.383333|-2.366667
+United Kingdom|Belfast|54.600000|-5.933333
+United Kingdom|Birmingham|52.483333|-1.900000
+United Kingdom|Bradford|53.800000|-1.750000
+United Kingdom|Brighton and Hove|50.833333|-0.150000
+United Kingdom|Bristol|51.450000|-2.583333
+United Kingdom|Cambridge|52.200000|0.116667
+United Kingdom|Cardiff|51.483333|-3.183333
+United Kingdom|Cockburn Town|21.466667|-71.133333
+United Kingdom|Coventry|52.400000|-1.516667
+United Kingdom|Derby|52.916667|-1.466667
+United Kingdom|Edinburgh|55.950000|-3.183333
+United Kingdom|Exeter|50.716667|-3.533333
+United Kingdom|George Town, Cayman Islands|19.300000|-81.383333
+United Kingdom|Glasgow|55.850000|-4.266667
+United Kingdom|Gloucester|51.866667|-2.233333
+United Kingdom|Greenwich|51.483333|0.000000
+United Kingdom|Grytviken|-54.283333|-36.500000
+United Kingdom|Inverness|57.466667|-4.233333
+United Kingdom|Leeds|53.800000|-1.550000
+United Kingdom|Leicester|52.633333|-1.133333
+United Kingdom|Liverpool|53.400000|-2.983333
+United Kingdom|London|51.500000|-0.133333
+United Kingdom|Manchester|53.466667|-2.233333
+United Kingdom|Newcastle upon Tyne|54.966667|-1.616667
+United Kingdom|Norwich|52.633333|1.300000
+United Kingdom|Nottingham|52.950000|-1.133333
+United Kingdom|Oxford|51.750000|-1.250000
+United Kingdom|Peterborough|52.583333|-0.250000
+United Kingdom|Plymouth|50.366667|-4.150000
+United Kingdom|Portsmouth|50.816667|-1.083333
+United Kingdom|Sheffield|53.383333|-1.466667
+United Kingdom|Southampton|50.900000|-1.400000
+United Kingdom|Stanley, Falkland Islands|-51.700000|-57.866667
+United Kingdom|Swansea|51.616667|-3.950000
+Great Britain|Douglas, Isle of Man|54.150000|-4.483333
+Great Britain|Gibraltar|36.133333|-5.350000
+Great Britain|Hamilton, Bermuda|32.300000|-64.783333
+Great Britain|Jamestown, Saint Helena|-15.916667|-5.716667
+Great Britain|Road Town|18.433333|-64.616667
+Great Britain|The Valley, Anguilla|18.216667|-63.050000
+Afghanistan|Kabul|34.533333|69.166667
+Afghanistan|Kandahar|31.616667|65.716667
+Albania|Tirana|41.333333|19.816667
+Algeria|Algiers|36.766667|3.216667
+Andorra|Andorra la Vella|42.500000|1.500000
+Angola|Huambo|-12.766667|15.733333
+Angola|Luanda|-8.833333|13.233333
+Antigua|St. JohnMs, Antigua and Barbuda|17.116667|-61.850000
+Argentina|Bahía Blanca|-38.716667|-62.266667
+Argentina|Buenos Aires|-34.600000|-58.383333
+Argentina|Comodoro Rivadavia|-45.866667|-67.483333
+Argentina|Córdoba, Argentina|-31.416667|-64.183333
+Argentina|Mendoza, Argentina|-32.883333|-68.816667
+Argentina|Río Gallegos, Santa Cruz|-51.633333|-69.216667
+Argentina|Rosario, Santa Fe|-32.950000|-60.666667
+Argentina|Salta|-24.783333|-65.416667
+Argentina|San Carlos de Bariloche|-41.150000|-71.300000
+Argentina|San Miguel de Tucumán|-26.816667|-65.216667
+Argentina|Trelew|-43.250000|-65.300000
+Argentina|Ushuaia|-54.800000|-68.300000
+Armenia|Yerevan|40.183333|44.516667
+Australia|Adelaide|-34.933333|138.600000
+Australia|Brisbane|-27.466667|153.033333
+Australia|Cairns|-16.933333|145.783333
+Australia|Canberra|-35.300000|149.116667
+Australia|Darwin, Northern Territory|-12.450000|130.833333
+Australia|Geelong|-38.150000|144.350000
+Australia|Gold Coast, Queensland|-28.016667|153.400000
+Australia|Hobart|-42.883333|147.333333
+Australia|Kingston, Norfolk Island|-29.066667|167.966667
+Australia|Mandurah|-32.533333|115.716667
+Australia|Melbourne|-37.816667|144.966667
+Australia|Newcastle, New South Wales|-32.916667|151.750000
+Australia|Perth, Western Australia|-31.950000|115.866667
+Australia|Port Hedland, Western Australia|-20.316667|118.600000
+Australia|Rockhampton|-23.383333|150.516667
+Australia|Sydney|-33.866667|151.216667
+Australia|Townsville|-19.250000|146.816667
+Australia|Wollongong|-34.433333|150.883333
+Austria|Graz|47.066667|15.433333
+Austria|Innsbruck|47.266667|11.383333
+Austria|Linz|48.300000|14.283333
+Austria|Salzburg|47.800000|13.033333
+Austria|Vienna|48.216667|16.366667
+Azerbaijan|Baku|40.400000|49.883333
+Bahamas|Nassau, Bahamas|25.066667|-77.333333
+Bahrain|Bandar Seri Begawan|4.883333|114.950000
+Bahrain|Manama|26.216667|50.583333
+Bangladesh|Chittagong|22.366667|91.800000
+Bangladesh|Dhaka|23.700000|90.383333
+Barbados|Bridgetown|13.100000|-59.616667
+Belarus|Minsk|53.900000|27.566667
+Belgium|Antwerp|51.216667|4.400000
+Belgium|Brussels|50.850000|4.350000
+Belgium|Ghent|51.050000|3.733333
+Belize|Belize City|17.500000|-88.183333
+Belize|Belmopan|17.250000|-88.766667
+Benin|Cotonou|6.366667|2.433333
+Benin|Porto-Novo|6.500000|2.600000
+Bhutan|Thimphu|27.466667|89.650000
+Bolivia|La Paz|-16.500000|-68.150000
+Bolivia|Santa Cruz de la Sierra|-17.800000|-63.166667
+Bolivia|Sucre|-19.050000|-65.250000
+Bosnia And Herzegovina|Sarajevo|43.850000|18.350000
+Botswana|Francistown|-21.166667|27.516667
+Botswana|Gaborone|-24.650000|25.916667
+Brazil|Aracaju|-10.916667|-37.050000
+Brazil|Araraquara|-21.800000|-48.183333
+Brazil|Assis|-22.666667|-50.416667
+Brazil|Bauru|-22.316667|-49.066667
+Brazil|Belém|-1.450000|-48.500000
+Brazil|Belo Horizonte|-19.916667|-43.933333
+Brazil|Boa Vista, Roraima|2.816667|-60.666667
+Brazil|Brasília|-15.800000|-47.866667
+Brazil|Campina Grande|-7.233333|-35.883333
+Brazil|Campinas|-22.900000|-47.050000
+Brazil|Campo Grande|-20.466667|-54.616667
+Brazil|Caruaru|-8.283333|-35.983333
+Brazil|Chuí, Rio Grande do Sul|-33.683333|-53.450000
+Brazil|Cuiabá|-15.600000|-56.100000
+Brazil|Curitiba|-25.416667|-49.250000
+Brazil|Fernando de Noronha|-3.850000|-32.416667
+Brazil|Florianópolis|-27.833333|-48.416667
+Brazil|Fortaleza|-3.716667|-38.550000
+Brazil|Garanhuns|-8.883333|-36.500000
+Brazil|Goiânia|-16.666667|-49.250000
+Brazil|Governador Valadares|-18.850000|-41.933333
+Brazil|Ilhéus|-14.783333|-39.050000
+Brazil|Imperatriz|-5.533333|-47.483333
+Brazil|João Pessoa|-7.083333|-34.833333
+Brazil|Juazeiro do Norte|-7.200000|-39.333333
+Brazil|Juiz de Fora|-21.766667|-43.350000
+Brazil|Macapá|0.033333|-51.066667
+Brazil|Maceió|-9.666667|-35.733333
+Brazil|Manaus|-3.100000|-60.016667
+Brazil|Natal, Rio Grande do Norte|-5.783333|-35.200000
+Brazil|Palmas, Tocantins|-10.183333|-48.333333
+Brazil|Pelotas|-31.766667|-52.350000
+Brazil|Petrolina|-9.400000|-40.500000
+Brazil|Poços de Caldas|-21.783333|-46.566667
+Brazil|Porto Alegre|-30.033333|-51.233333
+Brazil|Porto Velho|-8.766667|-63.900000
+Brazil|Recife|-8.050000|-34.900000
+Brazil|Ribeirão Preto|-21.183333|-47.800000
+Brazil|Rio Branco|-9.966667|-67.816667
+Brazil|Rio de Janeiro|-22.916667|-43.200000
+Brazil|Salvador, Bahia|-12.966667|-38.483333
+Brazil|São José do Rio Preto|-20.800000|-49.383333
+Brazil|São José dos Campos|-23.183333|-45.883333
+Brazil|São Luís|-2.533333|-44.300000
+Brazil|São Paulo|-23.550000|-46.633333
+Brazil|Sinop, Mato Grosso|-11.866667|-55.500000
+Brazil|Sobral, Ceará|-3.666667|-40.233333
+Brazil|Teresina|-5.100000|-42.800000
+Brazil|Uberlândia|-18.916667|-48.283333
+Brazil|Vitória, Brazil|-20.316667|-40.333333
+Bulgaria|Sofia|42.700000|23.333333
+Burkina Faso|Bobo-Dioulasso|11.183333|-4.283333
+Burkina Faso|Ouagadougou|12.350000|-1.533333
+Burundi|Bujumbura|-3.383333|29.366667
+Cambodia|Phnom Penh|11.550000|104.916667
+Cambodia|Siem Reap|13.366667|103.866667
+Cameroon|Douala|4.050000|9.700000
+Cameroon|Yaoundé|3.866667|11.516667
+Cape Verde|Praia|14.916667|-23.516667
+Central African Republic|Bangui|4.366667|18.583333
+Chad|Moundou|8.566667|16.083333
+Chad|NMDjamena|12.116667|15.050000
+Chile|Antofagasta|-23.650000|-70.400000
+Chile|Arica|-18.483333|-70.333333
+Chile|Calama, Chile|-22.466667|-68.933333
+Chile|Coihaique|-45.566667|-72.066667
+Chile|Concepción, Chile|-36.833333|-73.050000
+Chile|Copiapó|-27.366667|-70.333333
+Chile|Hanga Roa|-27.150000|-109.433333
+Chile|Iquique|-20.216667|-70.150000
+Chile|La Serena, Chile|-29.900000|-71.250000
+Chile|Puerto Aisén|-45.400000|-72.683333
+Chile|Puerto Montt|-41.466667|-72.933333
+Chile|Puerto Toro|-55.083333|-67.083333
+Chile|Puerto Williams|-54.933333|-67.616667
+Chile|Punta Arenas|-53.166667|-70.933333
+Chile|Santiago, Chile|-33.450000|-70.666667
+Chile|Temuco, Chile|-38.750000|-72.666667
+Chile|Valdivia, Chile|-39.816667|-73.250000
+Chile|Valparaíso|-33.050000|-71.616667
+Colombia|Barranquilla|10.966667|-74.800000
+Colombia|Bogotá|4.600000|-74.083333
+Colombia|Cartagena, Colombia|10.400000|-75.500000
+Colombia|Cúcuta|7.900000|-72.500000
+Colombia|Medellín|6.233333|-75.583333
+Colombia|Santiago de Cali|3.416667|-76.516667
+Comoros|Moroni, Comoros|-11.750000|43.200000
+Costa Rica|Alajuela|10.016667|-84.216667
+Costa Rica|Liberia, Costa Rica|10.633333|-85.433333
+Costa Rica|Limón|9.983333|-83.033333
+Costa Rica|Puntarenas|9.966667|-84.833333
+Costa Rica|San José, Costa Rica|9.933333|-84.083333
+Cote D Ivoire|Abidjan|5.316667|-4.033333
+Cote D Ivoire|Yamoussoukro|6.816667|-5.283333
+Croatia|Split (city)|43.500000|16.433333
+Croatia|Zagreb|45.816667|15.983333
+Cuba|Havana|23.133333|-82.383333
+Cuba|Santiago de Cuba|20.016667|-75.816667
+Cyprus|Nicosia|35.166667|33.366667
+Czech Republic|Prague|50.083333|14.416667
+Denmark|Aarhus|56.150000|10.216667
+Denmark|Copenhagen|55.683333|12.566667
+Denmark|Esbjerg|55.483333|8.450000
+Denmark|Nord, Greenland|81.600000|-16.666667
+Denmark|Nuuk|64.183333|-51.733333
+Denmark|Odense|55.400000|10.383333
+Denmark|Qaanaaq|77.466667|-69.233333
+Denmark|Qaqortoq|60.716667|-46.033333
+Denmark|Tórshavn|62.016667|-6.766667
+Denmark|Upernavik|72.783333|-56.150000
+Djibouti|Djibouti, Djibouti|11.583333|43.150000
+Dominican Republic|Santo Domingo|18.466667|-69.950000
+Dominica|Roseau|15.300000|-61.383333
+Ecuador|Guayaquil|-2.183333|-79.883333
+Ecuador|Quito|-0.250000|-78.583333
+Egypt|Alexandria|31.200000|29.916667
+Egypt|Cairo|30.050000|31.233333
+Egypt|Luxor|25.683333|32.650000
+Egypt|Port Said|31.250000|32.283333
+Egypt|Suez|29.966667|32.550000
+El Salvador|San Salvador|13.683333|-89.183333
+Equatorial Guinea|Malabo|3.750000|8.783333
+Eritrea|Asmara|15.333333|38.933333
+Estonia|Tallinn|59.433333|24.750000
+Estonia|Tartu|58.383333|26.716667
+Ethiopia|Addis Ababa|9.033333|38.733333
+Federated States Of Micronesia|Palikir|6.916667|158.166667
+Federated States Of Micronesia|Weno|7.450000|151.850000
+Fiji|Labasa|-16.433333|179.366667
+Fiji|Rabi Island|-16.500000|-180.000000
+Fiji|Suva|-18.133333|178.450000
+Finland|Espoo|60.200000|24.650000
+Finland|Helsinki|60.166667|24.933333
+Finland|Jyväskylä|62.250000|25.750000
+Finland|Kemi|65.733333|24.566667
+Finland|Kemijärvi|66.716667|27.433333
+Finland|Kuopio|62.900000|27.683333
+Finland|Kuusamo|65.966667|29.183333
+Finland|Lahti|60.983333|25.650000
+Finland|Nuorgam|70.083333|27.883333
+Finland|Oulu|65.016667|25.466667
+Finland|Pudasjärvi|65.366667|27.000000
+Finland|Rovaniemi|66.500000|25.733333
+Finland|Tampere|61.500000|23.766667
+Finland|Tornio|65.850000|24.150000
+Finland|Turku|60.450000|11.266667
+Finland|Utsjoki|69.900000|27.016667
+Finland|Vaasa|63.100000|21.616667
+Finland|Vantaa|60.300000|25.033333
+France|Basse-Terre|16.000000|-61.733333
+France|Bordeaux|44.833333|-0.583333
+France|Cannes|43.550000|7.016667
+France|Cayenne|4.916667|-52.333333
+France|Fort-de-France|14.600000|-61.083333
+France|Lyon|45.766667|4.850000
+France|Mamoudzou|-12.783333|45.233333
+France|Marseille|43.300000|5.366667
+France|Mata-Utu|-13.283333|-176.183333
+France|Nantes|47.216667|-1.550000
+France|Nice|43.700000|7.266667
+France|Nouméa|-22.283333|166.450000
+France|Papeete|-17.533333|-149.566667
+France|Paris|48.850000|2.350000
+France|Saint-Denis, Réunion|-20.883333|55.450000
+France|Saint-Pierre, Saint Pierre and Miquelon|46.783333|-56.183333
+France|Strasbourg|48.583333|7.750000
+France|Toulouse|43.600000|1.450000
+Gabon|Libreville|0.383333|9.450000
+Gambia|Banjul|13.450000|-16.583333
+Gambia|Brikama|13.266667|-16.650000
+Gambia|Serekunda|13.433333|-16.666667
+Georgia|Sukhumi|43.000000|41.016667
+Georgia|Tbilisi|41.716667|44.783333
+Georgia|Tskhinvali|42.233333|43.966667
+Germany|Berlin|52.516667|13.383333
+Germany|Bremen|53.083333|8.800000
+Germany|Cologne|50.950000|6.966667
+Germany|Dresden|51.033333|13.733333
+Germany|Düsseldorf|51.233333|6.783333
+Germany|Flensburg|54.783333|9.433333
+Germany|Frankfurt|50.116667|8.683333
+Germany|Hamburg|53.566667|10.000000
+Germany|Hannover|52.366667|9.716667
+Germany|Kiel|54.333333|10.133333
+Germany|Leipzig|51.333333|12.383333
+Germany|Munich|48.133333|11.566667
+Germany|Stuttgart|48.783333|9.183333
+Ghana|Accra|5.550000|-0.200000
+Ghana|Kumasi|6.666667|-1.616667
+Ghana|Sekondi-Takoradi|4.916667|-1.766667
+Ghana|Tamale, Ghana|9.400000|-0.850000
+Greece|Athens|37.966667|23.716667
+Greece|Halkida|38.466667|23.600000
+Greece|Heraklion|35.333333|25.133333
+Greece|Thessaloniki|40.650000|22.900000
+Grenada|St. GeorgeMs, Grenada|12.050000|-61.750000
+Guatemala|Guatemala City|14.616667|-90.533333
+Guatemala|Quetzaltenango|14.833333|-91.516667
+Guinea-Bissau|Bissau|11.850000|-15.566667
+Guinea|Conakry|9.516667|-13.716667
+Guinea|Nzérékoré|7.750000|-8.816667
+Guyana|Georgetown, Guyana|6.800000|-58.166667
+Haiti|Port-au-Prince|18.533333|-72.333333
+Honduras|Tegucigalpa|14.100000|-87.216667
+Hungary|Budapest|47.466667|19.050000
+Iceland|Akureyri|65.683333|-18.100000
+Iceland|Ísafjörður|66.083333|-23.133333
+Iceland|Reykjavík|64.133333|-21.933333
+India|Agartala|23.833333|91.266667
+India|Agra|27.183333|78.016667
+India|Ahmedabad|23.033333|72.583333
+India|Amritsar|31.633333|74.866667
+India|Bangalore|12.966667|77.566667
+India|Chandigarh|30.750000|76.783333
+India|Chennai|13.083333|80.266667
+India|Dibrugarh|27.483333|95.000000
+India|Gangtok|27.333333|88.616667
+India|Guwahati|26.183333|91.733333
+India|Hyderabad, India|17.366667|78.483333
+India|Jaipur|26.933333|75.816667
+India|Kanpur|26.466667|80.333333
+India|Kochi|9.966667|76.283333
+India|Kolkata|22.566667|88.366667
+India|Kulpahar|25.316667|79.633333
+India|Lucknow|26.850000|80.950000
+India|Ludhiana|30.916667|75.850000
+India|Mumbai|18.983333|72.833333
+India|Nagpur|21.133333|79.083333
+India|New Delhi|28.616667|77.216667
+India|Patna|25.616667|85.150000
+India|Port Blair|11.666667|92.766667
+India|Pune|18.516667|73.850000
+India|Shillong|25.566667|91.883333
+India|Shimla|31.100000|77.166667
+India|Siliguri|26.716667|88.433333
+India|Srinagar|34.083333|74.783333
+India|Surat, Gujarat|21.166667|72.833333
+India|Tezpur|26.633333|92.800000
+India|Trivandrum|8.483333|76.950000
+India|Visakhapatnam|17.683333|83.216667
+Indonesia|Ambon, Maluku|-3.700000|128.166667
+Indonesia|Balikpapan|-1.266667|116.833333
+Indonesia|Banda Aceh|5.550000|95.316667
+Indonesia|Bandung|-6.916667|107.616667
+Indonesia|Bogor|-6.600000|106.800000
+Indonesia|Denpasar|-8.650000|115.216667
+Indonesia|Jakarta|-6.200000|106.800000
+Indonesia|Jayapura|-2.533333|140.716667
+Indonesia|Makassar|-5.133333|119.416667
+Indonesia|Malang|-7.983333|112.616667
+Indonesia|Medan|3.583333|98.666667
+Indonesia|Padang, Indonesia|-0.950000|100.350000
+Indonesia|Palembang|-2.983333|104.750000
+Indonesia|Pekanbaru|0.533333|101.450000
+Indonesia|Pontianak, Indonesia|0.000000|109.333333
+Indonesia|Semarang|-6.966667|110.416667
+Indonesia|Surabaya|-7.266667|112.750000
+Indonesia|Yogyakarta (city)|-7.800000|110.366667
+Iran|Isfahan (city)|32.633333|51.650000
+Iran|Mashhad|36.300000|59.600000
+Iran|Tabriz|38.066667|46.300000
+Iran|Tehran|35.700000|51.416667
+Iraq|Arbil|36.183333|44.016667
+Iraq|Baghdad|33.333333|44.433333
+Iraq|Basra|30.500000|47.816667
+Iraq|Kirkuk|35.466667|44.316667
+Iraq|Mosul|36.333333|43.133333
+Ireland|Cork (city)|51.900000|-8.466667
+Ireland|Dublin|53.350000|-6.266667
+Israel|Eilat|29.550000|34.950000
+Israel|Jerusalem|31.783333|35.216667
+Israel|Tel Aviv|32.066667|34.783333
+Italy|Bologna|44.500000|11.350000
+Italy|Cagliari|39.250000|9.050000
+Italy|Catania|37.500000|15.083333
+Italy|Florence|43.783333|11.250000
+Italy|Messina|38.183333|15.550000
+Italy|Milan|45.466667|9.183333
+Italy|Naples|40.850000|14.266667
+Italy|Palermo|38.116667|13.366667
+Italy|Rome|41.900000|12.500000
+Italy|Turin|45.066667|7.700000
+Italy|Vatican City|41.900000|12.450000
+Italy|Venice|45.433333|12.333333
+Jamaica|Kingston, Jamaica|17.983333|-76.800000
+Japan|Fukuoka|33.583333|130.400000
+Japan|Hiroshima|34.383333|132.450000
+Japan|Kagoshima|31.600000|130.550000
+Japan|Kawasaki, Kanagawa|35.516667|139.700000
+Japan|Kobe|34.683333|135.200000
+Japan|Kyoto|35.016667|135.766667
+Japan|Nagoya|35.183333|136.900000
+Japan|Okinawa, Okinawa|26.333333|127.800000
+Japan|Osaka|34.700000|135.500000
+Japan|Sapporo|43.066667|141.350000
+Japan|Sendai|38.266667|140.866667
+Japan|Tokyo|35.683333|139.700000
+Japan|Yokohama|35.450000|139.633333
+Jordan|Amman|31.933333|35.933333
+Kazakhstan|Almaty|43.283333|76.900000
+Kazakhstan|Astana|51.166667|71.433333
+Kenya|Mombasa|-4.050000|39.666667
+Kenya|Nairobi|-1.283333|36.816667
+Kiribati|South Tarawa|1.433333|173.000000
+Korea|Busan|35.183333|129.083333
+Korea|Daegu|35.866667|128.600000
+Korea|Incheon|37.483333|126.633333
+Korea|Seoul|37.566667|126.983333
+Kuwait|Kuwait City|29.366667|47.983333
+Kyrgyzstan|Bishkek|42.866667|74.616667
+Lao Peoples Republic|Vientiane|17.966667|102.600000
+Latvia|Riga|56.950000|24.100000
+Lebanon|Beirut|33.883333|35.516667
+Lesotho|Maseru|-29.316667|27.483333
+Liberia|Monrovia|6.316667|-10.800000
+Libyan Arab Jamahiriya|Benghazi|32.116667|20.066667
+Libyan Arab Jamahiriya|Sabha, Libya|27.033333|14.433333
+Libyan Arab Jamahiriya|Tripoli|32.900000|13.183333
+Liechtenstein|Vaduz|47.133333|9.516667
+Lithuania|Vilnius|54.683333|25.283333
+Luxembourg|Luxembourg (city)|49.616667|6.116667
+Macedonia|Skopje|42.000000|21.433333
+Madagascar|Antananarivo|-18.933333|47.516667
+Malawi|Blantyre|-15.783333|35.000000
+Malawi|Lilongwe|-13.983333|33.783333
+Malaysia|Alor Star|6.116667|100.366667
+Malaysia|George Town, Penang|5.416667|100.316667
+Malaysia|Ipoh, Malaysia|4.600000|101.066667
+Malaysia|Johor Bahru|1.483333|103.733333
+Malaysia|Kota Bharu|6.133333|102.250000
+Malaysia|Kota Kinabalu|5.966667|116.100000
+Malaysia|Kuala Lumpur|3.150000|101.700000
+Malaysia|Kuching|1.566667|110.350000
+Malaysia|Malacca Town|2.200000|102.250000
+Malaysia|Miri|4.400000|114.000000
+Maldives|Malé|4.183333|73.516667
+Mali|Bamako|12.650000|-8.000000
+Mali|Koulikoro|12.866667|-7.566667
+Mali|Timbuktu|16.783333|-3.016667
+Malta|Birkirkara|35.900000|14.466667
+Malta|Valletta|35.900000|14.516667
+Marshall Islands|Majuro|7.066667|171.266667
+Mauritania|Nouakchott|18.100000|-15.950000
+Mauritius|Port Louis|-20.166667|57.500000
+Mexico|Acapulco|16.866667|-99.883333
+Mexico|Aguascalientes, Aguascalientes|21.883333|-102.300000
+Mexico|Cabo San Lucas|22.883333|-109.916667
+Mexico|Cancún|21.166667|-86.850000
+Mexico|Chihuahua, Chihuahua|28.633333|-106.083333
+Mexico|Ciudad Juárez|31.733333|-106.483333
+Mexico|Culiacán|24.800000|-107.383333
+Mexico|Durango, Durango|24.016667|-104.666667
+Mexico|Ensenada, Baja California|31.850000|-116.600000
+Mexico|flagicon|Mexican Federal District|19.433333|-99.133333
+Mexico|Guadalajara, Jalisco|20.666667|-103.350000
+Mexico|Hermosillo, Sonora|29.100000|-110.950000
+Mexico|León, Guanajuato|21.116667|-101.683333
+Mexico|Mérida, Yucatán|20.966667|-89.616667
+Mexico|Mexicali|32.666667|-115.466667
+Mexico|Monterrey|25.666667|-100.300000
+Mexico|Puebla, Puebla|19.050000|-98.216667
+Mexico|Puerto Vallarta|20.666667|-105.266667
+Mexico|San Luis Potosí, San Luis Potosí|22.150000|-100.850000
+Mexico|Santiago de Querétaro|20.583333|-100.400000
+Mexico|Tampico|22.250000|-97.866667
+Mexico|Tapachula|14.900000|-92.266667
+Mexico|Tijuana|32.533333|-117.033333
+Mexico|Torreón|25.533333|-103.450000
+Mexico|Veracruz, Veracruz|19.183333|-96.150000
+Mexico|Zapopan, Jalisco|20.716667|-103.400000
+Monaco|Monaco|43.733333|7.416667
+Mongolia|Ulan Bator|47.916667|106.916667
+Montenegro|Podgorica|42.433333|19.266667
+Morocco|Casablanca|33.533333|-7.583333
+Morocco|El Aaiún|27.150000|-13.200000
+Morocco|Marrakech|31.633333|-8.016667
+Morocco|Rabat|34.033333|-6.833333
+Mozambique|Maputo|-25.966667|32.583333
+Myanmar|Naypyidaw|19.750000|96.100000
+Myanmar|Yangon|16.800000|96.150000
+Namibia|Windhoek|-22.566667|17.083333
+Nauru|Yaren District|-0.550000|166.916667
+Nepal|Kathmandu|27.700000|85.333333
+Netherlands|Amsterdam|52.366667|4.900000
+Netherlands|Enschede|52.216667|6.900000
+Netherlands|Groningen (city)|53.216667|6.550000
+Netherlands|Haarlem|52.383333|4.633333
+Netherlands|Leiden|52.166667|4.483333
+Netherlands|Maastricht|50.850000|5.683333
+Netherlands|Oranjestad, Aruba|12.516667|-70.033333
+Netherlands|Rotterdam|51.933333|4.483333
+Netherlands|The Hague|52.083333|4.316667
+Netherlands|Utrecht (city)|52.100000|5.116667
+Netherlands|Willemstad|12.116667|-68.933333
+New Zealand|Alofi|-19.050000|-169.916667
+New Zealand|Auckland|-36.833333|174.733333
+New Zealand|Avarua|-21.200000|-159.766667
+New Zealand|Christchurch|-43.533333|172.616667
+New Zealand|Dunedin|-45.866667|170.500000
+New Zealand|Hamilton, New Zealand|-37.783333|175.283333
+New Zealand|Hastings, New Zealand|-39.650000|176.833333
+New Zealand|Invercargill|-46.416667|168.350000
+New Zealand|Nelson, New Zealand|-41.266667|173.283333
+New Zealand|Wellington|-41.283333|174.783333
+Nicaragua|Chinandega|12.616667|-87.150000
+Nicaragua|Managua|12.133333|-86.250000
+Nigeria|Abuja|9.066667|7.483333
+Nigeria|Benin City|6.316667|5.600000
+Nigeria|Enugu|6.450000|7.516667
+Nigeria|Ibadan|7.400000|3.916667
+Nigeria|Kano|12.000000|8.516667
+Nigeria|Lagos|6.450000|3.400000
+Nigeria|Port Harcourt|4.750000|7.000000
+Niger|Niamey|13.516667|2.100000
+North Korea|Chongjin|41.800000|129.783333
+North Korea|Kaesong|37.966667|126.550000
+North Korea|Pyongyang|39.016667|125.733333
+North Korea|Wonsan|39.150000|127.450000
+Norway|Bergen|60.383333|5.333333
+Norway|Bodø|67.300000|14.550000
+Norway|Hammerfest (town)|70.666667|23.683333
+Norway|Honningsvåg|70.983333|25.983333
+Norway|Kristiansand|58.166667|8.000000
+Norway|Lillehammer|61.133333|10.433333
+Norway|Longyearbyen|78.216667|15.650000
+Norway|Narvik|68.416667|17.566667
+Norway|Ny-Ålesund|78.916667|11.933333
+Norway|Oslo|59.950000|10.750000
+Norway|Sarpsborg|59.283333|11.200000
+Norway|Stjordal|63.483333|11.166667
+Norway|Tromsø|69.683333|18.950000
+Norway|Trondheim|63.433333|10.400000
+Norway|Vadsø (town)|70.083333|29.733333
+Oman|Muscat, Oman|23.616667|58.600000
+Oman|Salalah|17.016667|54.083333
+Pakistan|Faisalabad|31.416667|73.083333
+Pakistan|Hyderabad, Sindh|25.383333|68.366667
+Pakistan|Islamabad|33.716667|73.066667
+Pakistan|Karachi|24.866667|67.016667
+Pakistan|Lahore|31.550000|74.350000
+Pakistan|Multan|30.200000|71.466667
+Pakistan|Peshawar|34.016667|71.583333
+Pakistan|Rawalpindi|33.600000|73.033333
+Palau|Koror|7.366667|134.483333
+Palau|Melekeok|7.483333|134.600000
+Palestine|Gaza|31.516667|34.450000
+Panama|Panama City|8.983333|-79.516667
+Papua New Guinea|Port Moresby|-9.516667|147.216667
+Paraguay|Asunción|-25.283333|-57.633333
+Paraguay|Ciudad del Este|-25.516667|-54.616667
+Peoples Republic Of China|Changchun|43.900000|125.200000
+Peoples Republic Of China|Chengdu|30.666667|104.066667
+Peoples Republic Of China|Chongqing|29.566667|106.566667
+Peoples Republic Of China|Dalian|38.916667|121.633333
+Peoples Republic Of China|Dongguan|23.033333|113.716667
+Peoples Republic Of China|Guangzhou|23.133333|113.266667
+Peoples Republic Of China|Handan|36.600000|114.483333
+Peoples Republic Of China|Hangzhou|30.250000|120.166667
+Peoples Republic Of China|Harbin|45.750000|126.633333
+Peoples Republic Of China|HKG|22.283333|114.166667
+Peoples Republic Of China|Jinan|36.666667|116.983333
+Peoples Republic Of China|Kunming|25.066667|102.683333
+Peoples Republic Of China|Lanzhou|36.033333|103.800000
+Peoples Republic Of China|Lhasa|29.650000|91.100000
+Peoples Republic Of China|MAC|22.166667|113.550000
+Peoples Republic Of China|Nanjing|32.050000|118.766667
+Peoples Republic Of China|Nanning|22.816667|108.316667
+Peoples Republic Of China|Qingdao|36.066667|120.383333
+Peoples Republic Of China|Shanghai|31.200000|121.500000
+Peoples Republic Of China|Shenyang|41.816667|123.416667
+Peoples Republic Of China|Shenzhen|22.550000|114.100000
+Peoples Republic Of China|Shigatse|29.266667|88.883333
+Peoples Republic Of China|Shijiazhuang|38.050000|114.500000
+Peoples Republic Of China|Taiyuan|37.866667|112.566667
+Peoples Republic Of China|Tianjin|39.133333|117.183333
+Peoples Republic Of China|Ürümqi|43.833333|87.600000
+Peoples Republic Of China|Wuhan|30.583333|114.283333
+Peoples Republic Of China|XiMan|34.266667|108.900000
+Peoples Republic Of China|Xining|36.633333|101.766667
+Peoples Republic Of China|Zhengzhou|34.766667|113.650000
+Peru|Arequipa|-16.400000|-71.533333
+Peru|Ayacucho|-13.166667|-74.216667
+Peru|Cusco|-13.533333|-71.966667
+Peru|Iquitos|-3.733333|-73.250000
+Peru|Lima|-12.050000|-77.033333
+Peru|Trujillo, Peru|-8.116667|-79.033333
+Philippines|Cebu City|10.283333|123.900000
+Philippines|Davao City|7.066667|125.600000
+Philippines|Iloilo City|10.716667|122.566667
+Philippines|Makati|14.550000|121.033333
+Philippines|Manila|14.583333|120.966667
+Philippines|Quezon City|14.633333|121.033333
+Philippines|Tagbilaran|9.650000|123.850000
+Philippines|Zamboanga City|6.900000|122.066667
+Poland|Gdańsk|54.366667|18.633333
+Poland|Gdynia|54.500000|18.550000
+Poland|Kraków|50.066667|19.933333
+Poland|Poznań|52.400000|16.916667
+Poland|Warsaw|52.233333|21.016667
+Portugal|Angra do Heroísmo|38.483333|-27.216667
+Portugal|Flores Island (Azores)|39.466667|-31.233333
+Portugal|Horta (Azores)|38.583333|-28.716667
+Portugal|Lisbon|38.716667|-9.133333
+Portugal|Ponta Delgada, São Miguel Island|37.816667|-25.750000
+Portugal|Porto|41.166667|-8.616667
+Qatar|Doha|25.283333|51.533333
+Republic Of Moldova|Chişinău|47.000000|28.916667
+Republic Of Moldova|Tiraspol|46.850000|29.633333
+Republic Of The Congo|Brazzaville|-4.266667|15.300000
+Republic Of The Congo|Kinshasa|-4.333333|15.316667
+Republic Of The Congo|Lubumbashi|-11.666667|27.466667
+Romania|Bucharest|44.433333|26.100000
+Romania|Cluj-Napoca|46.766667|23.583333
+Romania|Craiova|44.333333|23.816667
+Russian Federation|Anadyr (town)|64.733333|177.516667
+Russian Federation|Arkhangelsk|64.533333|40.533333
+Russian Federation|Bratsk|56.116667|101.600000
+Russian Federation|Chelyabinsk|55.150000|61.383333
+Russian Federation|Dikson|73.500000|80.516667
+Russian Federation|Irkutsk|52.316667|104.300000
+Russian Federation|Izhevsk|56.833333|53.183333
+Russian Federation|Kaliningrad|54.716667|20.516667
+Russian Federation|Kazan|55.783333|49.133333
+Russian Federation|Krasnodar|45.033333|38.966667
+Russian Federation|Krasnoyarsk|56.016667|93.066667
+Russian Federation|Magadan|59.566667|150.800000
+Russian Federation|Moscow|55.750000|37.616667
+Russian Federation|Murmansk|68.966667|33.083333
+Russian Federation|Nizhny Novgorod|56.333333|44.000000
+Russian Federation|Norilsk|69.333333|88.216667
+Russian Federation|Novosibirsk|55.016667|82.933333
+Russian Federation|Omsk|54.983333|73.366667
+Russian Federation|Perm|58.000000|56.316667
+Russian Federation|Petropavlovsk-Kamchatsky|53.016667|158.650000
+Russian Federation|Rostov-on-Don|47.233333|39.700000
+Russian Federation|Saint Petersburg|59.950000|30.300000
+Russian Federation|Samara, Russia|53.200000|50.133333
+Russian Federation|Saratov|51.533333|46.016667
+Russian Federation|Sochi|43.583333|39.716667
+Russian Federation|Tiksi|71.650000|128.866667
+Russian Federation|Tolyatti|53.516667|49.416667
+Russian Federation|Ufa|54.750000|55.966667
+Russian Federation|Verkhoyansk|67.550000|133.383333
+Russian Federation|Vladivostok|43.133333|131.900000
+Russian Federation|Volgograd|48.700000|44.516667
+Russian Federation|Voronezh|51.666667|39.216667
+Russian Federation|Yakutsk|62.033333|129.733333
+Russian Federation|Yaroslavl|57.616667|39.850000
+Russian Federation|Yekaterinburg|56.833333|60.583333
+Rwanda|Kigali|-1.950000|30.066667
+Saint Kitts And Nevis|Basseterre|17.300000|-62.733333
+Saint Lucia|Castries|14.016667|-60.983333
+Samoa|Apia|-13.833333|-171.750000
+San Marino|San Marino, San Marino|43.933333|12.450000
+São Tomé And Príncipe|São Tomé|0.333333|6.683333
+Saudi Arabia|Dammam|26.283333|50.200000
+Saudi Arabia|Jeddah|21.550000|39.166667
+Saudi Arabia|Mecca|21.416667|39.816667
+Saudi Arabia|Medina|24.466667|39.600000
+Saudi Arabia|Riyadh|24.633333|46.716667
+Senegal|Dakar|14.700000|-17.450000
+Senegal|Thiès|14.783333|-16.916667
+Serbia|Belgrade|44.816667|20.466667
+Serbia|Pristina|42.666667|21.166667
+Seychelles|Victoria, Seychelles|-4.616667|55.450000
+Sierra Leone|Freetown|8.483333|-13.233333
+Singapore|Singapore|1.283333|103.833333
+Slovakia|Bratislava|48.150000|17.116667
+Slovenia|Ljubljana|46.050000|14.516667
+Solomon Islands|Honiara|-9.466667|159.816667
+Somalia|Hargeisa|9.550000|44.066667
+Somalia|Kismayo|-0.350000|42.550000
+Somalia|Mogadishu|2.033333|45.350000
+South Africa|Bhisho|-32.850000|27.433333
+South Africa|Bloemfontein|-29.116667|26.216667
+South Africa|Cape Town|-33.933333|18.416667
+South Africa|Durban|-29.883333|31.050000
+South Africa|Johannesburg|-26.200000|28.050000
+South Africa|Kimberley, Northern Cape|-28.750000|24.766667
+South Africa|Mafikeng|-25.850000|25.633333
+South Africa|Nelspruit|-25.466667|30.983333
+South Africa|Pietermaritzburg|-29.616667|30.383333
+South Africa|Polokwane|-23.900000|29.450000
+South Africa|Port Elizabeth|-33.950000|25.600000
+South Africa|Pretoria|-25.750000|28.183333
+South Sudan|Juba|4.850000|31.600000
+Spain|Barcelona|41.383333|2.183333
+Spain|Bilbao|43.250000|-2.916667
+Spain|Gijón|43.033333|-5.700000
+Spain|Ibiza|38.983333|1.433333
+Spain|Las Palmas de Gran Canaria|28.150000|-15.416667
+Spain|Madrid|40.400000|-3.683333
+Spain|Málaga|36.716667|-4.416667
+Spain|Palma, Majorca|39.566667|2.650000
+Spain|San Sebastián|43.316667|-2.000000
+Spain|Santa Cruz de Tenerife|28.466667|-16.250000
+Spain|Seville|37.383333|-5.983333
+Spain|Valencia, Spain|39.466667|-0.383333
+Spain|Vitoria-Gasteiz|42.850000|-2.683333
+Spain|Zaragoza|41.650000|-0.883333
+Sri Lanka|Batticaloa|7.716667|81.700000
+Sri Lanka|Colombo|6.933333|79.850000
+Sri Lanka|Kandy|7.300000|80.633333
+Sri Lanka|Sri Jayawardenapura-Kotte|6.916667|79.883333
+St Vincent And The Grenadines|Kingstown|13.150000|-61.233333
+Sudan|Khartoum|15.633333|32.533333
+Sudan|Omdurman|15.650000|32.483333
+Suriname|Paramaribo|5.866667|-55.166667
+Swaziland|Lobamba|-26.416667|31.166667
+Swaziland|Manzini, Swaziland|-26.483333|31.366667
+Swaziland|Mbabane|-26.316667|31.133333
+Sweden|Boden, Sweden|65.833333|21.716667
+Sweden|Göteborg|57.700000|11.966667
+Sweden|Haparanda|65.833333|24.133333
+Sweden|Kiruna|67.850000|20.216667
+Sweden|Luleå|65.583333|22.150000
+Sweden|Malmö|55.583333|13.033333
+Sweden|Norrköping|58.600000|16.200000
+Sweden|Örnsköldsvik|63.283333|18.733333
+Sweden|Östersund|63.183333|14.666667
+Sweden|Piteå|65.333333|21.500000
+Sweden|Skellefteå|64.750000|20.950000
+Sweden|Stockholm|59.333333|18.066667
+Sweden|Sundsvall|62.400000|17.316667
+Sweden|Umeå|63.833333|20.266667
+Sweden|Uppsala|59.850000|17.650000
+Switzerland|Basel|47.566667|7.600000
+Switzerland|Bern|46.950000|7.450000
+Switzerland|Geneva|46.200000|6.150000
+Switzerland|Lausanne|46.516667|6.633333
+Switzerland|Zürich|47.366667|8.550000
+Syrian Arab Republic|Damascus|33.516667|36.300000
+Syrian Arab Republic|Latakia|35.516667|35.783333
+Taiwan|Kaohsiung|22.633333|120.266667
+Taiwan|Taichung|24.150000|120.666667
+Taiwan|Tainan|22.983333|120.183333
+Taiwan|Taipei|25.033333|121.633333
+Tajikistan|Dushanbe|38.533333|68.783333
+Tanzania|Dar es Salaam|-6.800000|39.283333
+Tanzania|Dodoma|-6.166667|35.750000
+Tanzania|Mwanza|-2.516667|32.900000
+Tanzania|Zanzibar City|-6.166667|39.200000
+Thailand|Ayutthaya (city)|14.350000|100.566667
+Thailand|Bangkok|13.750000|100.466667
+Thailand|Chiang Mai|18.800000|99.000000
+Thailand|Chiang Rai|19.916667|99.833333
+Thailand|Hat Yai|7.016667|100.466667
+Thailand|Khon Kaen|16.433333|102.833333
+Thailand|Nakhon Ratchasima|14.983333|102.100000
+Thailand|Pattaya|12.933333|100.883333
+Thailand|Phuket (city)|7.883333|98.400000
+Thailand|Surat Thani|9.133333|99.333333
+Thailand|Udon Thani|17.416667|102.750000
+Timor Leste|Dili|-8.550000|125.583333
+Togo|Lomé|6.133333|1.216667
+Tonga|Nukuʻalofa|-21.133333|-175.200000
+Trinidad And Tobago|Chaguanas|10.500000|-61.383333
+Trinidad And Tobago|Port of Spain|10.666667|-61.516667
+Trinidad And Tobago|San Fernando, Trinidad and Tobago|10.283333|-61.466667
+Tunisia|Sfax|34.733333|10.766667
+Tunisia|Tunis|36.800000|10.183333
+Turkey|Adana|37.000000|35.316667
+Turkey|Bursa, Turkey|40.183333|29.050000
+Turkey|Eskisehir|39.783333|30.516667
+Turkey|Gaziantep|37.066667|37.383333
+Turkey|Istanbul|41.016667|28.950000
+Turkey|İzmir|38.433333|27.150000
+Turkey|Konya|37.866667|32.483333
+Turkey|Mersin|36.800000|34.633333
+Turkmenistan|Ashgabat|37.933333|58.366667
+Tuvalu|Funafuti|-8.516667|179.216667
+Tuvalu|Nukulaelae|-9.383333|179.850000
+Uganda|Entebbe|0.050000|32.466667
+Uganda|Kampala|0.316667|32.583333
+Ukraine|Donetsk|48.000000|37.800000
+Ukraine|Kharkiv|50.000000|36.233333
+Ukraine|Kiev|50.450000|30.516667
+Ukraine|Lviv|49.850000|24.016667
+Ukraine|Odessa|46.466667|30.733333
+Ukraine|Simferopol|44.950000|34.100000
+United Arab Emirates|Abu Dhabi|24.466667|54.366667
+United Arab Emirates|Dubai|25.250000|55.300000
+Uruguay|Montevideo|-34.883333|-56.183333
+Uzbekistan|Namangan|41.000000|71.666667
+Uzbekistan|Nukus|42.466667|59.600000
+Uzbekistan|Tashkent|41.266667|69.216667
+Vanuatu|Port Vila|-17.750000|168.300000
+Venezuela|Caracas|10.500000|-66.916667
+Venezuela|Ciudad Bolívar|8.116667|-63.550000
+Venezuela|Maracaibo|10.650000|-71.633333
+Venezuela|Maracay|10.250000|-67.600000
+Venezuela|Puerto Ayacucho|5.666667|-67.633333
+Vietnam|Da Nang|16.066667|108.233333
+Vietnam|Hai Phong|20.850000|106.683333
+Vietnam|Hanoi|21.033333|105.850000
+Vietnam|Ho Chi Minh City|10.766667|106.683333
+Vietnam|Huế|16.466667|107.583333
+Yemen|SanaMa|15.350000|44.200000
+Zambia|Livingstone, Zambia|-17.850000|25.866667
+Zambia|Lusaka|-15.416667|28.283333
+Zambia|Ndola|-12.966667|28.633333
+Zimbabwe|Bulawayo|-20.166667|28.583333
+Zimbabwe|Harare|-17.866667|31.033333
