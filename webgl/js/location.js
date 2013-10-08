@@ -65,7 +65,7 @@ Country.prototype.loadList = function() {
 		var c = this.list[idx];
 		var select = (c.select)?" select":"";
 		cityhtml += '<div id="p'+idx+
-			'" class="listitem'+select+'"><div class="ccolor"></div>'+c.name+'</div>';
+			'" class="listitem'+select+'"><div class="pcolor"></div>'+c.name+'</div>';
 	}
 	list2.innerHTML = cityhtml;
 	homebase.city_elem = list2.getElementsByClassName('listitem select')[0];

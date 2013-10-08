@@ -164,7 +164,7 @@ body {
 	background-color: #307f9a;
 }
 
-.listitem .gcolor, .listitem .scolor, .listitem .ccolor {
+.listitem .gcolor, .listitem .scolor, .listitem .ccolor, .listitem .pcolor {
 	position: relative;
 	float: left;
 	height: 30px;
@@ -177,13 +177,12 @@ body {
 	background-repeat: no-repeat;
 }
 
-.listitem .scolor, .listitem .ccolor {
+.listitem .scolor, .listitem .ccolor, .listitem .pcolor {
 	pointer-events: none;
 }
 
-.listitem .ccolor {
-	background-image: url(../images/flag.png);
-}
+.listitem .ccolor {background-image: url(../images/flag.png);}
+.listitem .pcolor {background-image: url(../images/city.png);}
 
 .text {
 	position: relative;

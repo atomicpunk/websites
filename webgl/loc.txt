@@ -1,33 +1,33 @@
 United States Of America|Adak, Alaska|51.883333|-176.650000
 United States Of America|Albuquerque, New Mexico|35.116667|-106.616667
 United States Of America|Anchorage, Alaska|61.216667|-149.900000
-United States Of America|Atlanta|33.750000|-84.383333
+United States Of America|Atlanta, Georga|33.750000|-84.383333
 United States Of America|Augusta, Maine|44.316667|-69.783333
 United States Of America|Austin, Texas|30.250000|-97.750000
-United States Of America|Baltimore|39.283333|-76.616667
+United States Of America|Baltimore, Maryland|39.283333|-76.616667
 United States Of America|Barrow, Alaska|71.300000|-156.766667
 United States Of America|Birmingham, Alabama|33.650000|-86.816667
 United States Of America|Bismarck, North Dakota|46.816667|-100.783333
 United States Of America|Boise, Idaho|43.616667|-116.200000
-United States Of America|Boston|42.350000|-71.066667
+United States Of America|Boston, Massachusettes|42.350000|-71.066667
 United States Of America|Boulder, Colorado|40.016667|-105.283333
 United States Of America|Buffalo, New York|42.900000|-78.850000
 United States Of America|Charleston, South Carolina|33.300000|-80.550000
 United States Of America|Charleston, West Virginia|38.350000|-81.633333
-United States Of America|Charlotte Amalie, United States Virgin Islands|18.350000|-64.950000
+United States Of America|Charlotte Amalie, Virgin Islands|18.350000|-64.950000
 United States Of America|Charlotte, North Carolina|35.233333|-80.850000
 United States Of America|Cheyenne, Wyoming|41.150000|-104.800000
-United States Of America|Chicago|41.883333|-87.633333
-United States Of America|Cincinnati|39.100000|-84.516667
-United States Of America|Cleveland|41.483333|-81.666667
+United States Of America|Chicago, Illinois|41.883333|-87.633333
+United States Of America|Cincinnati, Ohio|39.100000|-84.516667
+United States Of America|Cleveland, Ohio|41.483333|-81.666667
 United States Of America|Columbia, South Carolina|34.000000|-81.050000
 United States Of America|Concord, New Hampshire|43.200000|-71.533333
-United States Of America|Dallas|32.783333|-96.800000
+United States Of America|Dallas, Texas|32.783333|-96.800000
 United States Of America|Deadhorse, Alaska|70.200000|-148.516667
 United States Of America|Dededo, Guam|13.516667|144.833333
-United States Of America|Denver|39.733333|-104.983333
+United States Of America|Denver, Colorado|39.733333|-104.983333
 United States Of America|Des Moines, Iowa|41.583333|-93.616667
-United States Of America|Detroit|42.333333|-83.050000
+United States Of America|Detroit, Michigan|42.333333|-83.050000
 United States Of America|Dover, Delaware|39.166667|-75.533333
 United States Of America|El Paso, Texas|31.783333|-106.416667
 United States Of America|Fairbanks, Alaska|64.850000|-147.716667
@@ -37,60 +37,61 @@ United States Of America|Hartford, Connecticut|41.766667|-72.666667
 United States Of America|Helena, Montana|46.600000|-112.033333
 United States Of America|Hillsboro, Oregon|45.518259|-122.902044
 United States Of America|Hilo, Hawaii|19.700000|-155.083333
-United States Of America|Honolulu|21.316667|-157.833333
-United States Of America|Houston|29.766667|-95.383333
-United States Of America|Indianapolis|39.766667|-86.150000
+United States Of America|Honolulu, Hawaii|21.316667|-157.833333
+United States Of America|Houston, Texas|29.766667|-95.383333
+United States Of America|Indianapolis, Indiana|39.766667|-86.150000
 United States Of America|Jackson, Mississippi|32.300000|-90.183333
 United States Of America|Jacksonville, Florida|30.333333|-81.666667
 United States Of America|Jersey City, New Jersey|40.716667|-74.066667
-United States Of America|Juneau|58.300000|-134.416667
+United States Of America|Juneau, Alaska|58.300000|-134.416667
 United States Of America|Kansas City, Missouri|39.100000|-94.583333
 United States Of America|Key West, Florida|24.566667|-81.783333
 United States Of America|Knoxville, Tennessee|35.966667|-83.950000
 United States Of America|Las Vegas, Nevada|36.183333|-115.133333
 United States Of America|Lincoln, Nebraska|40.816667|-96.683333
 United States Of America|Little Rock, Arkansas|34.733333|-92.333333
-United States Of America|Los Angeles|34.050000|-118.250000
+United States Of America|Los Angeles, California|34.050000|-118.250000
 United States Of America|Louisville, Kentucky|38.250000|-85.766667
 United States Of America|Memphis, Tennessee|35.116667|-89.966667
-United States Of America|Miami|25.783333|-80.216667
-United States Of America|Milwaukee|43.050000|-87.950000
-United States Of America|Minneapolis|44.983333|-93.266667
+United States Of America|Miami, Florida|25.783333|-80.216667
+United States Of America|Milwaukee, Wisconsin|43.050000|-87.950000
+United States Of America|Minneapolis, Minnesota|44.983333|-93.266667
 United States Of America|Mobile, Alabama|30.700000|-88.050000
 United States Of America|Montpelier, Vermont|44.250000|-72.566667
 United States Of America|Nashville, Tennessee|36.166667|-86.783333
-United States Of America|New Orleans|29.966667|-90.050000
-United States Of America|New York City|40.666667|-73.933333
-United States Of America|Oklahoma City|35.483333|-97.533333
+United States Of America|New Orleans, Louisiana|29.966667|-90.050000
+United States Of America|New York, New York|40.666667|-73.933333
+United States Of America|Oklahoma City, Oklahoma|35.483333|-97.533333
 United States Of America|Orlando, Florida|28.416667|-81.300000
-United States Of America|Pago Pago|-14.283333|-170.700000
-United States Of America|Philadelphia|40.950000|-75.166667
+United States Of America|Pago Pago, American Samoa|-14.283333|-170.700000
+United States Of America|Philadelphia, Pennsylvania|40.950000|-75.166667
 United States Of America|Phoenix, Arizona|33.450000|-112.066667
 United States Of America|Pierre, South Dakota|44.366667|-100.333333
-United States Of America|Pittsburgh|40.450000|-80.000000
+United States Of America|Pittsburgh, Pennsylvania|40.450000|-80.000000
 United States Of America|Portland, Oregon|45.516667|-122.683333
 United States Of America|Providence, Rhode Island|41.816667|-71.416667
 United States Of America|Raleigh, North Carolina|35.816667|-78.650000
 United States Of America|Reno, Nevada|39.533333|-119.816667
 United States Of America|Riverside, California|33.950000|-117.400000
-United States Of America|Rochester, NY|43.166667|-77.616667
+United States Of America|Rochester, New York|43.166667|-77.616667
 United States Of America|Sacramento, California|38.550000|-121.466667
-United States Of America|Saipan|15.183333|145.750000
-United States Of America|Salt Lake City|40.750000|-111.883333
-United States Of America|San Antonio|29.416667|-98.500000
-United States Of America|San Diego|32.716667|-117.166667
-United States Of America|San Francisco|37.783333|-122.416667
+United States Of America|Saipan, Mariana Islands|15.183333|145.750000
+United States Of America|Salt Lake City, Utah|40.750000|-111.883333
+United States Of America|San Antonio, Texas|29.416667|-98.500000
+United States Of America|San Diego, California|32.716667|-117.166667
+United States Of America|San Francisco, California|37.783333|-122.416667
 United States Of America|San Juan, Puerto Rico|18.450000|-66.066667
 United States Of America|Santa Barbara, California|34.433333|-119.716667
-United States Of America|Seattle|47.616667|-122.333333
-United States Of America|Sitka|57.050000|-135.333333
+United States Of America|Seattle, Washington|47.616667|-122.333333
+United States Of America|Sioux Falls, South Dakota|43.500667|-96.741427
+United States Of America|Sitka, Alaska|57.050000|-135.333333
 United States Of America|Springfield, Missouri|37.200000|-93.283333
 United States Of America|St. Louis, Missouri|38.633333|-90.200000
 United States Of America|Tampa, Florida|27.950000|-82.466667
 United States Of America|Trenton, New Jersey|40.216667|-74.766667
 United States Of America|Tucson, Arizona|32.216667|-110.933333
 United States Of America|Tulsa, Oklahoma|36.133333|-95.933333
-United States Of America|Virginia Beach|36.850000|-75.983333
+United States Of America|Virginia Beach, Virginia|36.850000|-75.983333
 United States Of America|Washington, D.C.|38.900000|-77.033333
 United States Of America|Wichita, Kansas|37.683333|-97.333333
 United States Of America|Wilmington, North Carolina|34.216667|-77.916667
@@ -171,6 +172,8 @@ Great Britain|Hamilton, Bermuda|32.300000|-64.783333
 Great Britain|Jamestown, Saint Helena|-15.916667|-5.716667
 Great Britain|Road Town|18.433333|-64.616667
 Great Britain|The Valley, Anguilla|18.216667|-63.050000
+North/South Poles|North Pole|90.0|0.0
+North/South Poles|South Pole|-90.0|0.0
 Afghanistan|Kabul|34.533333|69.166667
 Afghanistan|Kandahar|31.616667|65.716667
 Albania|Tirana|41.333333|19.816667
@@ -178,7 +181,7 @@ Algeria|Algiers|36.766667|3.216667
 Andorra|Andorra la Vella|42.500000|1.500000
 Angola|Huambo|-12.766667|15.733333
 Angola|Luanda|-8.833333|13.233333
-Antigua|St. JohnMs, Antigua and Barbuda|17.116667|-61.850000
+Antigua|St. John, Barbuda|17.116667|-61.850000
 Argentina|Bahía Blanca|-38.716667|-62.266667
 Argentina|Buenos Aires|-34.600000|-58.383333
 Argentina|Comodoro Rivadavia|-45.866667|-67.483333
@@ -204,8 +207,8 @@ Australia|Kingston, Norfolk Island|-29.066667|167.966667
 Australia|Mandurah|-32.533333|115.716667
 Australia|Melbourne|-37.816667|144.966667
 Australia|Newcastle, New South Wales|-32.916667|151.750000
-Australia|Perth, Western Australia|-31.950000|115.866667
-Australia|Port Hedland, Western Australia|-20.316667|118.600000
+Australia|Perth|-31.950000|115.866667
+Australia|Port Hedland|-20.316667|118.600000
 Australia|Rockhampton|-23.383333|150.516667
 Australia|Sydney|-33.866667|151.216667
 Australia|Townsville|-19.250000|146.816667
@@ -216,7 +219,7 @@ Austria|Linz|48.300000|14.283333
 Austria|Salzburg|47.800000|13.033333
 Austria|Vienna|48.216667|16.366667
 Azerbaijan|Baku|40.400000|49.883333
-Bahamas|Nassau, Bahamas|25.066667|-77.333333
+Bahamas|Nassau|25.066667|-77.333333
 Bahrain|Bandar Seri Begawan|4.883333|114.950000
 Bahrain|Manama|26.216667|50.583333
 Bangladesh|Chittagong|22.366667|91.800000
@@ -301,34 +304,34 @@ Chad|Moundou|8.566667|16.083333
 Chad|NMDjamena|12.116667|15.050000
 Chile|Antofagasta|-23.650000|-70.400000
 Chile|Arica|-18.483333|-70.333333
-Chile|Calama, Chile|-22.466667|-68.933333
+Chile|Calama|-22.466667|-68.933333
 Chile|Coihaique|-45.566667|-72.066667
 Chile|Concepción, Chile|-36.833333|-73.050000
 Chile|Copiapó|-27.366667|-70.333333
 Chile|Hanga Roa|-27.150000|-109.433333
 Chile|Iquique|-20.216667|-70.150000
-Chile|La Serena, Chile|-29.900000|-71.250000
+Chile|La Serena|-29.900000|-71.250000
 Chile|Puerto Aisén|-45.400000|-72.683333
 Chile|Puerto Montt|-41.466667|-72.933333
 Chile|Puerto Toro|-55.083333|-67.083333
 Chile|Puerto Williams|-54.933333|-67.616667
 Chile|Punta Arenas|-53.166667|-70.933333
-Chile|Santiago, Chile|-33.450000|-70.666667
-Chile|Temuco, Chile|-38.750000|-72.666667
-Chile|Valdivia, Chile|-39.816667|-73.250000
+Chile|Santiago|-33.450000|-70.666667
+Chile|Temuco|-38.750000|-72.666667
+Chile|Valdivia|-39.816667|-73.250000
 Chile|Valparaíso|-33.050000|-71.616667
 Colombia|Barranquilla|10.966667|-74.800000
 Colombia|Bogotá|4.600000|-74.083333
-Colombia|Cartagena, Colombia|10.400000|-75.500000
+Colombia|Cartagena|10.400000|-75.500000
 Colombia|Cúcuta|7.900000|-72.500000
 Colombia|Medellín|6.233333|-75.583333
 Colombia|Santiago de Cali|3.416667|-76.516667
-Comoros|Moroni, Comoros|-11.750000|43.200000
+Comoros|Moroni|-11.750000|43.200000
 Costa Rica|Alajuela|10.016667|-84.216667
-Costa Rica|Liberia, Costa Rica|10.633333|-85.433333
+Costa Rica|Liberia|10.633333|-85.433333
 Costa Rica|Limón|9.983333|-83.033333
 Costa Rica|Puntarenas|9.966667|-84.833333
-Costa Rica|San José, Costa Rica|9.933333|-84.083333
+Costa Rica|San José|9.933333|-84.083333
 Cote D Ivoire|Abidjan|5.316667|-4.033333
 Cote D Ivoire|Yamoussoukro|6.816667|-5.283333
 Croatia|Split (city)|43.500000|16.433333
@@ -401,7 +404,7 @@ France|Nouméa|-22.283333|166.450000
 France|Papeete|-17.533333|-149.566667
 France|Paris|48.850000|2.350000
 France|Saint-Denis, Réunion|-20.883333|55.450000
-France|Saint-Pierre, Saint Pierre and Miquelon|46.783333|-56.183333
+France|Saint-Pierre, Miquelon|46.783333|-56.183333
 France|Strasbourg|48.583333|7.750000
 France|Toulouse|43.600000|1.450000
 Gabon|Libreville|0.383333|9.450000
@@ -432,7 +435,7 @@ Greece|Athens|37.966667|23.716667
 Greece|Halkida|38.466667|23.600000
 Greece|Heraklion|35.333333|25.133333
 Greece|Thessaloniki|40.650000|22.900000
-Grenada|St. GeorgeMs, Grenada|12.050000|-61.750000
+Grenada|St. George|12.050000|-61.750000
 Guatemala|Guatemala City|14.616667|-90.533333
 Guatemala|Quetzaltenango|14.833333|-91.516667
 Guinea-Bissau|Bissau|11.850000|-15.566667
@@ -599,7 +602,7 @@ Mexico|Mexicali|32.666667|-115.466667
 Mexico|Monterrey|25.666667|-100.300000
 Mexico|Puebla, Puebla|19.050000|-98.216667
 Mexico|Puerto Vallarta|20.666667|-105.266667
-Mexico|San Luis Potosí, San Luis Potosí|22.150000|-100.850000
+Mexico|San Luis Potosí|22.150000|-100.850000
 Mexico|Santiago de Querétaro|20.583333|-100.400000
 Mexico|Tampico|22.250000|-97.866667
 Mexico|Tapachula|14.900000|-92.266667
@@ -636,10 +639,10 @@ New Zealand|Auckland|-36.833333|174.733333
 New Zealand|Avarua|-21.200000|-159.766667
 New Zealand|Christchurch|-43.533333|172.616667
 New Zealand|Dunedin|-45.866667|170.500000
-New Zealand|Hamilton, New Zealand|-37.783333|175.283333
-New Zealand|Hastings, New Zealand|-39.650000|176.833333
+New Zealand|Hamilton|-37.783333|175.283333
+New Zealand|Hastings|-39.650000|176.833333
 New Zealand|Invercargill|-46.416667|168.350000
-New Zealand|Nelson, New Zealand|-41.266667|173.283333
+New Zealand|Nelson|-41.266667|173.283333
 New Zealand|Wellington|-41.283333|174.783333
 Nicaragua|Chinandega|12.616667|-87.150000
 Nicaragua|Managua|12.133333|-86.250000
@@ -740,7 +743,7 @@ Portugal|Angra do Heroísmo|38.483333|-27.216667
 Portugal|Flores Island (Azores)|39.466667|-31.233333
 Portugal|Horta (Azores)|38.583333|-28.716667
 Portugal|Lisbon|38.716667|-9.133333
-Portugal|Ponta Delgada, São Miguel Island|37.816667|-25.750000
+Portugal|Ponta Delgada, São Miguel|37.816667|-25.750000
 Portugal|Porto|41.166667|-8.616667
 Qatar|Doha|25.283333|51.533333
 Republic Of Moldova|Chişinău|47.000000|28.916667
@@ -895,7 +898,7 @@ Togo|Lomé|6.133333|1.216667
 Tonga|Nukuʻalofa|-21.133333|-175.200000
 Trinidad And Tobago|Chaguanas|10.500000|-61.383333
 Trinidad And Tobago|Port of Spain|10.666667|-61.516667
-Trinidad And Tobago|San Fernando, Trinidad and Tobago|10.283333|-61.466667
+Trinidad And Tobago|San Fernando|10.283333|-61.466667
 Tunisia|Sfax|34.733333|10.766667
 Tunisia|Tunis|36.800000|10.183333
 Turkey|Adana|37.000000|35.316667
