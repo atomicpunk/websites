@@ -9,12 +9,12 @@
 
 var display = {
 	spaceview: true,
-	earth: true,
+	earth: false,
 	moon: true,
 	stars: true,
 	sun: true,
 	sat: true,
-	initmenu: true
+	initmenu: false
 };
 
 var loading = 0;
@@ -158,117 +158,6 @@ function updateMatricesGround(newAlt, newAzi, newZoom, geomodel) {
 	}
 }
 
-function Home() {
-	"use strict";
-
-	var self = this;
-	this.lat = homepos[0];
-	this.lon = homepos[1];
-	this.pos = [0, 0, 0];
-	this.vec = [0, 0, 0];
-
-	this.initVectors = initVectors;
-	function initVectors(geomodel) {
-		if(failure) return;
-
-		self.vecstar = vectorFromLatLon(self.lat, self.lon + geomodel.starazi*180/Math.PI);
-		self.vecmoon = vectorFromLatLon(self.lat, self.lon + geomodel.moonazi*180/Math.PI);
-		self.vecsun = vectorFromLatLon(self.lat, self.lon + geomodel.sunazi*180/Math.PI);
-	}
-
-	this.init = init;
-	function init() {
-		if(failure) return;
-
-		povLatLon(self.lat, self.lon);
-		self.pos = posFromLatLon(self.lat, self.lon);
-		self.vec = vectorFromLatLon(self.lat, self.lon);
-		if(aristotle) initVectors(aristotle);
-
-		if(gl) {
-			var posArray = [self.pos[0], self.pos[1], self.pos[2]];
-			var idxArray = [0];
-
-			self.posBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, self.posBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(posArray), gl.STATIC_DRAW);
-			self.posBuffer.itemSize = 3;
-			self.posBuffer.numItems = posArray.length/3;
-
-			self.idxBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.idxBuffer);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idxArray), gl.STATIC_DRAW);
-			self.idxBuffer.itemSize = 1;
-			self.idxBuffer.numItems = idxArray.length;
-		}
-	}
-
-	this.newpos = newpos;
-	function newpos(p) {
-		if(gl) {
-			self.pos = p;
-			var posArray = [self.pos[0], self.pos[1], self.pos[2]];
-			var idxArray = [0];
-
-			self.posBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, self.posBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(posArray), gl.STATIC_DRAW);
-			self.posBuffer.itemSize = 3;
-			self.posBuffer.numItems = posArray.length/3;
-
-			self.idxBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.idxBuffer);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idxArray), gl.STATIC_DRAW);
-			self.idxBuffer.itemSize = 1;
-			self.idxBuffer.numItems = idxArray.length;
-		}
-	}
-
-	function posFromLatLon(latitude, longitude) {
-		var pos = [];
-		var lat = (90 - latitude)*Math.PI/180;
-		var lon = (180 - longitude)*Math.PI/180;
-		pos[0] = earthsize*Math.cos(lon)*Math.sin(lat);
-		pos[1] = earthsize*Math.cos(lat);
-		pos[2] = earthsize*Math.sin(lon)*Math.sin(lat);
-		return pos;
-	}
-
-	function vectorFromLatLon(latitude, longitude) {
-		var vec = [];
-		var lat = (90 - latitude)*Math.PI/180;
-		var lon = (180 - longitude)*Math.PI/180;
-		vec[0] = Math.cos(lon)*Math.sin(lat);
-		vec[1] = Math.cos(lat);
-		vec[2] = Math.sin(lon)*Math.sin(lat);
-		return vec;
-	}
-
-	function posOpposite(pos) {
-		return [-pos[0], -pos[1], -pos[2]];
-	}
-
-	this.povLatLon = povLatLon;
-	function povLatLon(latitude, longitude) {
-		povAlt = (latitude)*Math.PI/180;
-		povAzi = (90 - longitude)*Math.PI/180;
-	}
-}
-
-Home.prototype.draw = function() {
-	if(loading > 0 || failure) return;
-
-	gl.uniform1i(shader.uselighting, 0);
-	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, earthMatrix);
-	gl.uniform1f(shader.pointSize, 10.0);
-	gl.uniform1i(shader.monochromatic, 1);
-	gl.uniform3f(shader.monoColor, 0.0, 1.0, 0.0);
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
-	gl.vertexAttribPointer(shader.vertexPositionAttribute, this.posBuffer.itemSize, gl.FLOAT, false, 0, 0);
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.idxBuffer);
-	gl.drawElements(gl.POINTS, this.idxBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-}
-
 function GeocentricModel() {
 	"use strict";
 
@@ -356,16 +245,10 @@ function GeocentricModel() {
 }
 
 GeocentricModel.prototype.isNight = function(lat, lon) {
-    var x1 = this.latlon[lat][lon].x, y1 = this.latlon[lat][lon].y, z1 = this.latlon[lat][lon].z;
-    var x2 = this.sunvector[0], y2 = this.sunvector[1], z2 = this.sunvector[2];
-    var dotp = x1*x2 + y1*y2 + z1*z2;
-    var mag1 = Math.sqrt(x1*x1 + y1*y1 + z1*z1);
-    var mag2 = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
-    var a = Math.acos(dotp / (mag1 * mag2));
-
-    if(a < (Math.PI/2))
-        return false;
-    return true;
+	var v = [this.latlon[lat][lon].x, this.latlon[lat][lon].y, this.latlon[lat][lon].z];
+	if(vec3.dot(v, this.sunvector) > 0)
+		return false;
+	return true;
 }
 
 function CosmicBody(idstr, imgfile, radius, lighting) {
@@ -624,6 +507,7 @@ function WebGl() {
 		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		gl.lineWidth(2.0);
 
 		initShaders();
 
@@ -851,30 +735,6 @@ function WebGl() {
 
 	function handleMouseUp(event) {
 		mouseDown = false;
-		if(click) {
-			var x = event.clientX/myWidth*2.0-1.0;
-			var y = 1.0-event.clientY/myHeight*2.0;
-			var z = Math.sqrt(earthsize*earthsize - x*x - y*y);
-			//var out = [x, y, z];
-			//home.newpos(out);
-			//console.log(out);
-			//return;
-
-			var inf = [x, y, z, 1.0];
-			var e = mat4.create();
-			var m = mat4.create();
-			var out = vec3.create();
-
-			mat4.identity(e);
-			//mat4.translate(e, [0, 0, zoomval]);
-			mat4.rotate(e, povAlt, [1, 0, 0]);
-			mat4.rotate(e, povAzi, [0, 1, 0]);
-			//mat4.multiply(earthMatrix, pMatrix, m);
-			mat4.inverse(e, m);
-			mat4.multiplyVec4(m, inf, out);
-			home.newpos(out);
-			console.log(out);
-		}
 	}
 
 	function handleMove(newX, newY) {

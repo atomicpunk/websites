@@ -231,29 +231,47 @@ function Home() {
 		if(aristotle) initVectors(aristotle);
 
 		if(gl) {
-			var posArray = [self.pos[0], self.pos[1], self.pos[2]];
-			var idxArray = [0];
+			/* points at earth center, home city, and above home city */
+			var posArray = [self.pos[0], self.pos[1], self.pos[2],
+							0, 0, 0,
+							self.pos[0]*1.2, self.pos[1]*1.2, self.pos[2]*1.2];
+			var idxArray = [0, 1, 0, 2];
 
-			self.posBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, self.posBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(posArray), gl.STATIC_DRAW);
-			self.posBuffer.itemSize = 3;
-			self.posBuffer.numItems = posArray.length/3;
+			/* draw a lon line over home, represents North-South */
+			var dsize = earthsize * 0.9999;
+			var idx = 3;
+			var phi = (180 - self.lon) * Math.PI / 180;
+			for (var lat = 0; lat <= 360; lat++) {
+				var theta = lat * Math.PI / 180;
+				var sinTheta = Math.sin(theta);
+				var cosTheta = Math.cos(theta);
+				var x = dsize * Math.cos(phi) * sinTheta;
+				var y = dsize * cosTheta;
+				var z = dsize * Math.sin(phi) * sinTheta;
+				posArray.push(x, y, z);
+				if(lat < 360)
+					idxArray.push(idx, idx+1);
+				idx++;
+			}
 
-			self.idxBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.idxBuffer);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idxArray), gl.STATIC_DRAW);
-			self.idxBuffer.itemSize = 1;
-			self.idxBuffer.numItems = idxArray.length;
-		}
-	}
-
-	this.newpos = newpos;
-	function newpos(p) {
-		if(gl) {
-			self.pos = p;
-			var posArray = [self.pos[0], self.pos[1], self.pos[2]];
-			var idxArray = [0];
+			/* draw a lat line over home, represents East-West */
+			var vx = vectorFromLatLon(self.lat, self.lon);
+			var vy = [vx[0], vx[1], vx[2]];
+			var vz = vectorFromLatLon(0, self.lon+90);
+			vec3.cross(vy, vz);
+			vec3.normalize(vy);
+			var m = mat4.create();
+			mat4.identity(m);
+			for(var i = 0; i < 3; i++) m[i] = vx[i];
+			for(var i = 0; i < 3; i++) m[i+4] = vy[i];
+			for(var i = 0; i < 3; i++) m[i+8] = vz[i];
+			for (var lon = 0; lon <= 360; lon++) {
+				posArray.push(dsize*m[0], dsize*m[1], dsize*m[2]);
+				mat4.rotate(m, Math.PI/180, [0, 1, 0]);
+				if(lon < 360)
+					idxArray.push(idx, idx+1);
+				idx++;
+			}
 
 			self.posBuffer = gl.createBuffer();
 			gl.bindBuffer(gl.ARRAY_BUFFER, self.posBuffer);
@@ -305,11 +323,12 @@ Home.prototype.draw = function() {
 
 	gl.uniform1i(shader.uselighting, 0);
 	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, earthMatrix);
-	gl.uniform1f(shader.pointSize, 10.0);
+	gl.uniform1f(shader.pointSize, 4.0);
 	gl.uniform1i(shader.monochromatic, 1);
 	gl.uniform3f(shader.monoColor, 0.0, 1.0, 0.0);
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
 	gl.vertexAttribPointer(shader.vertexPositionAttribute, this.posBuffer.itemSize, gl.FLOAT, false, 0, 0);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.idxBuffer);
-	gl.drawElements(gl.POINTS, this.idxBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+	gl.drawElements(gl.POINTS, 1, gl.UNSIGNED_SHORT, 0);
+	gl.drawElements(gl.LINES, this.idxBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 }
