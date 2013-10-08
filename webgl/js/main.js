@@ -744,8 +744,8 @@ function WebGl() {
 				if(e.target.parentNode.className == "toggle p1")
 					return;
 				e.target.parentNode.className = "toggle p1";
-				list1title.innerText="Categories";
-				list2title.innerText="Satellites";
+				list1title.innerHTML="Categories";
+				list2title.innerHTML="Satellites";
 				grpallnone.style.display="block";
 				satallnone.style.display="block";
 				list2.removeEventListener("click", home.refresh);
@@ -754,8 +754,8 @@ function WebGl() {
 				if(e.target.parentNode.className == "toggle p2")
 					return;
 				e.target.parentNode.className = "toggle p2";
-				list1title.innerText="Countries";
-				list2title.innerText="Cities";
+				list1title.innerHTML="Countries";
+				list2title.innerHTML="Cities";
 				grpallnone.style.display="none";
 				satallnone.style.display="none";
 				satarray.group.saveList();

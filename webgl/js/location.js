@@ -84,7 +84,7 @@ Country.prototype.loadList = function() {
 				homebase.city_obj = c;
 				homebase.city_elem = e.target;
 				homebase.city_elem.className = "listitem select";
-				homedisplay.innerText = c.name;
+				homedisplay.innerHTML = c.name;
 				c.select = true;
 			}
 		}
@@ -177,7 +177,7 @@ function LocationList(file) {
 				}
 				country.addCity(l[1], parseFloat(l[2]), parseFloat(l[3]), iscity);
 				if(iscity)
-					homedisplay.innerText = l[1];
+					homedisplay.innerHTML = l[1];
 			}
 		}
 		request.send();
