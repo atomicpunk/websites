@@ -9,12 +9,12 @@
 
 var display = {
 	spaceview: true,
-	earth: false,
+	earth: true,
 	moon: true,
 	stars: true,
 	sun: true,
 	sat: true,
-	initmenu: false
+	initmenu: true
 };
 
 var loading = 0;
@@ -704,8 +704,10 @@ function WebGl() {
 
         shader.textureCoordAttribute = gl.getAttribLocation(shader, "aTextureCoord");
         shader.vertexNormalAttribute = gl.getAttribLocation(shader, "aVertexNormal");
+		shader.vertexColorAttribute = gl.getAttribLocation(shader, "aVertexColor");
         gl.enableVertexAttribArray(shader.textureCoordAttribute);
         gl.enableVertexAttribArray(shader.vertexNormalAttribute);
+		gl.enableVertexAttribArray(shader.vertexColorAttribute);
 
         shader.pMatrixUniform = gl.getUniformLocation(shader, "uPMatrix");
         shader.mvMatrixUniform = gl.getUniformLocation(shader, "uMVMatrix");
@@ -798,6 +800,7 @@ function WebGl() {
 
 		gl.enableVertexAttribArray(shader.textureCoordAttribute);
 		gl.enableVertexAttribArray(shader.vertexNormalAttribute);
+		gl.disableVertexAttribArray(shader.vertexColorAttribute);
 
 		if(stardata && display.stars) stardata.draw(starMatrix);
 		if(sundata && display.sun) sundata.draw(starMatrix);
@@ -809,7 +812,8 @@ function WebGl() {
 
 		if(satarray) satarray.draw(earthMatrix);
 
-		home.draw();
+		gl.enableVertexAttribArray(shader.vertexColorAttribute);
+		home.draw(earthMatrix);
 	}
 
 	var lastframe = 0;

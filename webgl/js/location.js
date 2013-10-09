@@ -226,35 +226,53 @@ function Home() {
 		self.lon = homepos[1];
 		if(povchange)
 			povLatLon(self.lat, self.lon);
-		self.pos = posFromLatLon(self.lat, self.lon);
 		self.vec = vectorFromLatLon(self.lat, self.lon);
+		self.pos = posFromVector(self.vec);
 		if(aristotle) initVectors(aristotle);
 
 		if(gl) {
-			/* points at earth center, home city, and above home city */
-			var posArray = [self.pos[0], self.pos[1], self.pos[2],
-							0, 0, 0,
-							self.pos[0]*1.2, self.pos[1]*1.2, self.pos[2]*1.2];
-			var idxArray = [0, 1, 0, 2];
+			/* home city marker */
+			var mh = 1.4;
+			var posArray = [0, 0, 0,
+				self.pos[0], self.pos[1], self.pos[2],
+				self.pos[0]*mh, self.pos[1]*mh, self.pos[2]*mh];
+			var colorArray = [];
+			var idxArray = [0, 1, 1, 2];
+			colorArray.push(1.0, 0.0, 0.0, 0.0,
+							0.5, 1.0, 1.0, 1.0,
+							1.0, 1.0, 1.0, 0.0);
 
-			/* draw a lon line over home, represents North-South */
-			var dsize = earthsize * 0.9999;
+			/* North-South marker lines*/
+			var cns = [0.0, 1.0, 1.0, 0.0];
+			var crossradius = 10;
+			var cv = 1.0/crossradius;
+			var bounds = [180-crossradius, 180+crossradius];
+			var dsize = earthsize * 1.002;
 			var idx = 3;
 			var phi = (180 - self.lon) * Math.PI / 180;
-			for (var lat = 0; lat <= 360; lat++) {
-				var theta = lat * Math.PI / 180;
+			for (var lat = bounds[0]; lat <= bounds[1]; lat++) {
+				var theta = (lat - self.lat - 90) * Math.PI / 180;
 				var sinTheta = Math.sin(theta);
 				var cosTheta = Math.cos(theta);
 				var x = dsize * Math.cos(phi) * sinTheta;
 				var y = dsize * cosTheta;
 				var z = dsize * Math.sin(phi) * sinTheta;
 				posArray.push(x, y, z);
-				if(lat < 360)
+				if(lat <= 180) {
+					cns[3] += cv;
+					cns[2] -= cv*0.5;
+				} else {
+					cns[3] -= cv;
+					cns[2] += cv*0.5;
+				}
+				colorArray.push(cns[0], cns[1], cns[2], cns[3]);
+				if(lat < bounds[1])
 					idxArray.push(idx, idx+1);
 				idx++;
 			}
 
-			/* draw a lat line over home, represents East-West */
+			/* East-West marker lines*/
+			var cew = [0.0, 1.0, 1.0, 0.0];
 			var vx = vectorFromLatLon(self.lat, self.lon);
 			var vy = [vx[0], vx[1], vx[2]];
 			var vz = vectorFromLatLon(0, self.lon+90);
@@ -265,10 +283,20 @@ function Home() {
 			for(var i = 0; i < 3; i++) m[i] = vx[i];
 			for(var i = 0; i < 3; i++) m[i+4] = vy[i];
 			for(var i = 0; i < 3; i++) m[i+8] = vz[i];
-			for (var lon = 0; lon <= 360; lon++) {
+			if(bounds[0] > 0)
+				mat4.rotate(m, (1+bounds[0]/180)*Math.PI, [0, 1, 0]);
+			for (var lon = bounds[0]; lon <= bounds[1]; lon++) {
 				posArray.push(dsize*m[0], dsize*m[1], dsize*m[2]);
+				if(lon <= 180) {
+					cew[3] += cv;
+					cew[2] -= cv*0.5;
+				} else {
+					cew[3] -= cv;
+					cew[2] += cv*0.5;
+				}
+				colorArray.push(cew[0], cew[1], cew[2], cew[3]);
 				mat4.rotate(m, Math.PI/180, [0, 1, 0]);
-				if(lon < 360)
+				if(lon < bounds[1])
 					idxArray.push(idx, idx+1);
 				idx++;
 			}
@@ -279,6 +307,12 @@ function Home() {
 			self.posBuffer.itemSize = 3;
 			self.posBuffer.numItems = posArray.length/3;
 
+			self.colBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, self.colBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorArray), gl.STATIC_DRAW);
+			self.colBuffer.itemSize = 4;
+			self.colBuffer.numItems = colorArray.length/4;
+
 			self.idxBuffer = gl.createBuffer();
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, self.idxBuffer);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idxArray), gl.STATIC_DRAW);
@@ -287,13 +321,11 @@ function Home() {
 		}
 	}
 
-	function posFromLatLon(latitude, longitude) {
+	function posFromVector(vec) {
 		var pos = [];
-		var lat = (90 - latitude)*Math.PI/180;
-		var lon = (180 - longitude)*Math.PI/180;
-		pos[0] = earthsize*Math.cos(lon)*Math.sin(lat);
-		pos[1] = earthsize*Math.cos(lat);
-		pos[2] = earthsize*Math.sin(lon)*Math.sin(lat);
+		pos[0] = earthsize*vec[0];
+		pos[1] = earthsize*vec[1];
+		pos[2] = earthsize*vec[2];
 		return pos;
 	}
 
@@ -307,10 +339,6 @@ function Home() {
 		return vec;
 	}
 
-	function posOpposite(pos) {
-		return [-pos[0], -pos[1], -pos[2]];
-	}
-
 	this.povLatLon = povLatLon;
 	function povLatLon(latitude, longitude) {
 		povAlt = (latitude)*Math.PI/180;
@@ -318,17 +346,16 @@ function Home() {
 	}
 }
 
-Home.prototype.draw = function() {
+Home.prototype.draw = function(bodyMatrix) {
 	if(loading > 0 || failure) return;
 
 	gl.uniform1i(shader.uselighting, 0);
-	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, earthMatrix);
-	gl.uniform1f(shader.pointSize, 4.0);
-	gl.uniform1i(shader.monochromatic, 1);
-	gl.uniform3f(shader.monoColor, 0.0, 1.0, 0.0);
+	gl.uniformMatrix4fv(shader.mvMatrixUniform, false, bodyMatrix);
+	gl.uniform1i(shader.monochromatic, 3);
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer);
 	gl.vertexAttribPointer(shader.vertexPositionAttribute, this.posBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.colBuffer);
+	gl.vertexAttribPointer(shader.vertexColorAttribute, this.colBuffer.itemSize, gl.FLOAT, false, 0, 0);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.idxBuffer);
-	gl.drawElements(gl.POINTS, 1, gl.UNSIGNED_SHORT, 0);
 	gl.drawElements(gl.LINES, this.idxBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 }
