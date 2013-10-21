@@ -43,92 +43,6 @@ body {
     background: url(../images/krugereyes.jpg) no-repeat;
 }
 
-#lefteye {
-    position: absolute;
-    top: 173px;
-    left: 677px;
-    height: 77px;
-    width: 103px;
-    background-repeat: no-repeat;
-    background-image: url(../art/eyes/images/lefteye.png);
-    -webkit-animation: lefteye_anim 30s linear infinite;
-}
-
-@-webkit-keyframes lefteye_anim {
-    0% { background-image:url(../art/eyes/images/lefteye.png);}
-    16.67% { background-image:url(../art/eyes/images/lefteye_blue.png);}
-    33.33% { background-image:url(../art/eyes/images/lefteye_violet.png);}
-    50% { background-image:url(../art/eyes/images/lefteye_red.png);}
-    66.67% { background-image:url(../art/eyes/images/lefteye_orange.png);}
-    83.33% { background-image:url(../art/eyes/images/lefteye_yellow.png);}
-    100% { background-image:url(../art/eyes/images/lefteye.png);}
-}
-
-#righteye {
-    position: absolute;
-    top: 163px;
-    left: 1192px;
-    height: 75px;
-    width: 105px;
-    background-repeat: no-repeat;
-    background-image: url(../art/eyes/images/righteye.png);
-    -webkit-animation: righteye_anim 30s linear infinite;
-}
-
-@-webkit-keyframes righteye_anim {
-    0% { background-image:url(../art/eyes/images/righteye.png);}
-    16.67% { background-image:url(../art/eyes/images/righteye_blue.png);}
-    33.33% { background-image:url(../art/eyes/images/righteye_violet.png);}
-    50% { background-image:url(../art/eyes/images/righteye_red.png);}
-    66.67% { background-image:url(../art/eyes/images/righteye_orange.png);}
-    83.33% { background-image:url(../art/eyes/images/righteye_yellow.png);}
-    100% { background-image:url(../art/eyes/images/righteye.png);}
-}
-
-#hair_left {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    height: 360px;
-    width: 752px;
-    background-repeat: no-repeat;
-    background-image: url(../images/hair_left3.png);
-    -webkit-animation: hair_left_anim 50s linear infinite;
-    opacity: 1;
-}
-
-@-webkit-keyframes hair_left_anim {
-    0% { background-image:url(../images/hair_left3.png);}
-    16.67% { background-image:url(../images/hair_left_copper3.png);}
-    33.33% { background-image:url(../images/hair_left_red3.png);}
-    50% { background-image:url(../images/hair_left_violet3.png);}
-    66.67% { background-image:url(../images/hair_left_red3.png);}
-    83.33% { background-image:url(../images/hair_left_copper3.png);}
-    100% { background-image:url(../images/hair_left3.png);}
-}
-
-#hair_right {
-    position: absolute;
-    top: 0px;
-    left: 1403px;
-    height: 360px;
-    width: 517px;
-    background-repeat: no-repeat;
-    background-image: url(../images/hair_right3.png);
-    -webkit-animation: hair_right_anim 50s linear infinite;
-    opacity: 1;
-}
-
-@-webkit-keyframes hair_right_anim {
-    0% { background-image:url(../images/hair_right3.png);}
-    16.67% { background-image:url(../images/hair_right_copper3.png);}
-    33.33% { background-image:url(../images/hair_right_red3.png);}
-    50% { background-image:url(../images/hair_right_violet3.png);}
-    66.67% { background-image:url(../images/hair_right_red3.png);}
-    83.33% { background-image:url(../images/hair_right_copper3.png);}
-    100% { background-image:url(../images/hair_right3.png);}
-}
-
 #familyarchives {
     background: url(../images/brandt.jpg) no-repeat;
 }
@@ -231,15 +145,19 @@ a {
 }
 
 a:link {
-    color: #d7d7d7;
+    color: white;
 }
 
 a:visited {
-    color: #d7d7d7;
+    color: white;
 }
 
 a:active {
     color: red;
+}
+
+a:hover {
+    color: #8888f8;
 }
 
 /* -------------------------------- fonts ----------------------------- */
