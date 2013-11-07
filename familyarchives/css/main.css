@@ -56,14 +56,10 @@ a {
     width: 546px;
     margin-left: auto;
     margin-right: auto;
-    opacity: 0;
     background-image: url(../images/brandtengineering.jpg);
     -webkit-transition: opacity 1s;
     -moz-transition: opacity 1s;
     border: 2px solid white;
-}
-#sign:hover {
-    opacity: 1;
 }
 
 #titlediv {
