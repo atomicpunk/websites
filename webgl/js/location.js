@@ -242,13 +242,35 @@ function Home() {
 							0.5, 1.0, 1.0, 1.0,
 							1.0, 1.0, 1.0, 0.0);
 
+			/* telescope direction vector */
+			var alt = 45;
+			var azi = 45;
+			var vx = vectorFromLatLon(self.lat, self.lon);
+			var vy = [vx[0], vx[1], vx[2]];
+			var vz = vectorFromLatLon(0, self.lon+90);
+			vec3.cross(vy, vz);
+			vec3.normalize(vy);
+			var m = mat4.create();
+			mat4.identity(m);
+			for(var i = 0; i < 3; i++) m[i] = vx[i];
+			for(var i = 0; i < 3; i++) m[i+4] = vy[i];
+			for(var i = 0; i < 3; i++) m[i+8] = vz[i];
+			//mat4.translate(m, [earthsize, 0, 0]);
+			//mat4.rotate(m, (azi/180)*Math.PI, [1, 0, 0]);
+			//mat4.rotate(m, (alt/180)*Math.PI, [0, 0, 1]);
+			posArray.push(self.pos[0], self.pos[1], self.pos[2],
+				m[12], m[13], m[14]);
+			idxArray.push(3, 4);
+			colorArray.push(1.0, 0.0, 0.0, 1.0,
+							1.0, 0.0, 0.0, 1.0);
+
 			/* North-South marker lines*/
 			var cns = [0.0, 1.0, 1.0, 0.0];
 			var crossradius = 10;
 			var cv = 1.0/crossradius;
 			var bounds = [180-crossradius, 180+crossradius];
 			var dsize = earthsize * 1.002;
-			var idx = 3;
+			var idx = 5;
 			var phi = (180 - self.lon) * Math.PI / 180;
 			for (var lat = bounds[0]; lat <= bounds[1]; lat++) {
 				var theta = (lat - self.lat - 90) * Math.PI / 180;
