@@ -18,33 +18,33 @@ function Panorama(idx) {
 	 *  A0 is the top of the image in degrees from straight up (90 is horizon)
 	 *  dA is total vertical span of the panorama (180 degrees max)
 	 */
+	var pidx = idx;
 	var pano = [
 		{'src' : 'toddshouse_500m_1000_June24_private.jpg', 'A0' : 66, 'dA' : 114, 'lon' : 180 },
 		{'src' : 'toddshouse_500m_1000_June28_private.jpg', 'A0' : 66, 'dA' : 114, 'lon' : 120 },
 		{'src' : 'toddshouse_150m_1000_private.jpg', 		'A0' : 66, 'dA' : 114, 'lon' : 180 },
 		{'src' : 'toddshouse_150m_1600_private.jpg', 		'A0' : 66, 'dA' : 114, 'lon' : 180 },
 		{'src' : 'toddshouse_500m_1250_private.jpg', 		'A0' : 66, 'dA' : 114, 'lon' : 130 },
-		{'src' : 'toddshouse_305m_1s8_private.jpg', 		'A0' : 65, 'dA' : 115, 'lon' : 200 },
 		{'src' : 'toddshouse_385m_1600_private.jpg', 		'A0' : 64, 'dA' : 116, 'lon' : 180 },
 		{'src' : 'toddshouse_500m_400_private.jpg', 		'A0' : 64, 'dA' : 115, 'lon' : 85 },
 		{'src' : 'toddshouse_500m_640_private.jpg', 		'A0' : 65, 'dA' : 114, 'lon' : 120 },
 		{'src' : 'toddshouse_500m_800_private.jpg', 		'A0' : 65, 'dA' : 115, 'lon' : 120 },
+		{'src' : 'toddshouse_500m_1000_june14_private.jpg', 'A0' : 66, 'dA' : 114, 'lon' : 180 },
+		{'src' : 'toddshouse_500m_1000_june14_wb_private.jpg','A0' : 66, 'dA' : 114, 'lon' : 180 },
 		{'src' : 'amberglen_455m_1600_private.jpg', 		'A0' : 65, 'dA' : 115, 'lon' : 170 },
+		{'src' : 'cpassNskyline_500m_iso200_1000_private.jpg', 'A0' : 68, 'dA' : 112, 'lon' : 0 },
+		{'src' : 'toddshouse_305m_1s8_private.jpg', 		'A0' : 65, 'dA' : 115, 'lon' : 200 }, //13
 		{'src' : 'toddshouse_150m_1s4_private.jpg', 		'A0' : 85, 'dA' : 95, 'lon' : 180 },
 		{'src' : 'toddshouse_090m_1s4_private.jpg', 		'A0' : 86, 'dA' : 94, 'lon' : 180 },
 		{'src' : 'toddshouse_245m_1s8_private.jpg', 		'A0' : 79, 'dA' : 101, 'lon' : 190 },
-		{'src' : 'toddshouse_500m_1000_june14_private.jpg', 'A0' : 67, 'dA' : 75, 'lon' : 170 },
-		{'src' : 'Drone_Panorama_alt1500ft_private.jpg', 	'A0' : 76, 'dA' : 50},
+		{'src' : 'toddshouse_500m_1s5_private.jpg', 		'A0' : 75, 'dA' : 90},
+		{'src' : 'toddshouse_500m_1s5_wb_private.jpg', 		'A0' : 75, 'dA' : 90}, //18
 		{'src' : 'morning_sunshine_bright_private.jpg', 	'A0' : 75, 'dA' : 60},
 		{'src' : 'toddshouse_235m_1s4_private.jpg', 		'A0' : 80, 'dA' : 65},
 		{'src' : 'toddshouse_245m_1s4_private.jpg', 		'A0' : 70, 'dA' : 60},
-		{'src' : 'toddshouse_500m_1000_private.jpg', 		'A0' : 60, 'dA' : 80},
-		{'src' : 'toddshouse_500m_1000_wb_private.jpg', 	'A0' : 60, 'dA' : 80},
 		{'src' : 'toddshouse_500m_1s1_private.jpg', 		'A0' : 70, 'dA' : 70},
-		{'src' : 'toddshouse_500m_1s5_private.jpg', 		'A0' : 75, 'dA' : 90},
-		{'src' : 'toddshouse_500m_1s5_wb_private.jpg', 		'A0' : 75, 'dA' : 90},
-		{'src' : 'amberglen_095m_1s4_private.jpg', 			'A0' : 59, 'dA' : 80},
-		{'src' : 'amberglen_160m_2s5_private.jpg', 			'A0' : 60, 'dA' : 70},
+		{'src' : 'amberglen_095m_1s4_private.jpg', 			'A0' : 64, 'dA' : 82},
+		{'src' : 'amberglen_160m_2s5_private.jpg', 			'A0' : 63, 'dA' : 70},
 		{'src' : 'parknight_243m__private.jpg', 			'A0' : 75, 'dA' : 60},
 		{'src' : 'parknight_244m__private.jpg', 			'A0' : 75, 'dA' : 60},
 		{'src' : 'parknight_264m_1s_private.jpg', 			'A0' : 75, 'dA' : 60},
@@ -53,10 +53,9 @@ function Panorama(idx) {
 		{'src' : 'skylineblvd_345m_12_private.jpg', 		'A0' : 60, 'dA' : 90},
 		{'src' : 'skylineblvd_380m_12_private.jpg', 		'A0' : 59, 'dA' : 85},
 	];
-	var pidx = idx;
 	var manualControl = false;
 	var longitude = 0;
-	var latitude = 0;
+	var latitude = -20;
 	var savedX;
 	var savedY;
 	var savedLongitude;
@@ -106,7 +105,7 @@ function Panorama(idx) {
 		document.addEventListener("mousedown", onDocumentMouseDown, false);
 		document.addEventListener("mousemove", onDocumentMouseMove, false);
 		document.addEventListener("mouseup", onDocumentMouseUp, false);
-		//document.addEventListener("keyup", onDocumentKeyUp, false);
+		document.addEventListener("keyup", onDocumentKeyUp, false);
 		document.addEventListener("mousewheel", onDocumentMouseWheel, false);
 		document.addEventListener("DOMMouseScroll", onDocumentMouseWheel, false);
 
@@ -116,9 +115,9 @@ function Panorama(idx) {
 	function render(){
 		requestAnimationFrame(render);
 				
-		//if(!manualControl){
-		//	longitude += 0.01;
-		//}
+		if(!manualControl){
+			longitude += 0.01;
+		}
 
 		// limiting latitude from -85 to 85 (cannot point to the sky or under your feet)
 		latitude = Math.max(90-pano[pidx]['A0']-pano[pidx]['dA'], Math.min(0, latitude));
@@ -177,7 +176,7 @@ function Panorama(idx) {
 
 window.addEventListener('load', function () {
 	"use strict";
-	var idx = 2;
+	var idx = 0;
 	var query = window.location.search.substring(1);
 	if(query) {
 		query = query.split('&');
