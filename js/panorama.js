@@ -11,6 +11,7 @@
  */
 
 var pano = [
+	{'src' : 'toddshouse_073m_iso200_800.jpg', 		'A0' : 76, 'dA' : 104, 'lon' : 0 },
 	{'src' : 'toddshouse_080m_iso1600_6s10_private.jpg', 'A0' : 68, 'dA' : 112, 'lon' : 0 },
 	{'src' : 'toddshouse_021m_iso400_20_private.jpg', 'A0' : 66, 'dA' : 114, 'lon' : 0 },
 	{'src' : 'toddshouse_051m_iso1600_4s25_private.jpg', 'A0' : 66, 'dA' : 114, 'lon' : 0 },
