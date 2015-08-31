@@ -15,10 +15,120 @@ body {
 	-moz-user-select: none;
 }
 
+.chord {
+	height: 50px;
+	width: 100%;
+	margin-bottom: 5px;
+}
+
 .keyboard {
+	position: absolute;
 	height: 50px;
 	width: 100%;
 	background: url(../images/keyboard.svg) no-repeat;
 	background-size: 100% 50px;
-	margin-bottom: 5px;
 }
+
+.wkey {
+	position: absolute;
+	height: 50px;
+	width: 1.923076923%;
+	background-color: blue;
+	z-index: -1;
+}
+.wkey.n0 { margin-left: 0.039050% }
+.wkey.n1 { margin-left: 1.959050% }
+.wkey.n2 { margin-left: 3.879050% }
+.wkey.n3 { margin-left: 5.799050% }
+.wkey.n4 { margin-left: 7.719050% }
+.wkey.n5 { margin-left: 9.639050% }
+.wkey.n6 { margin-left: 11.559050% }
+.wkey.n7 { margin-left: 13.479050% }
+.wkey.n8 { margin-left: 15.399050% }
+.wkey.n9 { margin-left: 17.319050% }
+.wkey.n10 { margin-left: 19.239050% }
+.wkey.n11 { margin-left: 21.159050% }
+.wkey.n12 { margin-left: 23.079050% }
+.wkey.n13 { margin-left: 24.999050% }
+.wkey.n14 { margin-left: 26.919050% }
+.wkey.n15 { margin-left: 28.839050% }
+.wkey.n16 { margin-left: 30.759050% }
+.wkey.n17 { margin-left: 32.679050% }
+.wkey.n18 { margin-left: 34.599050% }
+.wkey.n19 { margin-left: 36.519050% }
+.wkey.n20 { margin-left: 38.439050% }
+.wkey.n21 { margin-left: 40.359050% }
+.wkey.n22 { margin-left: 42.279050% }
+.wkey.n23 { margin-left: 44.199050% }
+.wkey.n24 { margin-left: 46.119050% }
+.wkey.n25 { margin-left: 48.039050% }
+.wkey.n26 { margin-left: 49.959050% }
+.wkey.n27 { margin-left: 51.879050% }
+.wkey.n28 { margin-left: 53.799050% }
+.wkey.n29 { margin-left: 55.719050% }
+.wkey.n30 { margin-left: 57.639050% }
+.wkey.n31 { margin-left: 59.559050% }
+.wkey.n32 { margin-left: 61.479050% }
+.wkey.n33 { margin-left: 63.399050% }
+.wkey.n34 { margin-left: 65.319050% }
+.wkey.n35 { margin-left: 67.239050% }
+.wkey.n36 { margin-left: 69.159050% }
+.wkey.n37 { margin-left: 71.079050% }
+.wkey.n38 { margin-left: 72.999050% }
+.wkey.n39 { margin-left: 74.919050% }
+.wkey.n40 { margin-left: 76.839050% }
+.wkey.n41 { margin-left: 78.759050% }
+.wkey.n42 { margin-left: 80.679050% }
+.wkey.n43 { margin-left: 82.599050% }
+.wkey.n44 { margin-left: 84.519050% }
+.wkey.n45 { margin-left: 86.439050% }
+.wkey.n46 { margin-left: 88.359050% }
+.wkey.n47 { margin-left: 90.279050% }
+.wkey.n48 { margin-left: 92.199050% }
+.wkey.n49 { margin-left: 94.119050% }
+.wkey.n50 { margin-left: 96.039050% }
+.wkey.n51 { margin-left: 97.959050% }
+
+.bkey {
+	position: absolute;
+	height: 33px;
+	width: 0.93%;
+	background-color: blue;
+	z-index: 2;
+}
+.bkey.n0 { margin-left: 1.535511% }
+.bkey.n1 { margin-left: 5.375511% }
+.bkey.n2 { margin-left: 7.295511% }
+.bkey.n3 { margin-left: 11.135511% }
+.bkey.n4 { margin-left: 13.055511% }
+.bkey.n5 { margin-left: 14.975511% }
+.bkey.n6 { margin-left: 18.815511% }
+.bkey.n7 { margin-left: 20.735511% }
+.bkey.n8 { margin-left: 24.575511% }
+.bkey.n9 { margin-left: 26.495511% }
+.bkey.n10 { margin-left: 28.415511% }
+.bkey.n11 { margin-left: 32.255511% }
+.bkey.n12 { margin-left: 34.175511% }
+.bkey.n13 { margin-left: 38.015511% }
+.bkey.n14 { margin-left: 39.935511% }
+.bkey.n15 { margin-left: 41.855511% }
+.bkey.n16 { margin-left: 45.695511% }
+.bkey.n17 { margin-left: 47.615511% }
+.bkey.n18 { margin-left: 51.455511% }
+.bkey.n19 { margin-left: 53.375511% }
+.bkey.n20 { margin-left: 55.295511% }
+.bkey.n21 { margin-left: 59.135511% }
+.bkey.n22 { margin-left: 61.055511% }
+.bkey.n23 { margin-left: 64.895511% }
+.bkey.n24 { margin-left: 66.815511% }
+.bkey.n25 { margin-left: 68.735511% }
+.bkey.n26 { margin-left: 72.575511% }
+.bkey.n27 { margin-left: 74.495511% }
+.bkey.n28 { margin-left: 78.335511% }
+.bkey.n29 { margin-left: 80.255511% }
+.bkey.n30 { margin-left: 82.175511% }
+.bkey.n31 { margin-left: 86.015511% }
+.bkey.n32 { margin-left: 87.935511% }
+.bkey.n33 { margin-left: 91.775511% }
+.bkey.n34 { margin-left: 93.695511% }
+.bkey.n35 { margin-left: 95.615511% }
