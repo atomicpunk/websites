@@ -36,6 +36,15 @@ body {
 	background-color: blue;
 	z-index: -1;
 }
+
+.bkey {
+	position: absolute;
+	height: 33px;
+	width: 0.93%;
+	background-color: blue;
+	z-index: 2;
+}
+
 .wkey.n0 { margin-left: 0.039050% }
 .wkey.n1 { margin-left: 1.959050% }
 .wkey.n2 { margin-left: 3.879050% }
@@ -88,14 +97,6 @@ body {
 .wkey.n49 { margin-left: 94.119050% }
 .wkey.n50 { margin-left: 96.039050% }
 .wkey.n51 { margin-left: 97.959050% }
-
-.bkey {
-	position: absolute;
-	height: 33px;
-	width: 0.93%;
-	background-color: blue;
-	z-index: 2;
-}
 .bkey.n0 { margin-left: 1.535511% }
 .bkey.n1 { margin-left: 5.375511% }
 .bkey.n2 { margin-left: 7.295511% }
