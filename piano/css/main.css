@@ -16,32 +16,32 @@ body {
 }
 
 .chord {
-	height: 50px;
+	height: 23px;
 	width: 100%;
-	margin-bottom: 5px;
+	border-bottom: solid 1px black;
 }
 
 .keyboard {
 	position: absolute;
-	height: 50px;
+	height: 23px;
 	width: 100%;
 	background: url(../images/keyboard.svg) no-repeat;
-	background-size: 100% 50px;
+	background-size: 100% 23px;
 }
 
 .wkey {
 	position: absolute;
-	height: 50px;
+	height: 23px;
 	width: 1.923076923%;
-	background-color: blue;
+	background-color: black;
 	z-index: -1;
 }
 
 .bkey {
 	position: absolute;
-	height: 33px;
+	height: 15px;
 	width: 0.93%;
-	background-color: blue;
+	background-color: black;
 	z-index: 2;
 }
 
