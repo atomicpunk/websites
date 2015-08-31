@@ -91,10 +91,9 @@ function showScore(data) {
 	}
 }
 
-function readMidiFile(input) {
-	console.log(input.files[0]);
+function loadMidiFile(file) {
 	var reader = new FileReader();
-	reader.readAsArrayBuffer(input.files[0]);
+	reader.readAsArrayBuffer(file);
 	reader.onloadend=function(event) {
 		midiFile=new MIDIFile(event.target.result);
 		var m=midiFile.getMidiEvents();
@@ -115,7 +114,21 @@ function readMidiFile(input) {
 	}
 }
 
+function localMidiFile(input) {
+	$('#score').empty();
+	loadMidiFile(input.files[0]);
+}
+
 function onload() {
 	"use strict";
+	var midifile = 'midi/beethoven/Sonata_Pathetique_2.mid';
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', midifile, true);
+	xhr.responseType = 'blob';
+	xhr.onload = function(e) {
+		if (this.status == 200)
+			loadMidiFile(this.response);
+	};
+	xhr.send();
 }
 $(document).ready(onload);
